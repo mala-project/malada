@@ -12,4 +12,4 @@ class CrystalStructureProvider(Provider):
             raise Exception("Currently there is no way to provide a cif file"
                             "on the fly.")
         else:
-            return cif_file
+            print("Getting <<crystal_structure>>.cif file from disc.")
