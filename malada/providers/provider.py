@@ -16,5 +16,5 @@ class Provider:
         self.parameters = parameters
 
     @abstractmethod
-    def provide(self):
+    def provide(self, provider_path):
         pass
