@@ -5,6 +5,7 @@ from shutil import copyfile
 import ase
 import ase.io
 
+import malada
 from malada.utils.convergence_guesses import *
 from malada.utils.custom_converter import *
 from malada.utils.vasp_utils import VaspUtils
@@ -32,14 +33,21 @@ class DFTConvergenceProvider(Provider):
                     "_" + self.parameters.dft_calculator+".conv.xml"
         self.supercell_file = os.path.join(provider_path, file_name)
 
+        # Instantiate a runner.
+        dft_runner = malada.BashRunner()
+
         # Check if there exist results or if we have to work from scratch.
         if self.external_convergence_results is None:
             if self.external_convergence_folder is None:
                 # In this case we have to run convergence calculations.
                 # First: cutoffs.
-                self.__create_dft_convergence_inputs("cutoff", supercell_file,
-                                                     provider_path)
-
+                cutoff_folders = self.\
+                    __create_dft_convergence_inputs("cutoff", supercell_file,
+                                                    provider_path)
+                for cutoff_folder in cutoff_folders:
+                    print("Running DFT in", cutoff_folder)
+                    dft_runner.run_folder(cutoff_folder,
+                                          self.parameters.dft_calculator)
 
             else:
                 pass # TODO: Write analysis here.
@@ -93,6 +101,7 @@ class DFTConvergenceProvider(Provider):
             kpoints = (1, 1, 1)
 
         # Create files for submission.
+        converge_folder_list = []
         for entry in converge_list:
             if parameters_to_converge == "kpoints":
                 kpoints = entry
@@ -100,9 +109,9 @@ class DFTConvergenceProvider(Provider):
                 cutoff = entry
             this_folder = self.__make_convergence_folder(kpoints, cutoff,
                                                          working_directory)
-
+            converge_folder_list.append(this_folder)
             qe_pseudopotentials = {self.parameters.element :
-                                   self.parameters.pseudopotential["path"]}
+                                   self.parameters.pseudopotential["name"]}
             nbands = int(self.parameters.number_of_atoms *
                          self.parameters.pseudopotential["valence_electrons"]
                          * 1.05)
@@ -161,6 +170,8 @@ class DFTConvergenceProvider(Provider):
                              "vasp")
                 VaspUtils.write_to_incar(this_folder, "INCAR", vasp_input_data)
                 VaspUtils.write_to_kpoints(this_folder, "KPOINTS", kpoints)
+
+        return converge_folder_list
 
     def __make_convergence_folder(self, kgrid, cutoff, base_folder):
             if self.parameters.dft_calculator == "qe":

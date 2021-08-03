@@ -9,4 +9,5 @@ class Parameters:
         self.base_folder = "./"
         self.dft_calculator = "qe"
         # TODO: Get number of electrons directly from file.
-        self.pseudopotential = {"path": None, "valence_electrons": 0}
+        self.pseudopotential = {"path": None, "valence_electrons": 0,
+                                "name": None}
