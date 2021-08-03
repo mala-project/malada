@@ -1,15 +1,28 @@
 import os
-from malada.utils.convergence_guesses import *
+import numpy as np
 
-class DFTConvergenceProvider:
+from shutil import copyfile
+import ase
+import ase.io
+
+from malada.utils.convergence_guesses import *
+from malada.utils.custom_converter import *
+from malada.utils.vasp_utils import VaspUtils
+from .provider import Provider
+
+
+class DFTConvergenceProvider(Provider):
     """For a given supercell and calculator, determine convergence."""
 
-    def __init__(self, parameters, external_convergence_results,
-                 external_convergence_folder):
+    def __init__(self, parameters, external_convergence_results = None,
+                 external_convergence_folder = None):
         super(DFTConvergenceProvider, self).__init__(parameters)
         self.parameters = parameters
         self.external_convergence_results = external_convergence_results
         self.external_convergence_folder = external_convergence_folder
+        self.convergence_results_file = None
+        self.converged_cutoff = None
+        self.converged_kgrid = None
 
     def provide(self, provider_path, supercell_file):
         file_name = self.parameters.element + \
@@ -31,82 +44,83 @@ class DFTConvergenceProvider:
             else:
                 pass # TODO: Write analysis here.
         else:
-            copyfile(self.external_cif_file, self.supercell_file)
-            print("Getting <<supercell>>.vasp file from disc.")
+            copyfile(self.external_convergence_results,
+                     self.convergence_results_file)
+            print("Getting <<convergence_results>>.pkl file from disc.")
+
+    def __check_input_correctness(self, atoms):
+        # Check if what we read made sense (assuming there was specified
+        # user input.)
+        if self.parameters.element is not None \
+                and self.parameters.number_of_atoms is not None:
+            if not np.all(
+                    atoms.get_atomic_numbers() ==
+                    atoms.get_atomic_numbers()):
+                raise Exception(
+                    "Mismatch between user input and provided file.")
+            if atoms.get_chemical_symbols()[0] != \
+                    self.parameters.element:
+                raise Exception(
+                    "Mismatch between user input and provided file.")
+            if len(atoms) != self.parameters.number_of_atoms:
+                raise Exception(
+                    "Mismatch between user input and provided file.")
+
 
     def __create_dft_convergence_inputs(self, parameters_to_converge, posfile,
                                         working_directory):
         atoms_Angstrom = ase.io.read(posfile, format="vasp")
+        self.__check_input_correctness(atoms_Angstrom)
 
-        # Check if what we read made sense (assuming there was specified user input.)
-        if element is not None and number_of_atoms is not None:
-            if not np.all(
-                    atoms_Angstrom.get_atomic_numbers() ==
-                    atoms_Angstrom.get_atomic_numbers()):
-                raise Exception(
-                    "Mismatch between user input and provided file.")
-            if atoms_Angstrom.get_chemical_symbols()[0] != \
-                    self.parameters.element:
-                raise Exception(
-                    "Mismatch between user input and provided file.")
-            if len(atoms_Angstrom) != self.parameters.number_of_atoms:
-                raise Exception(
-                    "Mismatch between user input and provided file.")
         # This is needed for QE.
         scaling = int(np.round(
             atoms_Angstrom.cell.cellpar()[0] / atoms_Angstrom.cell.cellpar()[
                 1]))
 
         # Determine parameters to converge.
-        if parameter_to_converge == "kpoints":
-            if self.parameters.element == "Fe":
-                basic_list = []
-                converge_list = []
-                for i in basic_list:
-                    converge_list.append((i * scaling, i, i))
-            if self.parameters.element == "Be":
-                basic_list = []
-                converge_list = []
-                for i in basic_list:
-                    converge_list.append((i * scaling, i, i))
+        converge_list = []
+        if parameters_to_converge == "kpoints":
+            if self.parameters.dft_calculator == "qe":
+                converge_list = kpoints_guesses[self.parameters.element]
+            elif self.parameters.dft_calculator == "vasp":
+                converge_list = kpoints_guesses[self.parameters.element]
+            cutoff = self.converged_cutoff
         else:
-            if self.parameters.element == "Fe":
-                if calculator == "qe":
-                    converge_list = cutoff_guesses_qe["Fe"]
-                elif calculator == "vasp":
-                    converge_list = cutoff_guesses_vasp["Fe"]
-                kpoints = (1, 1, 1)
-            if self.parameters.element == "Be":
-                converge_list = [40, 50, 60, 70]
-                kpoints = (1, 1, 1)
+            if self.parameters.dft_calculator == "qe":
+                converge_list = cutoff_guesses_qe[self.parameters.element]
+            elif self.parameters.dft_calculator == "vasp":
+                converge_list = cutoff_guesses_vasp[self.parameters.element]
+            kpoints = (1, 1, 1)
+
         # Create files for submission.
         for entry in converge_list:
-            if parameter_to_converge == "kpoints":
+            if parameters_to_converge == "kpoints":
                 kpoints = entry
             else:
                 cutoff = entry
-                kpoints = (1, 1, 1)
-            this_folder = self.__make_convergence_folder(kpoints, cutoff, base_folder,
-                                                  calculator)
+            this_folder = self.__make_convergence_folder(kpoints, cutoff,
+                                                         working_directory)
 
             qe_pseudopotentials = {self.parameters.element :
                                    self.parameters.pseudopotential["path"]}
-            nbands = int(self.parameters.number_of_atoms*
+            nbands = int(self.parameters.number_of_atoms *
                          self.parameters.pseudopotential["valence_electrons"]
-                         *1.05)
+                         * 1.05)
 
+            # Get the run parameters.
+            # TODO: Find some metric for the mixing!
             mixing = 0.1
             qe_input_data = {
                 "occupations": 'smearing',
                 "calculation": 'scf',
                 "restart_mode": 'from_scratch',
-                "prefix": element,
-                "pseudo_dir": pspath,
-                "outdir": base_data_folder,
+                "prefix": self.parameters.element,
+                "pseudo_dir": self.parameters.pseudopotential["path"],
+                "outdir": "temp",
                 "ibrav": 0,
                 "smearing": 'fermi-dirac',
-                "degauss": round(get_smearing_from_temperature(temperature),
-                                 7),
+                "degauss": round(kelvin_to_rydberg(
+                                 self.parameters.temperature), 7),
                 "ecutrho": cutoff * 4,
                 "ecutwfc": cutoff,
                 "tstress": True,
@@ -114,7 +128,7 @@ class DFTConvergenceProvider:
                 "nbnd": nbands,
                 "mixing_mode": "plain",
                 "mixing_beta": mixing,
-                "conv_thr": 1e-6 * number_of_atoms,
+                "conv_thr": 1e-6 * self.parameters.number_of_atoms,
                 "nosym": True,
                 "noinv": True
             }
@@ -122,26 +136,31 @@ class DFTConvergenceProvider:
             vasp_input_data = {
                 "ISTART": 0,
                 "ENCUT": str(cutoff) + " eV",
-                "EDIFF": 1e-6 * number_of_atoms * ase.units.Rydberg,
+                "EDIFF": 1e-6 * self.parameters.number_of_atoms *
+                                ase.units.Rydberg,
                 "ISMEAR": -1,
-                "SIGMA": round(get_smearing_from_temperature(
-                    temperature) * ase.units.Rydberg, 7),
+                "SIGMA": round(kelvin_to_eV(
+                               self.parameters.temperature) *
+                               ase.units.Rydberg, 7),
                 "ISYM": 0,
                 "NBANDS": nbands,
                 "LREAL": "A",
             }
 
-            if calculator == "qe":
-                ase.io.write(this_folder + element + ".pw.scf.in",
+            # Write the convergence files.
+            if self.parameters.dft_calculator == "qe":
+                ase.io.write(this_folder + self.parameters.element
+                             + ".pw.scf.in",
                              atoms_Angstrom,
                              "espresso-in", input_data=qe_input_data,
                              pseudopotentials= \
-                                 qe_pseudopotentials, kpts=kpoints)
-            elif calculator == "vasp":
+                             qe_pseudopotentials, kpts=kpoints)
+
+            elif self.parameters.dft_calculator == "vasp":
                 ase.io.write(this_folder + "POSCAR", atoms_Angstrom,
                              "vasp")
-                write_to_incar(this_folder, "INCAR", vasp_input_data)
-                write_to_kpoints(this_folder, "KPOINTS", kpoints)
+                VaspUtils.write_to_incar(this_folder, "INCAR", vasp_input_data)
+                VaspUtils.write_to_kpoints(this_folder, "KPOINTS", kpoints)
 
     def __make_convergence_folder(self, kgrid, cutoff, base_folder):
             if self.parameters.dft_calculator == "qe":
