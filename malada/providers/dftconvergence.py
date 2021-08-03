@@ -1,9 +1,11 @@
 import os
 import numpy as np
+import glob
 
 from shutil import copyfile
 import ase
 import ase.io
+from ase.units import Rydberg
 
 import malada
 from malada.utils.convergence_guesses import *
@@ -41,15 +43,30 @@ class DFTConvergenceProvider(Provider):
             if self.external_convergence_folder is None:
                 # In this case we have to run convergence calculations.
                 # First: cutoffs.
+                # Create, run and analyze.
                 cutoff_folders = self.\
                     __create_dft_convergence_inputs("cutoff", supercell_file,
                                                     provider_path)
-                for cutoff_folder in cutoff_folders:
-                    print("Running DFT in", cutoff_folder)
-                    dft_runner.run_folder(cutoff_folder,
-                                          self.parameters.dft_calculator)
+                # for cutoff_folder in cutoff_folders:
+                #     print("Running DFT in", cutoff_folder)
+                #     dft_runner.run_folder(cutoff_folder,
+                #                           self.parameters.dft_calculator)
+                self.converged_cutoff = self.__analyze_convergence_runs(provider_path, "cutoff",
+                                                                        fixed_kpoints=(1, 1, 1))
+                kpoints_folders = self. \
+                    __create_dft_convergence_inputs("kpoints", supercell_file,
+                                                    provider_path)
+                # for kpoint_folder in kpoints_folders:
+                #     print("Running DFT in", kpoint_folder)
+                #     dft_runner.run_folder(kpoint_folder,
+                #                           self.parameters.dft_calculator)
+                self.converged_kgrid = self.__analyze_convergence_runs(provider_path,
+                                                                       "kpoints",
+                                                                        fixed_cutoff=self.converged_cutoff)
 
+                print(self.converged_cutoff, self.converged_kgrid)
             else:
+                # In this case we just have to run the analysis on the folder.
                 pass # TODO: Write analysis here.
         else:
             copyfile(self.external_convergence_results,
@@ -88,10 +105,8 @@ class DFTConvergenceProvider(Provider):
         # Determine parameters to converge.
         converge_list = []
         if parameters_to_converge == "kpoints":
-            if self.parameters.dft_calculator == "qe":
-                converge_list = kpoints_guesses[self.parameters.element]
-            elif self.parameters.dft_calculator == "vasp":
-                converge_list = kpoints_guesses[self.parameters.element]
+            for grids in kpoints_guesses[self.parameters.element]:
+                converge_list.append(self.__k_edge_length_to_grid(grids))
             cutoff = self.converged_cutoff
         else:
             if self.parameters.dft_calculator == "qe":
@@ -174,14 +189,101 @@ class DFTConvergenceProvider(Provider):
         return converge_folder_list
 
     def __make_convergence_folder(self, kgrid, cutoff, base_folder):
-            if self.parameters.dft_calculator == "qe":
-                folder_name = str(cutoff) + "Ry_k" + str(kgrid[0]) + str(
-                    kgrid[1]) + str(kgrid[2]) + "/"
-            elif self.parameters.dft_calculator == "vasp":
-                folder_name = str(cutoff) + "eV_k" + str(kgrid[0]) + str(
-                    kgrid[1]) + str(kgrid[2]) + "/"
-            this_folder = os.path.join(base_folder, folder_name)
-            if not os.path.exists(this_folder):
-                os.makedirs(this_folder)
-            return this_folder
+        if self.parameters.dft_calculator == "qe":
+            folder_name = str(cutoff) + "Ry_k" + str(kgrid[0]) + str(
+                kgrid[1]) + str(kgrid[2]) + "/"
+        elif self.parameters.dft_calculator == "vasp":
+            folder_name = str(cutoff) + "eV_k" + str(kgrid[0]) + str(
+                kgrid[1]) + str(kgrid[2]) + "/"
+        this_folder = os.path.join(base_folder, folder_name)
+        if not os.path.exists(this_folder):
+            os.makedirs(this_folder)
+        return this_folder
 
+    def __analyze_convergence_runs(self, base_folder, parameter_to_converge,
+                                  fixed_cutoff=None, fixed_kpoints=None):
+
+        # First, parse the results out of the output files.
+        result_list = []
+        if parameter_to_converge == "cutoff":
+            converge_list = glob.glob(os.path.join(base_folder,
+                                      "*Ry_k"+str(fixed_kpoints[0]) +
+                                      str(fixed_kpoints[1]) +
+                                      str(fixed_kpoints[2])))
+        elif parameter_to_converge == "kpoints":
+            converge_list = glob.glob(os.path.join(base_folder,
+                                                   str(fixed_cutoff)+"Ry_k*"))
+        else:
+            raise Exception("Unknown convergence parameter.")
+
+        for entry in converge_list:
+            if self.parameters.dft_calculator == "qe":
+                if parameter_to_converge == "cutoff":
+                   argument = int(os.path.basename(entry).split("Ry")[0])
+                elif parameter_to_converge == "kpoints":
+                    argument = (int((os.path.basename(entry).split("k")[1])[0]),
+                                int((os.path.basename(entry).split("k")[1])[1]),
+                                int((os.path.basename(entry).split("k")[1])[2]))
+                convergence_file_lists = glob.glob(os.path.join(entry,
+                                                   "*.out"))
+                if len(convergence_file_lists) != 1:
+                    print(convergence_file_lists)
+                    raise Exception("Run folder with ambigous content.")
+                energy = self.__get_qe_energy(convergence_file_lists[0])
+
+            elif self.parameters.dft_calculator == "vasp":
+                argument = int(os.path.basename(entry).split("eV")[0])
+                energy = self.__get_vasp_energy(os.path.join(entry,
+                                                               "OUTCAR"))
+            else:
+                raise Exception("Unknown calculator chosen.")
+            result_list.append([argument, energy])
+        result_list = sorted(result_list, key=lambda d: [d[0]])
+
+        # Next, analyze the convergence.
+        for i in range(1, len(result_list)):
+            if np.abs(result_list[i][1] - result_list[i-1][1]) < self.\
+                    parameters.dft_accuracy_meVperatom:
+                if best_param is not None:
+                    break
+                else:
+                    best_param = result_list[i - 1][0]
+            else:
+                best_param = None
+        return best_param
+
+    def __get_qe_energy(self, file):
+        energy = np.nan
+        convergence_achieved = True
+        with open(file, "r") as f:
+            ll = f.readlines()
+            for l in ll:
+                if "total energy" in l and "is F=E-TS" not in l:
+                    energy = float((l.split('=')[1]).split('Ry')[0])
+                if "convergence NOT achieved" in l or "oom-kill" in l or\
+                        "CANCELLED" in l or "BAD TERMINATION" in l:
+                    convergence_achieved = False
+        if convergence_achieved is False:
+            raise Exception("Convergence was not achieved at", file)
+
+        return float((energy * Rydberg * 1000)/self.parameters.number_of_atoms)
+
+    def __get_vasp_energy(self, file):
+        energy = np.nan
+        convergence_achieved = True
+        found_end = False
+        with open(file, "r") as f:
+            ll = f.readlines()
+            for l in ll:
+                if "FREE ENERGIE" in l:
+                    found_end = True
+                if "TOTEN" in l and found_end:
+                    energy = float((l.split('=')[1]).split('eV')[0])
+        if convergence_achieved is False:
+            raise Exception("Convergence was not achieved at", file)
+
+        return float((energy * 1000)/self.parameters.number_of_atoms)
+
+    def __k_edge_length_to_grid(self, edge_length):
+        # TODO: Reflect geometry here.
+        return (edge_length, edge_length, edge_length)

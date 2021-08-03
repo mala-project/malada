@@ -11,3 +11,4 @@ class Parameters:
         # TODO: Get number of electrons directly from file.
         self.pseudopotential = {"path": None, "valence_electrons": 0,
                                 "name": None}
+        self.dft_accuracy_meVperatom = 1
