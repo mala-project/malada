@@ -44,26 +44,35 @@ class DFTConvergenceProvider(Provider):
                 # In this case we have to run convergence calculations.
                 # First: cutoffs.
                 # Create, run and analyze.
+                cutoff_try = 0
+                kpoint_try = 0
                 cutoff_folders = self.\
                     __create_dft_convergence_inputs("cutoff", supercell_file,
-                                                    provider_path)
+                                                    provider_path, cutoff_try)
                 # for cutoff_folder in cutoff_folders:
                 #     print("Running DFT in", cutoff_folder)
                 #     dft_runner.run_folder(cutoff_folder,
                 #                           self.parameters.dft_calculator)
                 self.converged_cutoff = self.__analyze_convergence_runs(provider_path, "cutoff",
                                                                         fixed_kpoints=(1, 1, 1))
-                kpoints_folders = self. \
-                    __create_dft_convergence_inputs("kpoints", supercell_file,
-                                                    provider_path)
-                # for kpoint_folder in kpoints_folders:
-                #     print("Running DFT in", kpoint_folder)
-                #     dft_runner.run_folder(kpoint_folder,
-                #                           self.parameters.dft_calculator)
-                self.converged_kgrid = self.__analyze_convergence_runs(provider_path,
-                                                                       "kpoints",
-                                                                        fixed_cutoff=self.converged_cutoff)
 
+                while (self.converged_kgrid is None and kpoint_try
+                       < self.parameters.maximum_kpoint_try):
+                    kpoints_folders = self. \
+                        __create_dft_convergence_inputs("kpoints", supercell_file,
+                                                        provider_path, kpoint_try)
+                    for kpoint_folder in kpoints_folders:
+                        print("Running DFT in", kpoint_folder)
+                        dft_runner.run_folder(kpoint_folder,
+                                              self.parameters.dft_calculator)
+                    self.converged_kgrid = self.__analyze_convergence_runs(provider_path,
+                                                                           "kpoints",
+                                                                            fixed_cutoff=self.converged_cutoff)
+                    if self.converged_kgrid is None:
+                        print("Could not find an aedaquate k-grid, trying again"
+                              "with larger k-grids. This will be try nr. "
+                              +str(kpoint_try+1))
+                    kpoint_try += 1
                 print(self.converged_cutoff, self.converged_kgrid)
             else:
                 # In this case we just have to run the analysis on the folder.
@@ -93,7 +102,7 @@ class DFTConvergenceProvider(Provider):
 
 
     def __create_dft_convergence_inputs(self, parameters_to_converge, posfile,
-                                        working_directory):
+                                        working_directory, try_number):
         atoms_Angstrom = ase.io.read(posfile, format="vasp")
         self.__check_input_correctness(atoms_Angstrom)
 
@@ -105,8 +114,14 @@ class DFTConvergenceProvider(Provider):
         # Determine parameters to converge.
         converge_list = []
         if parameters_to_converge == "kpoints":
-            for grids in kpoints_guesses[self.parameters.element]:
-                converge_list.append(self.__k_edge_length_to_grid(grids))
+            if try_number == 0:
+                for grids in kpoints_guesses[self.parameters.element]:
+                    converge_list.append(self.__k_edge_length_to_grid(grids))
+            else:
+                spacing = kpoints_guesses[self.parameters.element][-1]-\
+                          kpoints_guesses[self.parameters.element][-2]
+                converge_list.append(self.__k_edge_length_to_grid(kpoints_guesses[self.parameters.element][-1]+spacing*try_number))
+                converge_list.append(self.__k_edge_length_to_grid(kpoints_guesses[self.parameters.element][-1]+spacing*(try_number+1)))
             cutoff = self.converged_cutoff
         else:
             if self.parameters.dft_calculator == "qe":
@@ -152,7 +167,7 @@ class DFTConvergenceProvider(Provider):
                 "nbnd": nbands,
                 "mixing_mode": "plain",
                 "mixing_beta": mixing,
-                "conv_thr": 1e-6 * self.parameters.number_of_atoms,
+                "conv_thr": self.parameters.dft_scf_accuracy_per_atom * self.parameters.number_of_atoms,
                 "nosym": True,
                 "noinv": True
             }
