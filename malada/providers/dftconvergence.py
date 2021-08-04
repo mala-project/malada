@@ -46,16 +46,26 @@ class DFTConvergenceProvider(Provider):
                 # Create, run and analyze.
                 cutoff_try = 0
                 kpoint_try = 0
-                cutoff_folders = self.\
-                    __create_dft_convergence_inputs("cutoff", supercell_file,
-                                                    provider_path, cutoff_try)
-                # for cutoff_folder in cutoff_folders:
-                #     print("Running DFT in", cutoff_folder)
-                #     dft_runner.run_folder(cutoff_folder,
-                #                           self.parameters.dft_calculator)
-                self.converged_cutoff = self.__analyze_convergence_runs(provider_path, "cutoff",
-                                                                        fixed_kpoints=(1, 1, 1))
+                while (self.converged_cutoff is None and cutoff_try
+                       < self.parameters.maximum_cutoff_try):
 
+                    cutoff_folders = self.\
+                        __create_dft_convergence_inputs("cutoff", supercell_file,
+                                                        provider_path, cutoff_try)
+                    for cutoff_folder in cutoff_folders:
+                        print("Running DFT in", cutoff_folder)
+                        dft_runner.run_folder(cutoff_folder,
+                                              self.parameters.dft_calculator)
+                    self.converged_cutoff = self.__analyze_convergence_runs(provider_path, "cutoff",
+                                                                            fixed_kpoints=(1, 1, 1))
+                    if self.converged_cutoff is None:
+                        print("Could not find an aedaquate cutoff energy, trying again"
+                              "with larger cutoff energies. This will be try nr. "
+                              +str(cutoff_try+2))
+                    cutoff_try += 1
+
+                # Second: cutoffs.
+                # Create, run and analyze.
                 while (self.converged_kgrid is None and kpoint_try
                        < self.parameters.maximum_kpoint_try):
                     kpoints_folders = self. \
@@ -71,9 +81,10 @@ class DFTConvergenceProvider(Provider):
                     if self.converged_kgrid is None:
                         print("Could not find an aedaquate k-grid, trying again"
                               "with larger k-grids. This will be try nr. "
-                              +str(kpoint_try+1))
+                              +str(kpoint_try+2))
                     kpoint_try += 1
-                print(self.converged_cutoff, self.converged_kgrid)
+                print("Converged energy cutoff: ",self.converged_cutoff)
+                print("Converged k-grid: ", self.converged_kgrid)
             else:
                 # In this case we just have to run the analysis on the folder.
                 pass # TODO: Write analysis here.
@@ -120,14 +131,37 @@ class DFTConvergenceProvider(Provider):
             else:
                 spacing = kpoints_guesses[self.parameters.element][-1]-\
                           kpoints_guesses[self.parameters.element][-2]
-                converge_list.append(self.__k_edge_length_to_grid(kpoints_guesses[self.parameters.element][-1]+spacing*try_number))
-                converge_list.append(self.__k_edge_length_to_grid(kpoints_guesses[self.parameters.element][-1]+spacing*(try_number+1)))
+                converge_list.append(self.__k_edge_length_to_grid(kpoints_guesses[self.parameters.element][-1]+spacing*(try_number-1)*2+1))
+                converge_list.append(self.__k_edge_length_to_grid(kpoints_guesses[self.parameters.element][-1]+spacing*(try_number-1)*2+2))
             cutoff = self.converged_cutoff
         else:
             if self.parameters.dft_calculator == "qe":
                 converge_list = cutoff_guesses_qe[self.parameters.element]
+                if try_number == 0:
+                    converge_list = cutoff_guesses_qe[self.parameters.element]
+                else:
+                    spacing = cutoff_guesses_qe[self.parameters.element][-1] - \
+                              cutoff_guesses_qe[self.parameters.element][-2]
+                    converge_list.append(
+                        cutoff_guesses_qe[self.parameters.element][
+                            -1] + spacing * (try_number - 1) * 2 + 1)
+                    converge_list.append(
+                        cutoff_guesses_qe[self.parameters.element][
+                            -1] + spacing * (try_number - 1) * 2 + 2)
+
             elif self.parameters.dft_calculator == "vasp":
                 converge_list = cutoff_guesses_vasp[self.parameters.element]
+                if try_number == 0:
+                    converge_list = cutoff_guesses_vasp[self.parameters.element]
+                else:
+                    spacing = cutoff_guesses_vasp[self.parameters.element][-1] - \
+                              cutoff_guesses_vasp[self.parameters.element][-2]
+                    converge_list.append(
+                        cutoff_guesses_vasp[self.parameters.element][
+                            -1] + spacing * (try_number - 1) * 2 + 1)
+                    converge_list.append(
+                        cutoff_guesses_vasp[self.parameters.element][
+                            -1] + spacing * (try_number - 1) * 2 + 2)
             kpoints = (1, 1, 1)
 
         # Create files for submission.
@@ -167,7 +201,7 @@ class DFTConvergenceProvider(Provider):
                 "nbnd": nbands,
                 "mixing_mode": "plain",
                 "mixing_beta": mixing,
-                "conv_thr": self.parameters.dft_scf_accuracy_per_atom * self.parameters.number_of_atoms,
+                "conv_thr": self.parameters.dft_scf_accuracy_per_atom_Ry * self.parameters.number_of_atoms,
                 "nosym": True,
                 "noinv": True
             }
@@ -256,9 +290,12 @@ class DFTConvergenceProvider(Provider):
         result_list = sorted(result_list, key=lambda d: [d[0]])
 
         # Next, analyze the convergence.
+        print("Convergence results for: ", parameter_to_converge)
         for i in range(1, len(result_list)):
+            print(result_list[i-1][0], result_list[i][0],
+                  np.abs(result_list[i][1] - result_list[i-1][1]))
             if np.abs(result_list[i][1] - result_list[i-1][1]) < self.\
-                    parameters.dft_accuracy_meVperatom:
+                    parameters.dft_conv_accuracy_meVperatom:
                 if best_param is not None:
                     break
                 else:
@@ -273,7 +310,8 @@ class DFTConvergenceProvider(Provider):
         with open(file, "r") as f:
             ll = f.readlines()
             for l in ll:
-                if "total energy" in l and "is F=E-TS" not in l:
+                if "total energy" in l and "is F=E-TS" not in l and \
+                    "is the sum of" not in l:
                     energy = float((l.split('=')[1]).split('Ry')[0])
                 if "convergence NOT achieved" in l or "oom-kill" in l or\
                         "CANCELLED" in l or "BAD TERMINATION" in l:
