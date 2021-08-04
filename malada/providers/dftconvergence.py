@@ -6,6 +6,8 @@ from shutil import copyfile
 import ase
 import ase.io
 from ase.units import Rydberg
+from xml.etree.ElementTree import Element, SubElement, Comment, tostring
+from xml.dom import minidom
 
 import malada
 from malada.utils.convergence_guesses import *
@@ -29,11 +31,11 @@ class DFTConvergenceProvider(Provider):
 
     def provide(self, provider_path, supercell_file):
         file_name = self.parameters.element + \
-                    "_" + str(self.parameters.number_of_atoms) + \
+                    str(self.parameters.number_of_atoms) + \
                     "_" + self.parameters.crystal_structure +\
                     "_" + str(self.parameters.temperature) +\
                     "_" + self.parameters.dft_calculator+".conv.xml"
-        self.supercell_file = os.path.join(provider_path, file_name)
+        self.convergence_results_file = os.path.join(provider_path, file_name)
 
         # Instantiate a runner.
         dft_runner = malada.BashRunner()
@@ -59,8 +61,9 @@ class DFTConvergenceProvider(Provider):
                     self.converged_cutoff = self.__analyze_convergence_runs(provider_path, "cutoff",
                                                                             fixed_kpoints=(1, 1, 1))
                     if self.converged_cutoff is None:
-                        print("Could not find an aedaquate cutoff energy, trying again"
-                              "with larger cutoff energies. This will be try nr. "
+                        print("Could not find an aedaquate cutoff energy, "
+                              "trying again with larger cutoff energies. "
+                              "This will be try nr. "
                               +str(cutoff_try+2))
                     cutoff_try += 1
 
@@ -83,15 +86,72 @@ class DFTConvergenceProvider(Provider):
                               "with larger k-grids. This will be try nr. "
                               +str(kpoint_try+2))
                     kpoint_try += 1
-                print("Converged energy cutoff: ",self.converged_cutoff)
-                print("Converged k-grid: ", self.converged_kgrid)
             else:
-                # In this case we just have to run the analysis on the folder.
-                pass # TODO: Write analysis here.
+                # TODO: Add a sanity check here. It could be the provided
+                # folder does not match!
+                print("Reading precalculated convergence results.")
+                # Analyze the convergence analsyis.
+                # First: cutoffs.
+                self.converged_cutoff = self.__analyze_convergence_runs(self.external_convergence_folder, "cutoff",
+                                                                        fixed_kpoints=(1, 1, 1))
+                if self.converged_cutoff is None:
+                    raise Exception("Provided convergence data not sufficient,"
+                                    "please perform additional calculations"
+                                    " with larger k-grids.")
+
+                # Second: cutoffs.
+                self.converged_kgrid = self.__analyze_convergence_runs(self.external_convergence_folder,
+                                                                       "kpoints",
+                                                                        fixed_cutoff=self.converged_cutoff)
+                if self.converged_kgrid is None:
+                    raise Exception("Provided convergence data not sufficient,"
+                                    "please perform additional calculations"
+                                    " with larger k-grids.")
         else:
             copyfile(self.external_convergence_results,
                      self.convergence_results_file)
-            print("Getting <<convergence_results>>.pkl file from disc.")
+            print("Getting <<convergence_results>>.xml file from disc.")
+
+        # Print the output.
+        unit = "eV" if self.parameters.dft_calculator == "vasp" else "Ry"
+        print("Converged energy cutoff: ", self.converged_cutoff, unit)
+        print("Converged k-grid: ", self.converged_kgrid)
+
+        # Write the output to xml.
+        self.__write_to_xml()
+
+    def __write_to_xml(self):
+        top = Element('dftparameters')
+        calculationparameters = SubElement(top, "calculationparameters")
+        cpnode = SubElement(calculationparameters, "element",
+                            {"type": "string"})
+        cpnode.text = self.parameters.element
+        cpnode = SubElement(calculationparameters, "number_of_atoms",
+                          {"type": "int"})
+        cpnode.text = str(self.parameters.number_of_atoms)
+        cpnode = SubElement(calculationparameters, "crystal_structure",
+                                  {"type": "string"})
+        cpnode.text = self.parameters.crystal_structure
+        cpnode = SubElement(calculationparameters, "temperature",
+                                  {"type": "float"})
+        cpnode.text = str(self.parameters.temperature)
+        cpnode = SubElement(calculationparameters, "dft_calculator",
+                                  {"type": "string"})
+        cpnode.text = self.parameters.dft_calculator
+        cutoff = SubElement(top, "cutoff_energy", {'type': "int"})
+        cutoff.text = str(self.converged_cutoff)
+        kpoints = SubElement(top, "kpoints")
+        kx = SubElement(kpoints, "kx", {'type': "int"})
+        kx.text = str(self.converged_kgrid[0])
+        ky = SubElement(kpoints, "ky", {'type': "int"})
+        ky.text = str(self.converged_kgrid[1])
+        kz = SubElement(kpoints, "kz", {'type': "int"})
+        kz.text = str(self.converged_kgrid[2])
+        rough_string = tostring(top, 'utf-8')
+        reparsed = minidom.parseString(rough_string)
+        with open(self.convergence_results_file, "w") as f:
+            f.write(reparsed.toprettyxml(indent="  "))
+
 
     def __check_input_correctness(self, atoms):
         # Check if what we read made sense (assuming there was specified
@@ -110,7 +170,6 @@ class DFTConvergenceProvider(Provider):
             if len(atoms) != self.parameters.number_of_atoms:
                 raise Exception(
                     "Mismatch between user input and provided file.")
-
 
     def __create_dft_convergence_inputs(self, parameters_to_converge, posfile,
                                         working_directory, try_number):
