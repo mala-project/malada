@@ -26,8 +26,8 @@ class MDPerformanceProvider(Provider):
                 print("Using bash based run system, no MD performance "
                       "optimization possible or necessary.")
                 top = Element('mdperformanceparameters')
-                dummy = SubElement(top, "dummy", {'type': "int"})
-                dummy.text = "1"
+                dummy = SubElement(top, "nraise", {'type': "float"})
+                dummy.text = "0.001"
                 rough_string = tostring(top, 'utf-8')
                 reparsed = minidom.parseString(rough_string)
                 with open(self.md_performance_xml, "w") as f:

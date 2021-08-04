@@ -1,5 +1,5 @@
 from malada import CrystalStructureProvider, SuperCellProvider, \
-                   DFTConvergenceProvider, MDPerformanceProvider
+                   DFTConvergenceProvider, MDPerformanceProvider, MDProvider
 import os
 
 
@@ -11,6 +11,7 @@ class DataPipeline:
                  supercell_provider: SuperCellProvider = None,
                  dft_convergence_provider: DFTConvergenceProvider = None,
                  md_performance_provider: MDPerformanceProvider = None,
+                 md_provider: MDProvider = None,
                  ):
         self.parameters = parameters
 
@@ -35,6 +36,11 @@ class DataPipeline:
                 MDPerformanceProvider(self.parameters)
         else:
             self.md_performance_provider = md_performance_provider
+        if md_provider is None:
+            self.md_provider = \
+                MDProvider(self.parameters)
+        else:
+            self.md_provider = md_provider
 
     def run(self):
         # Step one: Get the crystal structure.
@@ -74,3 +80,13 @@ class DataPipeline:
                                              self.dft_convergence_provider.
                                              convergence_results_file)
         print("Testing MD performance: Done.")
+
+        # Step five: Get/Calculate a MD trajectory.
+        print("Getting MD trajectory...")
+        path04 = os.path.join(self.parameters.base_folder, "04_md")
+        if not os.path.exists(path04):
+            os.makedirs(path04)
+        self.md_provider.provide(path04, self.dft_convergence_provider.\
+                                 convergence_results_file, self.\
+                                 md_performance_provider.md_performance_xml)
+        print("Getting MD trajectory: Done.")

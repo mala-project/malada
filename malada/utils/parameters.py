@@ -15,3 +15,6 @@ class Parameters:
         self.maximum_cutoff_try = 2
         self.maximum_kpoint_try = 2
         self.dft_scf_accuracy_per_atom_Ry = 1e-6
+        self.md_at_gamma_point = True
+        self.maximum_number_of_timesteps = 100
+        self.time_step_fs = 1
