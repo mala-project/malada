@@ -1,13 +1,16 @@
-from malada import CrystalStructureProvider, SuperCellProvider, DFTConvergenceProvider
+from malada import CrystalStructureProvider, SuperCellProvider, \
+                   DFTConvergenceProvider, MDPerformanceProvider
 import os
+
 
 class DataPipeline:
     """Uses providers to run an entire data pipeline, ending with the LDOS."""
 
     def __init__(self, parameters,
-                 crystal_structure_provider:CrystalStructureProvider = None,
-                 supercell_provider:SuperCellProvider = None,
-                 dft_convergence_provider:DFTConvergenceProvider = None,
+                 crystal_structure_provider: CrystalStructureProvider = None,
+                 supercell_provider: SuperCellProvider = None,
+                 dft_convergence_provider: DFTConvergenceProvider = None,
+                 md_performance_provider: MDPerformanceProvider = None,
                  ):
         self.parameters = parameters
 
@@ -27,7 +30,11 @@ class DataPipeline:
                 DFTConvergenceProvider(self.parameters)
         else:
             self.dft_convergence_provider = dft_convergence_provider
-
+        if md_performance_provider is None:
+            self.md_performance_provider = \
+                MDPerformanceProvider(self.parameters)
+        else:
+            self.md_performance_provider = md_performance_provider
 
     def run(self):
         # Step one: Get the crystal structure.
@@ -57,3 +64,13 @@ class DataPipeline:
         self.dft_convergence_provider.provide(path02,
                                               self.supercell_provider.supercell_file)
         print("Converging DFT parameters: Done.")
+
+        # Step four: Get optimal MD run parameters.
+        print("Testing MD performance...")
+        path03 = os.path.join(self.parameters.base_folder, "03_md_performance")
+        if not os.path.exists(path03):
+            os.makedirs(path03)
+        self.md_performance_provider.provide(path03,
+                                             self.dft_convergence_provider.
+                                             convergence_results_file)
+        print("Testing MD performance: Done.")

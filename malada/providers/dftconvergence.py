@@ -6,7 +6,7 @@ from shutil import copyfile
 import ase
 import ase.io
 from ase.units import Rydberg
-from xml.etree.ElementTree import Element, SubElement, Comment, tostring
+from xml.etree.ElementTree import Element, SubElement, tostring
 from xml.dom import minidom
 
 import malada
@@ -19,8 +19,8 @@ from .provider import Provider
 class DFTConvergenceProvider(Provider):
     """For a given supercell and calculator, determine convergence."""
 
-    def __init__(self, parameters, external_convergence_results = None,
-                 external_convergence_folder = None):
+    def __init__(self, parameters, external_convergence_results=None,
+                 external_convergence_folder=None):
         super(DFTConvergenceProvider, self).__init__(parameters)
         self.parameters = parameters
         self.external_convergence_results = external_convergence_results
