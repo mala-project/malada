@@ -2,21 +2,26 @@ from .provider import Provider
 import os
 from shutil import copyfile
 import xml.etree.ElementTree as ET
-
-from ..utils import kelvin_to_rydberg
-
+import ase
+from ase.units import Rydberg
+import ase.io
+from ..utils import kelvin_to_rydberg, second_to_rydberg_time, kelvin_to_eV
+from malada.utils.vasp_utils import VaspUtils
+import malada
 
 class MDProvider(Provider):
     """Performs a DFT-MD calculation and provides an ASE trjactory.."""
     def __init__(self, parameters, external_trajectory=None,
-                 external_temperatures=None):
+                 external_temperatures=None, external_run_folder=None):
         super(MDProvider, self).__init__(parameters)
         self.external_trajectory = external_trajectory
         self.external_temperatures = external_temperatures
+        self.external_run_folder = external_run_folder
         self.trajectory_file = None
         self.temperature_file = None
 
-    def provide(self, provider_path, dft_convergence_file, md_performance_file):
+    def provide(self, provider_path, supercell_file, dft_convergence_file,
+                md_performance_file):
         file_name = self.parameters.element + \
                     str(self.parameters.number_of_atoms) + \
                     "_" + self.parameters.crystal_structure +\
@@ -26,9 +31,23 @@ class MDProvider(Provider):
         self.temperature_file = os.path.join(provider_path, file_name +
                                              ".temp.npy")
         if self.external_trajectory is None or self.external_temperatures is None:
-            # First, create MD inputs.
-            self.__create_md_run(dft_convergence_file, md_performance_file,
-                                 provider_path)
+            if self.external_run_folder is None:
+                # Here, we have to perform the MD first.
+                # First, create MD inputs.
+                self.__create_md_run(dft_convergence_file, md_performance_file,
+                                     supercell_file, provider_path)
+
+                # Run the MD calculation.
+                mdrunner = malada.BashRunner()
+                mdrunner.run_folder(provider_path,self.parameters.md_calculator,
+                                    qe_input_type="*.pw.md.in")
+                folder_to_parse = provider_path
+            else:
+                folder_to_parse = self.external_run_folder
+
+            # Now we parse the results.
+            self._qe_out_to_trajectory(folder_to_parse, self.trajectory_file)
+            self._qe_out_to_temperature(folder_to_parse, self.temperature_file)
 
         else:
             copyfile(self.external_trajectory, self.trajectory_file)
@@ -37,7 +56,7 @@ class MDProvider(Provider):
                   " files from disc.")
 
     def __create_md_run(self, dft_convergence_file, md_performance_file,
-                        base_path):
+                        posfile, base_path):
         cutoff, kgrid = self._read_convergence(dft_convergence_file)
         if self.parameters.md_at_gamma_point:
             kgrid = (1, 1, 1)
@@ -82,10 +101,10 @@ class MDProvider(Provider):
             "tempw": self.parameters.temperature,
             # Time step: In Ryberg atomic units.
             # For now: 1 fs
-            "dt": second_to_rydberg_time(1e-15),
+            "dt": second_to_rydberg_time(1e-15*self.parameters.time_step_fs),
             # Number of steps.
             # For now: 500.
-            "nstep": nstep,
+            "nstep": self.parameters.maximum_number_of_timesteps,
             # Control how the ionic dynamics are calculated.
             # I think we want verlet, which is also the default.
             "ion_dynamics": "verlet",
@@ -95,19 +114,17 @@ class MDProvider(Provider):
             # thermostat. It corresponds to tau/dt in e.g. eq. 1.12
             # of https://link.springer.com/content/pdf/10.1007%2F978-3-540-74686-7_1.pdf
             # By default it is 1, but I think we have to increase it a bit.
-            "nraise": nraise,
-            # To properly restart, the job needs to properly terminate.
-            # 200 Seconds as safety interval.
-            "max_seconds": (runtime_hours * 60 * 60) - 200
+            "nraise": 1#self.parameters.md_thermostat_controller,
         }
         vasp_input_data = {
             "ISTART": 0,
             "ENCUT": str(cutoff) + " eV",
-            "EDIFF": 1e-6 * number_atoms * ase.units.Rydberg,
+            "EDIFF": 1e-6 * self.parameters.number_of_atoms *
+                     ase.units.Rydberg,
             "ISMEAR": -1,
-            "SIGMA": round(
-                get_smearing_from_temperature(temperature) * ase.units.Rydberg,
-                7),
+            "SIGMA": round(kelvin_to_eV(
+                self.parameters.temperature) *
+                           ase.units.Rydberg, 7),
             "ISYM": 0,
             "NBANDS": nbands,
             "LREAL": "A",
@@ -119,8 +136,8 @@ class MDProvider(Provider):
             "PREC": "NORMAL",
             # Mixing algorithm, 48 is RMM-DIIS with preconditioning
             "IALGO": 48,
-            # Minimum number of electronic steps, the default is 2 and should be
-            # sligthly higher for MD runs.
+            # Minimum number of electronic steps, the default is 2 and should
+            # be sligthly higher for MD runs.
             "NELMIN": 6,
             # These are some missing parameters that Kushal and Mani used
             # and I am copying them because I assume they are beneficial for
@@ -134,13 +151,13 @@ class MDProvider(Provider):
             "NSW": 10000,
             # This enables the Nose Hoover thermostat, it is controlled by this
             # parameter
-            "SMASS": nraise,
+            "SMASS": self.parameters.md_thermostat_controller,
 
             # Time step in fs, we want 1 fs.
-            "POTIM": 1,
+            "POTIM": self.parameters.time_step_fs,
 
             # TEBEG: Initial temperature.
-            "TEBEG": temperature,
+            "TEBEG": self.parameters.temperature,
 
             # This surpresses large disk operations at the end of the run
             "LWAVE": ".FALSE.",
@@ -149,25 +166,20 @@ class MDProvider(Provider):
 
         }
 
-        if calculator == "qe":
-            posfile = "../00_Input_Configurations/convergence/" + element + "/" + str(
-                temperature) + "K/N" + str(number_atoms) + "/" + str(
-                cutoff) + "Ry_k" + kgrid_to_name(
-                kgrid) + "/" + element + ".pw.scf.in"
-            atoms_Angstrom = ase.io.read(posfile, format="espresso-in")
-            ase.io.write(this_folder + element + ".pw.md.in", atoms_Angstrom,
+        if self.parameters.dft_calculator == "qe":
+            atoms_Angstrom = ase.io.read(posfile, format="vasp")
+            ase.io.write(os.path.join(base_path, self.parameters.element
+                                      + ".pw.md.in"),
+                         atoms_Angstrom,
                          "espresso-in", input_data=qe_input_data,
                          pseudopotentials= \
                              qe_pseudopotentials, kpts=kgrid)
-        elif calculator == "vasp":
-            posfile = "../00_Input_Configurations/convergence/" + element + "/" + str(
-                temperature) + "K/N" + str(number_atoms) + "/" + str(
-                cutoff) + "eV_k" + kgrid_to_name(kgrid) + "/POSCAR"
+        elif self.parameters.dft_calculator == "vasp":
             atoms_Angstrom = ase.io.read(posfile, format="vasp")
-            ase.io.write(this_folder + "POSCAR", atoms_Angstrom,
+            ase.io.write(os.path.join(base_path, "POSCAR"), atoms_Angstrom,
                          "vasp")
-            ase.io.write(this_folder + "POSCAR_original", atoms_Angstrom,
+            ase.io.write(os.path.join(base_path, "POSCAR_original"), atoms_Angstrom,
                          "vasp")
-            write_to_incar(this_folder, "INCAR", vasp_input_data)
-            write_to_kpoints(this_folder, "KPOINTS", kgrid)
+            VaspUtils.write_to_incar(base_path, "INCAR", vasp_input_data)
+            VaspUtils.write_to_kpoints(base_path, "KPOINTS", kgrid)
 

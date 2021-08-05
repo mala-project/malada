@@ -8,6 +8,7 @@ class Parameters:
         self.element = None
         self.base_folder = "./"
         self.dft_calculator = "qe"
+        self.md_calculator = "qe"
         # TODO: Get number of electrons directly from file.
         self.pseudopotential = {"path": None, "valence_electrons": 0,
                                 "name": None}
@@ -16,5 +17,6 @@ class Parameters:
         self.maximum_kpoint_try = 2
         self.dft_scf_accuracy_per_atom_Ry = 1e-6
         self.md_at_gamma_point = True
-        self.maximum_number_of_timesteps = 100
+        self.maximum_number_of_timesteps = 10000
         self.time_step_fs = 1
+        self.md_thermostat_controller = 0.001

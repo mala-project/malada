@@ -86,7 +86,8 @@ class DataPipeline:
         path04 = os.path.join(self.parameters.base_folder, "04_md")
         if not os.path.exists(path04):
             os.makedirs(path04)
-        self.md_provider.provide(path04, self.dft_convergence_provider.\
-                                 convergence_results_file, self.\
+        self.md_provider.provide(path04, self.supercell_provider.supercell_file,
+                                 self.dft_convergence_provider.
+                                 convergence_results_file, self.
                                  md_performance_provider.md_performance_xml)
         print("Getting MD trajectory: Done.")

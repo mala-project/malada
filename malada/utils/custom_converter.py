@@ -10,3 +10,10 @@ def kelvin_to_rydberg(temperature_K):
 
 def kelvin_to_eV(temperature_K):
     return kelvin_to_rydberg(temperature_K) * ase.units.Rydberg
+
+
+def second_to_rydberg_time(time_s):
+    Ry_in_Joule = scipy.constants.Rydberg*scipy.constants.h*scipy.constants.c
+    t_0 = scipy.constants.hbar/Ry_in_Joule
+    return time_s / t_0
+
