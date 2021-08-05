@@ -3,6 +3,9 @@ import os
 from shutil import copyfile
 import xml.etree.ElementTree as ET
 
+from ..utils import kelvin_to_rydberg
+
+
 class MDProvider(Provider):
     """Performs a DFT-MD calculation and provides an ASE trjactory.."""
     def __init__(self, parameters, external_trajectory=None,
@@ -24,7 +27,8 @@ class MDProvider(Provider):
                                              ".temp.npy")
         if self.external_trajectory is None or self.external_temperatures is None:
             # First, create MD inputs.
-            self.__create_md_run(dft_convergence_file, md_performance_file)
+            self.__create_md_run(dft_convergence_file, md_performance_file,
+                                 provider_path)
 
         else:
             copyfile(self.external_trajectory, self.trajectory_file)
@@ -32,72 +36,31 @@ class MDProvider(Provider):
             print("Getting <<trajectory>>.traj and <<temperatures>>.temp.npy"
                   " files from disc.")
 
-    def __create_md_run(self, dft_convergence_file, md_performance_file):
-        self.__read_convergence(dft_convergence_file)
-        quit()
+    def __create_md_run(self, dft_convergence_file, md_performance_file,
+                        base_path):
+        cutoff, kgrid = self._read_convergence(dft_convergence_file)
+        if self.parameters.md_at_gamma_point:
+            kgrid = (1, 1, 1)
+            if self.parameters.dft_calculator == "qe":
+                kgrid = None
 
-        if calculator == "qe":
-            cutoff, kgrid = pickle.load(open("../00_Input_Configurations/"
-                                             "convergence_results/" + element + str(
-                number_atoms) + "_" \
-                                             + str(
-                temperature) + "K_conv_results.pkl", "rb"))
-        elif calculator == "vasp":
-            cutoff, kgrid = pickle.load(open("../00_Input_Configurations/"
-                                             "convergence_results/" + element + str(
-                number_atoms) + "_" \
-                                             + str(
-                temperature) + "K_conv_results_VASP.pkl", "rb"))
-
-        # We do MD only on the gamma point.
-        kgrid = (1, 1, 1)
-        if calculator == "qe":
-            kgrid = None
-
-        base_data_folder, module_string, partition_string, \
-        pspath, runner, number_of_tasks = \
-            cluster_setup(number_of_tasks, runtime_hours)
-
-        # Determine base folder to operate in.
-        base_folder = element + "/" + str(temperature) + "K/N" + str(
-            number_atoms) + "/"
-        folder_name = "MD" + run_number + "/"
-        try:
-            os.mkdir(base_folder + "/" + folder_name)
-        except FileExistsError:
-            pass
-        this_folder = base_folder + "/" + folder_name
-
-        # For pw.scf file
-        if element == "Fe":
-            qe_pseudopotentials = {"Fe": "Fe.pbe-n-rrkjus_psl.1.0.0.UPF"}
-            elec_per_atom = 8
-            # number of atoms * electrons per atom + some leeway
-            if number_atoms == 256:
-                nbands = 2200
-            elif number_atoms == 128:
-                nbands = 1110
-        if element == "Be":
-            qe_pseudopotentials = {"Be": "Be.pbe-n-rrkjus_psl.1.0.0.UPF"}
-            elec_per_atom = 2
-            # number of atoms * electrons per atom + some leeway
-            if number_atoms == 256:
-                nbands = 540
-            elif number_atoms == 128:
-                nbands = 270
+        qe_pseudopotentials = {self.parameters.element:
+                                   self.parameters.pseudopotential["name"]}
+        nbands = int(self.parameters.number_of_atoms *
+                     self.parameters.pseudopotential["valence_electrons"]
+                     * 1.05)
 
         qe_input_data = {
             "occupations": 'smearing',
             "calculation": 'md',
             "restart_mode": 'from_scratch',
-            "prefix": element,
-            "pseudo_dir": pspath,
-            "outdir": base_data_folder + element + "/" + str(
-                temperature) + "K/N" + str(
-                number_atoms) + "/MD" + run_number + "/",
+            "prefix": self.parameters.element,
+            "pseudo_dir": self.parameters.pseudopotential["path"],
+            "outdir": "temp",
             "ibrav": 0,
             "smearing": 'fermi-dirac',
-            "degauss": round(get_smearing_from_temperature(temperature), 7),
+            "degauss": round(kelvin_to_rydberg(
+                self.parameters.temperature), 7),
             "ecutrho": cutoff * 4,
             "ecutwfc": cutoff,
             "tstress": True,
@@ -105,7 +68,8 @@ class MDProvider(Provider):
             "nbnd": nbands,
             "mixing_mode": "plain",
             "mixing_beta": 0.1,
-            "conv_thr": 1e-6 * number_atoms,
+            "conv_thr": self.parameters.dft_scf_accuracy_per_atom_Ry *
+                        self.parameters.number_of_atoms,
             # "verbosity" : "high", # This is maybe a bit high
             "nosym": True,
             # MD variables - these are not final in any way.
@@ -115,7 +79,7 @@ class MDProvider(Provider):
             # it is apparent that we would need Nose-Hover, but the next
             # best thing QE gives us is berendsen.
             "ion_temperature": 'berendsen',
-            "tempw": temperature,
+            "tempw": self.parameters.temperature,
             # Time step: In Ryberg atomic units.
             # For now: 1 fs
             "dt": second_to_rydberg_time(1e-15),
@@ -207,6 +171,3 @@ class MDProvider(Provider):
             write_to_incar(this_folder, "INCAR", vasp_input_data)
             write_to_kpoints(this_folder, "KPOINTS", kgrid)
 
-    def __read_convergence(self, filename):
-        filecontents = ET.parse(filename).getroot()[0]
-        print(filecontents.get("cutoff_energy"))
