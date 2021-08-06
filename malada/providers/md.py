@@ -25,8 +25,7 @@ class MDProvider(Provider):
         file_name = self.parameters.element + \
                     str(self.parameters.number_of_atoms) + \
                     "_" + self.parameters.crystal_structure +\
-                    "_" + str(self.parameters.temperature) +\
-                    "_" + self.parameters.dft_calculator
+                    "_" + str(self.parameters.temperature)
         self.trajectory_file = os.path.join(provider_path, file_name+".traj")
         self.temperature_file = os.path.join(provider_path, file_name +
                                              ".temp.npy")

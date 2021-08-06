@@ -20,3 +20,12 @@ class Parameters:
         self.maximum_number_of_timesteps = 10000
         self.time_step_fs = 1
         self.md_thermostat_controller = 0.001
+        # TODO: Implement negative values, meaning automatic detection.
+        self.snapshot_parsing_beginning = -1
+        self.snapshot_parsing_temperature_tolerance_percent = 1
+        # TODO: Implement other criteria here.
+        self.snapshot_parsing_criterion = "random"
+        self.number_of_snapshots = 10
+        self.distance_metric_snapshots = "realspace"
+        # TODO: Implement negative values, meaning automatic detection.
+        self.distance_metric_snapshots_cutoff = -0.1

@@ -9,7 +9,7 @@ from .version import __version__
 from .utils import Parameters
 from .providers import CrystalStructureProvider, SuperCellProvider,\
                        DFTConvergenceProvider, MDPerformanceProvider,\
-                       MDProvider
+                       MDProvider, SnapshotsProvider
 from .pipeline import DataPipeline
 from .runners import Runner, BashRunner
 
