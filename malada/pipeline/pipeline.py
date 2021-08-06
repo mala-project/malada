@@ -1,6 +1,6 @@
 from malada import CrystalStructureProvider, SuperCellProvider, \
                    DFTConvergenceProvider, MDPerformanceProvider, MDProvider, \
-                   SnapshotsProvider
+                   SnapshotsProvider, LDOSConvergenceProvider
 import os
 
 
@@ -14,6 +14,7 @@ class DataPipeline:
                  md_performance_provider: MDPerformanceProvider = None,
                  md_provider: MDProvider = None,
                  snapshots_provider: SnapshotsProvider = None,
+                 ldos_configuration_provider: LDOSConvergenceProvider = None,
                  ):
         self.parameters = parameters
 
@@ -47,6 +48,10 @@ class DataPipeline:
             self.snapshots_provider = SnapshotsProvider(self.parameters)
         else:
             self.snapshots_provider = snapshots_provider
+        if ldos_configuration_provider is None:
+            self.ldos_configuration_provider = LDOSConvergenceProvider(self.parameters)
+        else:
+            self.ldos_configuration_provider = ldos_configuration_provider
 
     def run(self):
         # Step one: Get the crystal structure.
@@ -107,4 +112,15 @@ class DataPipeline:
                                         self.md_provider.trajectory_file,
                                         self.md_provider.temperature_file)
         print("Parsing snapshots from MD trajectory: Done.")
+
+        # Step seven: Determining the LDOS parameters.
+        print("Determining LDOS parameters...")
+        path06 = os.path.join(self.parameters.base_folder, "06_ldosconfiguration")
+        if not os.path.exists(path06):
+            os.makedirs(path06)
+        self.ldos_configuration_provider.provide(path06,
+                                                 self.snapshots_provider.snapshot_file,
+                                                 self.dft_convergence_provider.convergence_results_file)
+        print("Determining LDOS parameters: Done.")
+
 

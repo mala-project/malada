@@ -9,7 +9,7 @@ from scipy.spatial.distance import cdist
 
 
 class SnapshotsProvider(Provider):
-    """Performs a DFT-MD calculation and provides an ASE trjactory.."""
+    """Filter snapshots from a given MD trajectory."""
     def __init__(self, parameters, external_snapshots=None):
         super(SnapshotsProvider, self).__init__(parameters)
         self.external_snapshots = external_snapshots
