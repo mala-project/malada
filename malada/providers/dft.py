@@ -28,6 +28,7 @@ class DFTProvider(Provider):
             if self.parameters.dft_calculator != "qe":
                 raise Exception("Currently only QE is supported for "
                                 "DFT calculations.")
+            dftrunner = malada.BashRunner()
             all_valid_snapshots = ase.io.Trajectory(possible_snapshots_file)
             for i in range(0, self.parameters.number_of_snapshots):
                 snapshot_path = os.path.join(provider_path,"snapshot"+str(i))
@@ -36,6 +37,18 @@ class DFTProvider(Provider):
                                       all_valid_snapshots[i],
                                       snapshot_path,
                                       "snapshot"+str(i))
+            for i in range(0, self.parameters.number_of_snapshots):
+                # Run the individul files.
+                snapshot_path = os.path.join(provider_path,"snapshot"+str(i))
+                print("Running DFT in", snapshot_path)
+                dftrunner.run_folder(snapshot_path,self.parameters.dft_calculator,
+                                qe_input_type="*.pw.scf.in")
+                dftrunner.run_folder(snapshot_path,self.parameters.dft_calculator,
+                                qe_input_type="*.dos.in")
+                dftrunner.run_folder(snapshot_path,self.parameters.dft_calculator,
+                                qe_input_type="*.pp.dens.in")
+                dftrunner.run_folder(snapshot_path,self.parameters.dft_calculator,
+                                qe_input_type="*.pp.ldos.in")
         else:
             # Here, we have to do a consistency check.
             pass
@@ -73,7 +86,7 @@ class DFTProvider(Provider):
             "nbnd": nbands,
             "mixing_mode": "plain",
             "mixing_beta": 0.1,
-            "conv_thr": 1e-6 * self.parameters.number_of_atoms,
+            "conv_thr": self.parameters.dft_scf_accuracy_per_atom_Ry * self.parameters.number_of_atoms,
             # "verbosity" : "high", # This is maybe a bit high
             "nosym": True,
             "noinv": True

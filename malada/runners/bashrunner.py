@@ -25,7 +25,8 @@ class BashRunner(Runner):
                 raise Exception("Run folder with ambigous content.")
             filename = os.path.basename(filelist[0])
             outfile = filename.replace("in", "out")
-            run_process = subprocess.Popen("pw.x -in "+filename+" > "+outfile, cwd=folder, shell=True)
+            program_to_run = qe_input_type.split(".")[1]
+            run_process = subprocess.Popen(program_to_run+".x -in "+filename+" > "+outfile, cwd=folder, shell=True)
             run_process.wait()
 
         elif calculator_type == "vasp":
