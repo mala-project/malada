@@ -64,9 +64,7 @@ class MDProvider(Provider):
 
         qe_pseudopotentials = {self.parameters.element:
                                    self.parameters.pseudopotential["name"]}
-        nbands = int(self.parameters.number_of_atoms *
-                     self.parameters.pseudopotential["valence_electrons"]
-                     * 1.05)
+        nbands = self._get_number_of_bands()
 
         qe_input_data = {
             "occupations": 'smearing',

@@ -1,6 +1,6 @@
 from malada import CrystalStructureProvider, SuperCellProvider, \
                    DFTConvergenceProvider, MDPerformanceProvider, MDProvider, \
-                   SnapshotsProvider, LDOSConvergenceProvider
+                   SnapshotsProvider, LDOSConvergenceProvider, DFTProvider
 import os
 
 
@@ -15,6 +15,7 @@ class DataPipeline:
                  md_provider: MDProvider = None,
                  snapshots_provider: SnapshotsProvider = None,
                  ldos_configuration_provider: LDOSConvergenceProvider = None,
+                 dft_provider: DFTProvider = None,
                  ):
         self.parameters = parameters
 
@@ -52,6 +53,10 @@ class DataPipeline:
             self.ldos_configuration_provider = LDOSConvergenceProvider(self.parameters)
         else:
             self.ldos_configuration_provider = ldos_configuration_provider
+        if dft_provider is None:
+            self.dft_provider = DFTProvider(self.parameters)
+        else:
+            self.dft_provider = dft_provider
 
     def run(self):
         # Step one: Get the crystal structure.
@@ -123,4 +128,13 @@ class DataPipeline:
                                                  self.dft_convergence_provider.convergence_results_file)
         print("Determining LDOS parameters: Done.")
 
-
+        # Step eight (final step): Perfroming the necessary DFT calculations.
+        print("Performing DFT calculation...")
+        path07 = os.path.join(self.parameters.base_folder,
+                              "07_dft")
+        if not os.path.exists(path07):
+            os.makedirs(path07)
+        self.dft_provider.provide(path07,self.dft_convergence_provider.convergence_results_file,
+                                  self.ldos_configuration_provider.ldos_configuration_file,
+                                  self.snapshots_provider.snapshot_file)
+        print("Performing DFT calculation: Done.")

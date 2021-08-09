@@ -109,3 +109,9 @@ class Provider:
                 else:
                     break
         np.save(file_name)
+
+    def _get_number_of_bands(self):
+        number_of_bands = int(self.parameters.number_of_atoms *
+                     self.parameters.pseudopotential["valence_electrons"]
+                     * 1.05)
+        return number_of_bands
