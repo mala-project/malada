@@ -157,7 +157,6 @@ class DFTProvider(Provider):
         ldos_file.close()
         dens_file.close()
 
-
     def __read_ldos_convergence(self, filename):
 
         # Parse the XML file and first check for consistency.
@@ -169,7 +168,6 @@ class DFTProvider(Provider):
            float(dftparams.find("temperature").text) != self.parameters.temperature or \
            int(dftparams.find("number_of_atoms").text) != self.parameters.number_of_atoms:
             raise Exception("Incompatible convergence parameters provided.")
-
         ldos_params = {"ldos_offset_eV": float(filecontents.find("ldos_offset_eV").text),
                        "ldos_spacing_eV": float(filecontents.find("ldos_spacing_eV").text),
                        "ldos_length": int(filecontents.find("ldos_length").text),

@@ -107,18 +107,18 @@ class DFTConvergenceProvider(Provider):
                     raise Exception("Provided convergence data not sufficient,"
                                     "please perform additional calculations"
                                     " with larger k-grids.")
+            # Print the output.
+            unit = "eV" if self.parameters.dft_calculator == "vasp" else "Ry"
+            print("Converged energy cutoff: ", self.converged_cutoff, unit)
+            print("Converged k-grid: ", self.converged_kgrid)
+
+            # Write the output to xml.
+            self.__write_to_xml()
         else:
             copyfile(self.external_convergence_results,
                      self.convergence_results_file)
             print("Getting <<convergence_results>>.xml file from disc.")
 
-        # Print the output.
-        unit = "eV" if self.parameters.dft_calculator == "vasp" else "Ry"
-        print("Converged energy cutoff: ", self.converged_cutoff, unit)
-        print("Converged k-grid: ", self.converged_kgrid)
-
-        # Write the output to xml.
-        self.__write_to_xml()
 
     def __write_to_xml(self):
         top = Element('dftparameters')
@@ -349,6 +349,7 @@ class DFTConvergenceProvider(Provider):
         result_list = sorted(result_list, key=lambda d: [d[0]])
 
         # Next, analyze the convergence.
+        best_param = None
         print("Convergence results for: ", parameter_to_converge)
         for i in range(1, len(result_list)):
             print(result_list[i-1][0], result_list[i][0],

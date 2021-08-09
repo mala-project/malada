@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<dftparameters>
+  <calculationparameters>
+    <element type="string">Be</element>
+    <number_of_atoms type="int">2</number_of_atoms>
+    <crystal_structure type="string">bcc</crystal_structure>
+    <temperature type="float">298</temperature>
+    <dft_calculator type="string">qe</dft_calculator>
+  </calculationparameters>
+  <smearing_factor type="float">2</smearing_factor>
+  <ldos_offset_eV type="float">-5</ldos_offset_eV>
+  <ldos_spacing_eV type="foat">2.5</ldos_spacing_eV>
+  <ldos_length type="int">10</ldos_length>
+  <kpoints>
+    <kx type="int">8</kx>
+    <ky type="int">8</ky>
+    <kz type="int">8</kz>
+  </kpoints>
+</dftparameters>
