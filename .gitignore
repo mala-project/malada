@@ -1,1 +1,17 @@
 temp/
+*.pw.scf.*
+*.dos.*
+*.pp.ldos.*
+*.pp.dens.*
+*.cube
+*.dos
+*.traj
+*.pp*
+*.egg-info
+*.pyc
+*.npy
+examples/ex*/
+examples/develop*/
+examples/develop.py
+.idea
+

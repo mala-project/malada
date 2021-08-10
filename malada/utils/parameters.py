@@ -1,17 +1,23 @@
 class Parameters:
     """Holds parameters needed for constructing a data acqusition pipeline."""
     def __init__(self):
+        # General information about the system.
         self.temperature = 0
-        self.run_system = "bash"
         self.number_of_atoms = 0
         self.crystal_structure = "bcc"
         self.element = None
+
+        # Information about running the pipeline.
         self.base_folder = "./"
         self.dft_calculator = "qe"
         self.md_calculator = "qe"
         # TODO: Get number of electrons directly from file.
         self.pseudopotential = {"path": None, "valence_electrons": 0,
                                 "name": None}
+        self.run_system = "bash"
+
+
+        # Information about DFT and MD calculations.
         self.dft_conv_accuracy_meVperatom = 1
         self.maximum_cutoff_try = 2
         self.maximum_kpoint_try = 2
@@ -20,6 +26,8 @@ class Parameters:
         self.maximum_number_of_timesteps = 10000
         self.time_step_fs = 1
         self.md_thermostat_controller = 0.001
+
+        # Information about MD parsing.
         # TODO: Implement negative values, meaning automatic detection.
         self.snapshot_parsing_beginning = -1
         self.snapshot_parsing_temperature_tolerance_percent = 1
