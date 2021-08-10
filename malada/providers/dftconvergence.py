@@ -57,8 +57,7 @@ class DFTConvergenceProvider(Provider):
                     for cutoff_folder in cutoff_folders:
                         print("Running DFT in", cutoff_folder)
                         dft_runner.run_folder(cutoff_folder,
-                                              "dft",
-                                              self.parameters,)
+                                              "dft")
                     if self.parameters.run_system == "slurm_creator":
                         print("Created run scripts. Please run via slurm.")
                         print("Quitting...")

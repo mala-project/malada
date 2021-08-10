@@ -25,6 +25,7 @@ class BashRunner(Runner):
             calculator_type = self.parameters.md_calculator
 
         if calculator_type == "qe":
+            print(folder, qe_input_type)
             filelist = glob.glob(os.path.join(folder, qe_input_type))
             if len(filelist) != 1:
                 print(filelist, folder)
