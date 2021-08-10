@@ -37,8 +37,8 @@ class MDProvider(Provider):
                                      supercell_file, provider_path)
 
                 # Run the MD calculation.
-                dft_runner = malada.RunnerInterface(
-                    self.parameters.md_calculator)
+                mdrunner = malada.RunnerInterface(
+                    self.parameters)
                 mdrunner.run_folder(provider_path,"md",
                                     qe_input_type="*.pw.md.in")
                 folder_to_parse = provider_path
