@@ -6,8 +6,8 @@ class Runner:
     Runs a simulation.
     """
 
-    # TODO: Add some parameters to characterize the running.
-    def __init__(self):
+    def __init__(self, parameters):
+        self.parameters = parameters
         pass
 
     @abstractmethod

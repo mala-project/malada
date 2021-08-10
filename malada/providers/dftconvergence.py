@@ -38,7 +38,7 @@ class DFTConvergenceProvider(Provider):
         self.convergence_results_file = os.path.join(provider_path, file_name)
 
         # Instantiate a runner.
-        dft_runner = malada.BashRunner()
+        dft_runner = malada.RunnerInterface(self.parameters)
 
         # Check if there exist results or if we have to work from scratch.
         if self.external_convergence_results is None:
@@ -57,7 +57,12 @@ class DFTConvergenceProvider(Provider):
                     for cutoff_folder in cutoff_folders:
                         print("Running DFT in", cutoff_folder)
                         dft_runner.run_folder(cutoff_folder,
-                                              self.parameters.dft_calculator)
+                                              "dft",
+                                              self.parameters,)
+                    if self.parameters.run_system == "slurm_creator":
+                        print("Created run scripts. Please run via slurm.")
+                        print("Quitting...")
+                        quit()
                     self.converged_cutoff = self.__analyze_convergence_runs(provider_path, "cutoff",
                                                                             fixed_kpoints=(1, 1, 1))
                     if self.converged_cutoff is None:
@@ -77,7 +82,7 @@ class DFTConvergenceProvider(Provider):
                     for kpoint_folder in kpoints_folders:
                         print("Running DFT in", kpoint_folder)
                         dft_runner.run_folder(kpoint_folder,
-                                              self.parameters.dft_calculator)
+                                              "dft")
                     self.converged_kgrid = self.__analyze_convergence_runs(provider_path,
                                                                            "kpoints",
                                                                             fixed_cutoff=self.converged_cutoff)
@@ -233,8 +238,9 @@ class DFTConvergenceProvider(Provider):
             this_folder = self.__make_convergence_folder(kpoints, cutoff,
                                                          working_directory)
             converge_folder_list.append(this_folder)
-            qe_pseudopotentials = {self.parameters.element :
-                                   self.parameters.pseudopotential["name"]}
+            if self.parameters.dft_calculator == "qe":
+                qe_pseudopotentials = {self.parameters.element :
+                                       self.parameters.pseudopotential["name"]}
             nbands = int(self.parameters.number_of_atoms *
                          self.parameters.pseudopotential["valence_electrons"]
                          * 1.05)
@@ -291,8 +297,12 @@ class DFTConvergenceProvider(Provider):
             elif self.parameters.dft_calculator == "vasp":
                 ase.io.write(this_folder + "POSCAR", atoms_Angstrom,
                              "vasp")
-                VaspUtils.write_to_incar(this_folder, "INCAR", vasp_input_data)
-                VaspUtils.write_to_kpoints(this_folder, "KPOINTS", kpoints)
+                VaspUtils.write_to_incar(this_folder, vasp_input_data)
+                VaspUtils.write_to_kpoints(this_folder, kpoints)
+                VaspUtils.write_to_potcar_copy(this_folder,
+                                               os.path.join(self.parameters.pseudopotential["path"],
+                                                            self.parameters.pseudopotential["name"]))
+
 
         return converge_folder_list
 

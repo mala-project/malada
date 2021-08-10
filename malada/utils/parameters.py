@@ -1,3 +1,5 @@
+from .slurmparams import SlurmParameters
+
 class Parameters:
     """Holds parameters needed for constructing a data acqusition pipeline."""
     def __init__(self):
@@ -15,7 +17,8 @@ class Parameters:
         self.pseudopotential = {"path": None, "valence_electrons": 0,
                                 "name": None}
         self.run_system = "bash"
-
+        self.dft_slurm = SlurmParameters()
+        self.md_slurm = SlurmParameters()
 
         # Information about DFT and MD calculations.
         self.dft_conv_accuracy_meVperatom = 1

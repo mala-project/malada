@@ -14,10 +14,16 @@ class BashRunner(Runner):
     out for a better, ASE based runner.
     """
 
-    def __init__(self):
-        super(BashRunner, self).__init__()
+    def __init__(self, parameters):
+        super(BashRunner, self).__init__(parameters)
 
-    def run_folder(self, folder, calculator_type, qe_input_type="*.pw.scf.in"):
+    def run_folder(self, folder, calculcation_type,
+                   qe_input_type="*.pw.scf.in"):
+        if calculcation_type == "dft":
+            calculator_type = self.parameters.dft_calculator
+        if calculcation_type == "md":
+            calculator_type = self.parameters.md_calculator
+
         if calculator_type == "qe":
             filelist = glob.glob(os.path.join(folder, qe_input_type))
             if len(filelist) != 1:
