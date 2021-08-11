@@ -29,11 +29,14 @@ class MDProvider(Provider):
         self.trajectory_file = os.path.join(provider_path, file_name+".traj")
         self.temperature_file = os.path.join(provider_path, file_name +
                                              ".temp.npy")
+        if self.parameters.run_system == "slurm_creator":
+            self.parameters.md_slurm = malada.SlurmParameters.\
+                                       from_xml(md_performance_file)
         if self.external_trajectory is None or self.external_temperatures is None:
             if self.external_run_folder is None:
                 # Here, we have to perform the MD first.
                 # First, create MD inputs.
-                self.__create_md_run(dft_convergence_file, md_performance_file,
+                self.__create_md_run(dft_convergence_file,
                                      supercell_file, provider_path)
 
                 # Run the MD calculation.
@@ -42,6 +45,10 @@ class MDProvider(Provider):
                 mdrunner.run_folder(provider_path,"md",
                                     qe_input_type="*.pw.md.in")
                 folder_to_parse = provider_path
+                if self.parameters.run_system == "slurm_creator":
+                    print("Created run scripts. Please run via slurm.")
+                    print("Quitting...")
+                    quit()
             else:
                 folder_to_parse = self.external_run_folder
 
@@ -55,7 +62,7 @@ class MDProvider(Provider):
             print("Getting <<trajectory>>.traj and <<temperatures>>.temp.npy"
                   " files from disc.")
 
-    def __create_md_run(self, dft_convergence_file, md_performance_file,
+    def __create_md_run(self, dft_convergence_file,
                         posfile, base_path):
         cutoff, kgrid = self._read_convergence(dft_convergence_file)
         if self.parameters.md_at_gamma_point:
@@ -178,6 +185,6 @@ class MDProvider(Provider):
                          "vasp")
             ase.io.write(os.path.join(base_path, "POSCAR_original"), atoms_Angstrom,
                          "vasp")
-            VaspUtils.write_to_incar(base_path, "INCAR", vasp_input_data)
-            VaspUtils.write_to_kpoints(base_path, "KPOINTS", kgrid)
+            VaspUtils.write_to_incar(base_path, vasp_input_data)
+            VaspUtils.write_to_kpoints(base_path, kgrid)
 

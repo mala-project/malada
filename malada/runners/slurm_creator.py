@@ -34,10 +34,25 @@ class SlurmCreatorRunner(Runner):
         submit_file.write(slurm_params.module_loading_string)
         submit_file.write("\n")
         if calculator_type == "qe":
-            submit_file.write(runner+" -np "+number_of_tasks+" pw.x -in "+element+".pw.scf.in \n")
-        elif calculator_type == "vasp":
-            submit_file.write("bash potcar_copy.sh\n")
+            # TODO: Fix this.
             submit_file.write(slurm_params.mpi_runner+" -np "+
-                              str(slurm_params.nodes*slurm_params.tasks_per_node)+" "+
-                              slurm_params.scf_executable+" \n")
+                              str(slurm_params.nodes*slurm_params.tasks_per_node)+
+                              " pw.x -in "+self.parameters.element+".pw.scf.in \n")
+        elif calculator_type == "vasp":
+            if calculation_type == "dft":
+                submit_file.write("bash potcar_copy.sh\n")
+                submit_file.write(slurm_params.mpi_runner+" -np "+
+                                  str(slurm_params.nodes*slurm_params.tasks_per_node)+" "+
+                                  slurm_params.scf_executable+" \n")
+            elif calculation_type == "md":
+                submit_file.write("mkdir slurm-$SLURM_JOB_ID\n")
+                submit_file.write("cp INCAR slurm-$SLURM_JOB_ID\n")
+                submit_file.write("cp POSCAR slurm-$SLURM_JOB_ID\n")
+                submit_file.write("cp KPOINTS slurm-$SLURM_JOB_ID\n")
+                submit_file.write("cp potcar_copy.sh slurm-$SLURM_JOB_ID\n")
+                submit_file.write("cd slurm-$SLURM_JOB_ID\n")
+                submit_file.write(slurm_params.mpi_runner+" -np "+
+                                  str(slurm_params.nodes*slurm_params.tasks_per_node)+" "+
+                                  slurm_params.scf_executable+" \n")
+
         submit_file.close()
