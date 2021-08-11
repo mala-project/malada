@@ -20,14 +20,15 @@ class DFTConvergenceProvider(Provider):
     """For a given supercell and calculator, determine convergence."""
 
     def __init__(self, parameters, external_convergence_results=None,
-                 external_convergence_folder=None):
+                 external_convergence_folder=None,
+                 predefined_kgrid=None, predefined_cutoff=None):
         super(DFTConvergenceProvider, self).__init__(parameters)
         self.parameters = parameters
         self.external_convergence_results = external_convergence_results
         self.external_convergence_folder = external_convergence_folder
         self.convergence_results_file = None
-        self.converged_cutoff = None
-        self.converged_kgrid = None
+        self.converged_cutoff = predefined_cutoff
+        self.converged_kgrid = predefined_kgrid
 
     def provide(self, provider_path, supercell_file):
         file_name = self.parameters.element + \
@@ -96,17 +97,19 @@ class DFTConvergenceProvider(Provider):
                 print("Reading precalculated convergence results.")
                 # Analyze the convergence analsyis.
                 # First: cutoffs.
-                self.converged_cutoff = self.__analyze_convergence_runs(self.external_convergence_folder, "cutoff",
-                                                                        fixed_kpoints=(1, 1, 1))
+                if self.converged_cutoff is None:
+                    self.converged_cutoff = self.__analyze_convergence_runs(self.external_convergence_folder, "cutoff",
+                                                                            fixed_kpoints=(1, 1, 1))
                 if self.converged_cutoff is None:
                     raise Exception("Provided convergence data not sufficient,"
                                     "please perform additional calculations"
-                                    " with larger k-grids.")
+                                    " with larger cutoff energies.")
 
-                # Second: cutoffs.
-                self.converged_kgrid = self.__analyze_convergence_runs(self.external_convergence_folder,
-                                                                       "kpoints",
-                                                                        fixed_cutoff=self.converged_cutoff)
+                # Second: kgrid.
+                if self.converged_kgrid is None:
+                    self.converged_kgrid = self.__analyze_convergence_runs(self.external_convergence_folder,
+                                                                           "kpoints",
+                                                                            fixed_cutoff=self.converged_cutoff)
                 if self.converged_kgrid is None:
                     raise Exception("Provided convergence data not sufficient,"
                                     "please perform additional calculations"
@@ -273,7 +276,8 @@ class DFTConvergenceProvider(Provider):
             vasp_input_data = {
                 "ISTART": 0,
                 "ENCUT": str(cutoff) + " eV",
-                "EDIFF": 1e-6 * self.parameters.number_of_atoms *
+                "EDIFF": self.parameters.dft_scf_accuracy_per_atom_Ry*
+                         self.parameters.number_of_atoms *
                                 ase.units.Rydberg,
                 "ISMEAR": -1,
                 "SIGMA": round(kelvin_to_eV(
@@ -323,10 +327,16 @@ class DFTConvergenceProvider(Provider):
         # First, parse the results out of the output files.
         result_list = []
         if parameter_to_converge == "cutoff":
-            converge_list = glob.glob(os.path.join(base_folder,
-                                      "*Ry_k"+str(fixed_kpoints[0]) +
-                                      str(fixed_kpoints[1]) +
-                                      str(fixed_kpoints[2])))
+            if self.parameters.dft_calculator == "qe":
+                converge_list = glob.glob(os.path.join(base_folder,
+                                          "*Ry_k"+str(fixed_kpoints[0]) +
+                                          str(fixed_kpoints[1]) +
+                                          str(fixed_kpoints[2])))
+            elif self.parameters.dft_calculator == "vasp":
+                converge_list = glob.glob(os.path.join(base_folder,
+                                          "*eV_k"+str(fixed_kpoints[0]) +
+                                          str(fixed_kpoints[1]) +
+                                          str(fixed_kpoints[2])))
         elif parameter_to_converge == "kpoints":
             converge_list = glob.glob(os.path.join(base_folder,
                                                    str(fixed_cutoff)+"Ry_k*"))
