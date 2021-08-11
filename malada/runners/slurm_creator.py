@@ -27,7 +27,8 @@ class SlurmCreatorRunner(Runner):
         submit_file.write("#SBATCH --nodes="+str(slurm_params.nodes)+"\n")
         submit_file.write("#SBATCH --ntasks-per-node="+str(slurm_params.tasks_per_node)+"\n")
         submit_file.write("#SBATCH --job-name="+job_name+"\n")
-        submit_file.write("#SBATCH --output="+job_name+".out\n")
+        if calculation_type != "md":
+            submit_file.write("#SBATCH --output="+job_name+".out\n")
         submit_file.write("#SBATCH --time="+str(slurm_params.execution_time)+":00:00\n")
         submit_file.write(slurm_params.partition_string)
         submit_file.write("\n")
@@ -51,6 +52,7 @@ class SlurmCreatorRunner(Runner):
                 submit_file.write("cp KPOINTS slurm-$SLURM_JOB_ID\n")
                 submit_file.write("cp potcar_copy.sh slurm-$SLURM_JOB_ID\n")
                 submit_file.write("cd slurm-$SLURM_JOB_ID\n")
+                submit_file.write("bash potcar_copy.sh\n")
                 submit_file.write(slurm_params.mpi_runner+" -np "+
                                   str(slurm_params.nodes*slurm_params.tasks_per_node)+" "+
                                   slurm_params.scf_executable+" \n")

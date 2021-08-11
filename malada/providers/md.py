@@ -187,4 +187,11 @@ class MDProvider(Provider):
                          "vasp")
             VaspUtils.write_to_incar(base_path, vasp_input_data)
             VaspUtils.write_to_kpoints(base_path, kgrid)
+            VaspUtils.write_to_potcar_copy(base_path,
+                                           os.path.join(
+                                               self.parameters.pseudopotential[
+                                                   "path"],
+                                               self.parameters.pseudopotential[
+                                                   "name"]))
+
 
