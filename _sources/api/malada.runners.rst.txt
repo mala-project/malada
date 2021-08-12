@@ -1,0 +1,45 @@
+malada.runners package
+======================
+
+Submodules
+----------
+
+malada.runners.bashrunner module
+--------------------------------
+
+.. automodule:: malada.runners.bashrunner
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+malada.runners.runner module
+----------------------------
+
+.. automodule:: malada.runners.runner
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+malada.runners.runner\_interface module
+---------------------------------------
+
+.. automodule:: malada.runners.runner_interface
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+malada.runners.slurm\_creator module
+------------------------------------
+
+.. automodule:: malada.runners.slurm_creator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: malada.runners
+   :members:
+   :undoc-members:
+   :show-inheritance:

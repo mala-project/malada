@@ -1,0 +1,32 @@
+malada package
+==============
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   malada.pipeline
+   malada.providers
+   malada.runners
+   malada.utils
+
+Submodules
+----------
+
+malada.version module
+---------------------
+
+.. automodule:: malada.version
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: malada
+   :members:
+   :undoc-members:
+   :show-inheritance:

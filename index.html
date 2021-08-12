@@ -1,0 +1,304 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Welcome to MALADA’s documentation! &mdash; Materials Learning Algorithms Data Acquisition (MALADA)  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/mala_favicon.png"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="General Usage" href="usage/general.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home"> Materials Learning Algorithms Data Acquisition (MALADA)
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="usage/general.html">General Usage</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/modules.html">malada</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Materials Learning Algorithms Data Acquisition (MALADA)</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Welcome to MALADA’s documentation!</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            
+              <a href="https://github.com//mala-project/malada/blob/develop/docs/source/index.md" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="welcome-to-malada-s-documentation">
+<h1>Welcome to MALADA’s documentation!<a class="headerlink" href="#welcome-to-malada-s-documentation" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="mala-data-acquistion-malada">
+<h1>MALA Data Acquistion (MALADA)<a class="headerlink" href="#mala-data-acquistion-malada" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="scope">
+<h2>Scope<a class="headerlink" href="#scope" title="Permalink to this headline">¶</a></h2>
+<p>MALADA provides helpful functions to automate the data acquisition process for the Materials Learning Algorithms (MALA) package. It helps the user create and run the typical MALA data acquisition pipelin, consisting of creation of suitable supercells from crystal structures, determination of suitable calculation parameters, molecular dynamics (MD) simulations, density functional theory simulations (DFT) and post-processing of the latter to acquire the local density of states (LDOS). At the end of a run, MALA can be used to preprocess the data and build surrogate models.</p>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="providers">
+<h3>Providers<a class="headerlink" href="#providers" title="Permalink to this headline">¶</a></h3>
+<p>MALADA is a python package and works by writing run scripts.
+It is based on “providers” that provide certain files for the next step. These can be directly linked in the python script or via files. The following providers exist, reflecting the steps of a data acquisition pipeline:</p>
+<ol class="simple">
+<li><p>CrystalStructureProvider</p>
+<ul class="simple">
+<li><p>input: Element name, element ID in MaterialsProject</p></li>
+<li><p>output: .cif file containing the crystal structure</p></li>
+</ul>
+</li>
+<li><p>SupercellProvider</p>
+<ul class="simple">
+<li><p>input: .cif file containing the crystal structure, number of atoms</p></li>
+<li><p>output: .vasp file containing the positions of the atoms</p></li>
+</ul>
+</li>
+<li><p>DFTConvergenceProvider</p>
+<ul class="simple">
+<li><p>input: temperature at which to perform the simulation, .vasp file containing the positions of the atoms</p></li>
+<li><p>output: .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)</p></li>
+</ul>
+</li>
+<li><p>MDPerformanceProvider</p>
+<ul class="simple">
+<li><p>input: .pkl file containing converged DFT parameters (k-grid and cutoff energy for basis set), temperature at which to perform the simulation, .vasp file containing the positions of the atoms</p></li>
+<li><p>output: .xml file containing optimal parameters for MD simulation</p></li>
+</ul>
+</li>
+<li><p>MDProvider</p>
+<ul class="simple">
+<li><p>input: .pkl file containing converged DFT parameters (k-grid and cutoff energy for basis set), temperature at which to perform the simulation, .vasp file containing the positions of the atoms, .xml file containing optimal parameters for MD simulation</p></li>
+<li><p>output: .traj file containing trajectory of the MD run, .npy files containing temperature</p></li>
+</ul>
+</li>
+<li><p>SnapshotProvider</p>
+<ul class="simple">
+<li><p>input: .traj file containing trajectory of the MD run</p></li>
+<li><p>output: .npy file containing potential snapshots for DFT calculation</p></li>
+</ul>
+</li>
+<li><p>LDOSConvergenceProvider</p>
+<ul class="simple">
+<li><p>input: .npy file containing potential snapshots for DFT calculation, .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)</p></li>
+<li><p>output: .xml file containing updated DFT parameters for post processing</p></li>
+</ul>
+</li>
+<li><p>DFTProvider:</p>
+<ul class="simple">
+<li><p>input: .xml file cotnaining DFT parameters (for both energy and LDOS), .npy file containing potential snapshots for DFT calculation</p></li>
+<li><p>output: DFT calculation output files and LDOS cube files</p></li>
+</ul>
+</li>
+</ol>
+</div>
+<div class="section" id="global-parameters">
+<h3>Global parameters<a class="headerlink" href="#global-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Global parameters such as number of atoms, temperature and runner information (which run system, e.g. slurm, how many cores, etc.)</p>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="usage/general.html">General Usage</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/modules.html">malada</a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="usage/general.html" class="btn btn-neutral float-right" title="General Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright noneyet.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

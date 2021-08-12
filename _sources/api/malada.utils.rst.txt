@@ -1,0 +1,61 @@
+malada.utils package
+====================
+
+Submodules
+----------
+
+malada.utils.cell\_transformations module
+-----------------------------------------
+
+.. automodule:: malada.utils.cell_transformations
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+malada.utils.convergence\_guesses module
+----------------------------------------
+
+.. automodule:: malada.utils.convergence_guesses
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+malada.utils.custom\_converter module
+-------------------------------------
+
+.. automodule:: malada.utils.custom_converter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+malada.utils.parameters module
+------------------------------
+
+.. automodule:: malada.utils.parameters
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+malada.utils.slurmparams module
+-------------------------------
+
+.. automodule:: malada.utils.slurmparams
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+malada.utils.vasp\_utils module
+-------------------------------
+
+.. automodule:: malada.utils.vasp_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: malada.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:

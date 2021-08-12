@@ -1,0 +1,21 @@
+malada.pipeline package
+=======================
+
+Submodules
+----------
+
+malada.pipeline.pipeline module
+-------------------------------
+
+.. automodule:: malada.pipeline.pipeline
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: malada.pipeline
+   :members:
+   :undoc-members:
+   :show-inheritance:

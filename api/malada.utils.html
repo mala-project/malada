@@ -1,0 +1,787 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>malada.utils package &mdash; Materials Learning Algorithms Data Acquisition (MALADA)  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../_static/mala_favicon.png"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="malada.runners package" href="malada.runners.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Materials Learning Algorithms Data Acquisition (MALADA)
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../usage/general.html">General Usage</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">malada</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="malada.html">malada package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="malada.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="malada.pipeline.html">malada.pipeline package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="malada.providers.html">malada.providers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="malada.runners.html">malada.runners package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">malada.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="malada.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="malada.html#module-malada.version">malada.version module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="malada.html#module-malada">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Materials Learning Algorithms Data Acquisition (MALADA)</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">malada</a> &raquo;</li>
+        
+          <li><a href="malada.html">malada package</a> &raquo;</li>
+        
+      <li>malada.utils package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            
+              <a href="https://github.com//mala-project/malada/blob/develop/docs/source/api/malada.utils.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="malada-utils-package">
+<h1>malada.utils package<a class="headerlink" href="#malada-utils-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-malada.utils.cell_transformations">
+<span id="malada-utils-cell-transformations-module"></span><h2>malada.utils.cell_transformations module<a class="headerlink" href="#module-malada.utils.cell_transformations" title="Permalink to this headline">¶</a></h2>
+<p>WILL BE DELETED: Transformation matrices for supercell creation.</p>
+</div>
+<div class="section" id="module-malada.utils.convergence_guesses">
+<span id="malada-utils-convergence-guesses-module"></span><h2>malada.utils.convergence_guesses module<a class="headerlink" href="#module-malada.utils.convergence_guesses" title="Permalink to this headline">¶</a></h2>
+<p>Initial guesses for convergence calculations.</p>
+</div>
+<div class="section" id="module-malada.utils.custom_converter">
+<span id="malada-utils-custom-converter-module"></span><h2>malada.utils.custom_converter module<a class="headerlink" href="#module-malada.utils.custom_converter" title="Permalink to this headline">¶</a></h2>
+<p>Collection of custom converters.</p>
+<dl class="py function">
+<dt id="malada.utils.custom_converter.kelvin_to_eV">
+<code class="sig-prename descclassname"><span class="pre">malada.utils.custom_converter.</span></code><code class="sig-name descname"><span class="pre">kelvin_to_eV</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temperature_K</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.utils.custom_converter.kelvin_to_eV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a temperature from Kelvin to electron volts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>temperature_K</strong> (<em>float</em>) – Temperature in Kelvin.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>temperature_Ry</strong> – Temperature expressed in electron volts.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="malada.utils.custom_converter.kelvin_to_rydberg">
+<code class="sig-prename descclassname"><span class="pre">malada.utils.custom_converter.</span></code><code class="sig-name descname"><span class="pre">kelvin_to_rydberg</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temperature_K</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.utils.custom_converter.kelvin_to_rydberg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a temperature from Kelvin to Rydberg energy units.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>temperature_K</strong> (<em>float</em>) – Temperature in Kelvin.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>temperature_Ry</strong> – Temperature expressed in Rydberg.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="malada.utils.custom_converter.second_to_rydberg_time">
+<code class="sig-prename descclassname"><span class="pre">malada.utils.custom_converter.</span></code><code class="sig-name descname"><span class="pre">second_to_rydberg_time</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_s</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.utils.custom_converter.second_to_rydberg_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a time from second to Rydberg unit time.</p>
+<p>This is used in e.g. QE.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>time_s</strong> (<em>float</em>) – Time in seconds.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>time_ry</strong> – Time in Rydberg unit time.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-malada.utils.parameters">
+<span id="malada-utils-parameters-module"></span><h2>malada.utils.parameters module<a class="headerlink" href="#module-malada.utils.parameters" title="Permalink to this headline">¶</a></h2>
+<p>Collection of all parameters for the pipeline.</p>
+<dl class="py class">
+<dt id="malada.utils.parameters.Parameters">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">malada.utils.parameters.</span></code><code class="sig-name descname"><span class="pre">Parameters</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Holds parameters needed for constructing a data acqusition pipeline.</p>
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.temperature">
+<code class="sig-name descname"><span class="pre">temperature</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.temperature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Temperature in K.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.number_of_atoms">
+<code class="sig-name descname"><span class="pre">number_of_atoms</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.number_of_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of atoms in supercell.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.crystal_structure">
+<code class="sig-name descname"><span class="pre">crystal_structure</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.crystal_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Crystal structure, this is used for supercell creation because
+it determines the transformations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.element">
+<code class="sig-name descname"><span class="pre">element</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the element for which to generate data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.base_folder">
+<code class="sig-name descname"><span class="pre">base_folder</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.base_folder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base folder to operate in.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.dft_calculator">
+<code class="sig-name descname"><span class="pre">dft_calculator</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.dft_calculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the DFT calculator, currently only QuantumESPRESSO and VASP
+are supported.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.md_calculator">
+<code class="sig-name descname"><span class="pre">md_calculator</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.md_calculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the DFT-MD calculator, currently only QuantumESPRESSO and VASP
+are supported.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.pseudopotential">
+<code class="sig-name descname"><span class="pre">pseudopotential</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.pseudopotential" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary for the pseudopotential. Needs to contain “path” for
+path to pseudopotential, “name” for name, and “valence_electrons”
+for number of valence electrons.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.run_system">
+<code class="sig-name descname"><span class="pre">run_system</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.run_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run system used during pipeline, currently only “bash” and
+“slurm_creator” are supported.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.dft_slurm">
+<code class="sig-name descname"><span class="pre">dft_slurm</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.dft_slurm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Slurm parameters used for DFT calculations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>malada.SlurmParameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.md_slurm">
+<code class="sig-name descname"><span class="pre">md_slurm</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.md_slurm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Slurm parameters used for DFT-MD calculations. Please note that
+these should not be set here, as they will be overwritten in
+the pipeline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>malada.SlurmParameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.dft_conv_accuracy_meVperatom">
+<code class="sig-name descname"><span class="pre">dft_conv_accuracy_meVperatom</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.dft_conv_accuracy_meVperatom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accuracy of the DFT convergence calculations in meV/atom.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.maximum_cutoff_try">
+<code class="sig-name descname"><span class="pre">maximum_cutoff_try</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.maximum_cutoff_try" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maxmimum number of cutoff convergence iterations. If the optimal
+cutoff is not found with initial values, calculation
+of it it is retried maximum_cutoff_try number of times.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.maximum_kpoint_try">
+<code class="sig-name descname"><span class="pre">maximum_kpoint_try</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.maximum_kpoint_try" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maxmimum number of k-grid convergence iterations. If the optimal
+k-grid is not found with initial values, calculation
+of it it is retried maximum_kpoint_try number of times.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.dft_scf_accuracy_per_atom_Ry">
+<code class="sig-name descname"><span class="pre">dft_scf_accuracy_per_atom_Ry</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.dft_scf_accuracy_per_atom_Ry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accuracy of all DFT calculation in terms of total energy/per atom.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.md_at_gamma_point">
+<code class="sig-name descname"><span class="pre">md_at_gamma_point</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.md_at_gamma_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>If True, MD simulations will be run at the gamma point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.maximum_number_of_timesteps">
+<code class="sig-name descname"><span class="pre">maximum_number_of_timesteps</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.maximum_number_of_timesteps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maximum number of timesteps for MD calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.time_step_fs">
+<code class="sig-name descname"><span class="pre">time_step_fs</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.time_step_fs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Timestep for MD calculation in fs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.md_thermostat_controller">
+<code class="sig-name descname"><span class="pre">md_thermostat_controller</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.md_thermostat_controller" title="Permalink to this definition">¶</a></dt>
+<dd><p>Thermostat controller for MD calculation. This is “NRAISE” for QE
+and “SMASS” for VASP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.snapshot_parsing_beginning">
+<code class="sig-name descname"><span class="pre">snapshot_parsing_beginning</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.snapshot_parsing_beginning" title="Permalink to this definition">¶</a></dt>
+<dd><p>The snapshot after which snapshot parsing is started. If &lt; 0 automatic
+detection of this snapshot will be performed (currently not supported)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.snapshot_parsing_temperature_tolerance_percent">
+<code class="sig-name descname"><span class="pre">snapshot_parsing_temperature_tolerance_percent</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.snapshot_parsing_temperature_tolerance_percent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maximum deviation of temperature between snapshot and desired
+temperature for snapshot to be considered for DFT calculation
+(in percent)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.snapshot_parsing_criterion">
+<code class="sig-name descname"><span class="pre">snapshot_parsing_criterion</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.snapshot_parsing_criterion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Criterion with which to parse the snapshots, currently only
+“random” is supported.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.number_of_snapshots">
+<code class="sig-name descname"><span class="pre">number_of_snapshots</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.number_of_snapshots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of snapshots the pipeline shoudl generate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.distance_metric_snapshots">
+<code class="sig-name descname"><span class="pre">distance_metric_snapshots</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.distance_metric_snapshots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Distance metric to determine how alike two atomic snapshots are.
+Currently only “realspace”, i.e. the realspace distance between atoms
+is calculated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.parameters.Parameters.distance_metric_snapshots_cutoff">
+<code class="sig-name descname"><span class="pre">distance_metric_snapshots_cutoff</span></code><a class="headerlink" href="#malada.utils.parameters.Parameters.distance_metric_snapshots_cutoff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Minimum distance in terms of distance_metric_snapshots after which
+after which two snapshots are considered distinct by the algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-malada.utils.slurmparams">
+<span id="malada-utils-slurmparams-module"></span><h2>malada.utils.slurmparams module<a class="headerlink" href="#module-malada.utils.slurmparams" title="Permalink to this headline">¶</a></h2>
+<p>Parameters to create a slurm run script.</p>
+<dl class="py class">
+<dt id="malada.utils.slurmparams.SlurmParameters">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">malada.utils.slurmparams.</span></code><code class="sig-name descname"><span class="pre">SlurmParameters</span></code><a class="headerlink" href="#malada.utils.slurmparams.SlurmParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class holding slurm parameters.</p>
+<dl class="py attribute">
+<dt id="malada.utils.slurmparams.SlurmParameters.scf_executable">
+<code class="sig-name descname"><span class="pre">scf_executable</span></code><a class="headerlink" href="#malada.utils.slurmparams.SlurmParameters.scf_executable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executable called for the DFT/MD calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.slurmparams.SlurmParameters.module_loading_string">
+<code class="sig-name descname"><span class="pre">module_loading_string</span></code><a class="headerlink" href="#malada.utils.slurmparams.SlurmParameters.module_loading_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>String to be executed prior to regular execution. Contains
+e.g. module loading on HPC infrastructures.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.slurmparams.SlurmParameters.execution_time">
+<code class="sig-name descname"><span class="pre">execution_time</span></code><a class="headerlink" href="#malada.utils.slurmparams.SlurmParameters.execution_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runtime of job in hours.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.slurmparams.SlurmParameters.partition_string">
+<code class="sig-name descname"><span class="pre">partition_string</span></code><a class="headerlink" href="#malada.utils.slurmparams.SlurmParameters.partition_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>String to be written on the top of a batch script containing
+information about which partition/account to use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.slurmparams.SlurmParameters.mpi_runner">
+<code class="sig-name descname"><span class="pre">mpi_runner</span></code><a class="headerlink" href="#malada.utils.slurmparams.SlurmParameters.mpi_runner" title="Permalink to this definition">¶</a></dt>
+<dd><p>MPI executable to be called for MPI jobs. There can be considerable
+differences in using mpiexec vs. mpirun.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.slurmparams.SlurmParameters.tasks_per_node">
+<code class="sig-name descname"><span class="pre">tasks_per_node</span></code><a class="headerlink" href="#malada.utils.slurmparams.SlurmParameters.tasks_per_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of tasks per node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="malada.utils.slurmparams.SlurmParameters.nodes">
+<code class="sig-name descname"><span class="pre">nodes</span></code><a class="headerlink" href="#malada.utils.slurmparams.SlurmParameters.nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="malada.utils.slurmparams.SlurmParameters.from_xml">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_xml</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.utils.slurmparams.SlurmParameters.from_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a SlurmParameters object from an xml file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>string</em>) – Path to file from which to create the parameters.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>slurm_parameters</strong> – The new parameters with values from the file</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#malada.utils.slurmparams.SlurmParameters" title="malada.utils.slurmparams.SlurmParameters">SlurmParameters</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="malada.utils.slurmparams.SlurmParameters.save">
+<code class="sig-name descname"><span class="pre">save</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.utils.slurmparams.SlurmParameters.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the parameters to a xml file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>string</em>) – Path to file to save parameters to.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-malada.utils.vasp_utils">
+<span id="malada-utils-vasp-utils-module"></span><h2>malada.utils.vasp_utils module<a class="headerlink" href="#module-malada.utils.vasp_utils" title="Permalink to this headline">¶</a></h2>
+<p>Utilities for setting up VASP calculations.</p>
+<dl class="py class">
+<dt id="malada.utils.vasp_utils.VaspUtils">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">malada.utils.vasp_utils.</span></code><code class="sig-name descname"><span class="pre">VaspUtils</span></code><a class="headerlink" href="#malada.utils.vasp_utils.VaspUtils" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Collection of functions to write to VASP files other then POSCAR.</p>
+<dl class="py method">
+<dt id="malada.utils.vasp_utils.VaspUtils.write_to_incar">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">write_to_incar</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vasp_array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.utils.vasp_utils.VaspUtils.write_to_incar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a dictionary of VASP input quantities to an INCAR file.</p>
+<p>Currently, there is NO sanity checking done here. Meaning that
+wrong INCAR files can be reated very easily.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> (<em>string</em>) – Path to where to write the INCAR file.</p></li>
+<li><p><strong>vasp_array</strong> (<em>dict</em>) – Dictionary of VASP quantities.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="malada.utils.vasp_utils.VaspUtils.write_to_kpoints">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">write_to_kpoints</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kgrid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.utils.vasp_utils.VaspUtils.write_to_kpoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a k-grid to VASP KPOINTS file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> (<em>string</em>) – Path to where to write the INCAR file.</p></li>
+<li><p><strong>kgrid</strong> (<em>tuple</em>) – k-grid to write in form of (kx, ky, kz).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="malada.utils.vasp_utils.VaspUtils.write_to_potcar_copy">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">write_to_potcar_copy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pspstring</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.utils.vasp_utils.VaspUtils.write_to_potcar_copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a file that will copy the POTCAR file to the run folder.</p>
+<p>VASP always looks for the POTCAR (PSP) in the current folder.
+Therefore, before running, we have to copy it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> (<em>string</em>) – Path tto where to create this script.</p></li>
+<li><p><strong>pspstring</strong> (<em>string</em>) – Path to POTCAR file.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-malada.utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-malada.utils" title="Permalink to this headline">¶</a></h2>
+<p>MALADA utils provides utilities for building data acquistion pipelines.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="malada.runners.html" class="btn btn-neutral float-left" title="malada.runners package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright noneyet.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,571 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>malada.providers package &mdash; Materials Learning Algorithms Data Acquisition (MALADA)  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../_static/mala_favicon.png"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="malada.runners package" href="malada.runners.html" />
+    <link rel="prev" title="malada.pipeline package" href="malada.pipeline.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Materials Learning Algorithms Data Acquisition (MALADA)
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../usage/general.html">General Usage</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">malada</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="malada.html">malada package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="malada.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="malada.pipeline.html">malada.pipeline package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">malada.providers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="malada.runners.html">malada.runners package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="malada.utils.html">malada.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="malada.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="malada.html#module-malada.version">malada.version module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="malada.html#module-malada">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Materials Learning Algorithms Data Acquisition (MALADA)</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">malada</a> &raquo;</li>
+        
+          <li><a href="malada.html">malada package</a> &raquo;</li>
+        
+      <li>malada.providers package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            
+              <a href="https://github.com//mala-project/malada/blob/develop/docs/source/api/malada.providers.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="malada-providers-package">
+<h1>malada.providers package<a class="headerlink" href="#malada-providers-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-malada.providers.crystalstructure">
+<span id="malada-providers-crystalstructure-module"></span><h2>malada.providers.crystalstructure module<a class="headerlink" href="#module-malada.providers.crystalstructure" title="Permalink to this headline">¶</a></h2>
+<p>Provider for crystal structures.</p>
+<dl class="py class">
+<dt id="malada.providers.crystalstructure.CrystalStructureProvider">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">malada.providers.crystalstructure.</span></code><code class="sig-name descname"><span class="pre">CrystalStructureProvider</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">external_cif_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.crystalstructure.CrystalStructureProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#malada.providers.provider.Provider" title="malada.providers.provider.Provider"><code class="xref py py-class docutils literal notranslate"><span class="pre">malada.providers.provider.Provider</span></code></a></p>
+<p>Provides crystal structure in the form of a .cif file.</p>
+<p>Currently limited to copying user input. In the future this will enable
+automatic download.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parameters</strong> (<em>malada.utils.parametes.Parameters</em>) – Parameters used to create this object.</p></li>
+<li><p><strong>external_cif_file</strong> (<em>string</em>) – Path to cif file provided by user. In the current state of the
+code, the pipeline will fail if this is None.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="malada.providers.crystalstructure.CrystalStructureProvider.provide">
+<code class="sig-name descname"><span class="pre">provide</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.crystalstructure.CrystalStructureProvider.provide" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide a crystal structure in the form of a cif file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>provider_path</strong> (<em>string</em>) – Path in which to operate in.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-malada.providers.dft">
+<span id="malada-providers-dft-module"></span><h2>malada.providers.dft module<a class="headerlink" href="#module-malada.providers.dft" title="Permalink to this headline">¶</a></h2>
+<p>Provider for DFT calculations to get energies and LDOS.</p>
+<dl class="py class">
+<dt id="malada.providers.dft.DFTProvider">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">malada.providers.dft.</span></code><code class="sig-name descname"><span class="pre">DFTProvider</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">external_calculation_folders</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.dft.DFTProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#malada.providers.provider.Provider" title="malada.providers.provider.Provider"><code class="xref py py-class docutils literal notranslate"><span class="pre">malada.providers.provider.Provider</span></code></a></p>
+<p>Performs a DFT calculation and provides an DFT output plus LDOS.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parameters</strong> (<em>malada.utils.parametes.Parameters</em>) – Parameters used to create this object.</p></li>
+<li><p><strong>external_calculation_folders</strong> – Path to folders containing already (half) finished calculations.
+If not None, MALADA will try to assess which calculations are still
+missing and then perform those.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="malada.providers.dft.DFTProvider.provide">
+<code class="sig-name descname"><span class="pre">provide</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dft_convergence_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ldos_convergence_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">possible_snapshots_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.dft.DFTProvider.provide" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide a set of DFT calculations on predefined snapshots.</p>
+<p>This includes DFT energies and snapshots.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>provider_path</strong> (<em>string</em>) – Path in which to operate in.</p></li>
+<li><p><strong>dft_convergence_file</strong> (<em>string</em>) – Path to xml file containing the DFT convergence parameter.</p></li>
+<li><p><strong>ldos_convergence_file</strong> (<em>string</em>) – Path to xml file containing the LDOS convergence parameter.
+This means a different set of DFT parameters needed for
+LDOS calculation.</p></li>
+<li><p><strong>possible_snapshots_file</strong> (<em>string</em>) – Path to a file containing an ASE trajectory containing atomic
+snapshots for DFT/LDOS calculation.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-malada.providers.dftconvergence">
+<span id="malada-providers-dftconvergence-module"></span><h2>malada.providers.dftconvergence module<a class="headerlink" href="#module-malada.providers.dftconvergence" title="Permalink to this headline">¶</a></h2>
+<p>Provider for optimized DFT calculation parameters.</p>
+<dl class="py class">
+<dt id="malada.providers.dftconvergence.DFTConvergenceProvider">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">malada.providers.dftconvergence.</span></code><code class="sig-name descname"><span class="pre">DFTConvergenceProvider</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">external_convergence_results</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">external_convergence_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predefined_kgrid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predefined_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.dftconvergence.DFTConvergenceProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#malada.providers.provider.Provider" title="malada.providers.provider.Provider"><code class="xref py py-class docutils literal notranslate"><span class="pre">malada.providers.provider.Provider</span></code></a></p>
+<p>For a given supercell and calculator, determine convergence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parameters</strong> (<em>malada.utils.parametes.Parameters</em>) – Parameters used to create this object.</p></li>
+<li><p><strong>external_convergence_results</strong> (<em>string</em>) – Path to xml file containing previously calculated convergence
+results. If not None, no DFT caclulations will be done.</p></li>
+<li><p><strong>external_convergence_folder</strong> (<em>string</em>) – Path to a folder containing already calculated DFT convergence
+results. If not none, no DFT calculations will be done.</p></li>
+<li><p><strong>predefined_kgrid</strong> (<em>tuple</em>) – Tuple in the form (kx,ky,kz). If not None, this k grid will be
+used and no attempt will be made to find a more optimal one.</p></li>
+<li><p><strong>predefined_cutoff</strong> (<em>float</em>) – Kinetic energy cutoff. If not None, this cutoff will be used and
+no attempt will be made to find a more optimal one.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="malada.providers.dftconvergence.DFTConvergenceProvider.provide">
+<code class="sig-name descname"><span class="pre">provide</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">supercell_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.dftconvergence.DFTConvergenceProvider.provide" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide DFT parameters converged to within user specification.</p>
+<p>The cutoff energy (=basis set size) and k-grid will be optimized.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>provider_path</strong> (<em>string</em>) – Path in which to operate in.</p></li>
+<li><p><strong>supercell_file</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-malada.providers.ldosconvergence">
+<span id="malada-providers-ldosconvergence-module"></span><h2>malada.providers.ldosconvergence module<a class="headerlink" href="#module-malada.providers.ldosconvergence" title="Permalink to this headline">¶</a></h2>
+<p>Provider for optimal LDOS calculation parameters.</p>
+<dl class="py class">
+<dt id="malada.providers.ldosconvergence.LDOSConvergenceProvider">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">malada.providers.ldosconvergence.</span></code><code class="sig-name descname"><span class="pre">LDOSConvergenceProvider</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">external_ldos_configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.ldosconvergence.LDOSConvergenceProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#malada.providers.provider.Provider" title="malada.providers.provider.Provider"><code class="xref py py-class docutils literal notranslate"><span class="pre">malada.providers.provider.Provider</span></code></a></p>
+<p>Determine number of k points and energy levels needed for a smooth LDOS.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parameters</strong> (<em>malada.utils.parametes.Parameters</em>) – Parameters used to create this object.</p></li>
+<li><p><strong>external_ldos_configuration</strong> (<em>string</em>) – Path xml file containing k grid for LDOS creation and energy levels.
+If not None, no DFT calculations will be performed.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="malada.providers.ldosconvergence.LDOSConvergenceProvider.provide">
+<code class="sig-name descname"><span class="pre">provide</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">possible_snapshots_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dft_convergence_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.ldosconvergence.LDOSConvergenceProvider.provide" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide correct number of k points and energy levels to calculate LDOS.</p>
+<p>The results of LDOS based (ML) workflows is heaviliy dependent on
+a correct choice of energy levels and the k-grid. If those are
+chosen wrongly, any neural network training will be hard and yet
+give insufficient accuracies.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>provider_path</strong> (<em>string</em>) – Path in which to operate in.</p></li>
+<li><p><strong>dft_convergence_file</strong> (<em>string</em>) – Path to xml file containing the DFT convergence parameter.</p></li>
+<li><p><strong>possible_snapshots_file</strong> (<em>string</em>) – Path to a file containing an ASE trajectory containing atomic
+snapshots for DFT/LDOS calculation.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-malada.providers.md">
+<span id="malada-providers-md-module"></span><h2>malada.providers.md module<a class="headerlink" href="#module-malada.providers.md" title="Permalink to this headline">¶</a></h2>
+<p>Provider for DFT-MD calculations.</p>
+<dl class="py class">
+<dt id="malada.providers.md.MDProvider">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">malada.providers.md.</span></code><code class="sig-name descname"><span class="pre">MDProvider</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">external_trajectory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">external_temperatures</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">external_run_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.md.MDProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#malada.providers.provider.Provider" title="malada.providers.provider.Provider"><code class="xref py py-class docutils literal notranslate"><span class="pre">malada.providers.provider.Provider</span></code></a></p>
+<p>Performs a DFT-MD calculation and provides an ASE trjactory.</p>
+<p>This can be done with a number of runners.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parameters</strong> (<em>malada.utils.parametes.Parameters</em>) – Parameters used to create this object.</p></li>
+<li><p><strong>external_trajectory</strong> (<em>string</em>) – Path to a file containing an ASE trajectory.
+If a MD trajectory has already been calculated, it can be provided
+here. In this case no MD calculation or processing is done whatsoever.
+Will be ignored if external_temperatures is None.</p></li>
+<li><p><strong>external_temperatures</strong> (<em>string</em>) – Path to a file containing a numpy array with temperature values.
+If an MD trajectory has already been calculated, the corresponding
+temperatures can be provided here. In this case no MD calculation or
+processing is done whatsoever.
+Will be ignored if external_trajectory is None.</p></li>
+<li><p><strong>external_run_folder</strong> (<em>string</em>) – Path to a folder containing a finished MD calculation.
+If provided, this MD calculation will be preprocessed by this
+file.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="malada.providers.md.MDProvider.provide">
+<code class="sig-name descname"><span class="pre">provide</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">supercell_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dft_convergence_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">md_performance_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.md.MDProvider.provide" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide a MD trajectory and temperatures from previous steps.</p>
+<p>Depending on arguments at creation, no actual MD calculation
+may be necessary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>provider_path</strong> (<em>string</em>) – Path in which to operate in.</p></li>
+<li><p><strong>supercell_file</strong> (<em>string</em>) – Path to file containing structue of the supercell in VASP format.</p></li>
+<li><p><strong>dft_convergence_file</strong> (<em>string</em>) – Path to xml file containing the DFT convergence parameter.</p></li>
+<li><p><strong>md_performance_file</strong> (<em>string</em>) – Path to xml file containing the optimal run parameters for
+MD.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-malada.providers.mdperformance">
+<span id="malada-providers-mdperformance-module"></span><h2>malada.providers.mdperformance module<a class="headerlink" href="#module-malada.providers.mdperformance" title="Permalink to this headline">¶</a></h2>
+<p>Provider for optimal MD performance parameters.</p>
+<dl class="py class">
+<dt id="malada.providers.mdperformance.MDPerformanceProvider">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">malada.providers.mdperformance.</span></code><code class="sig-name descname"><span class="pre">MDPerformanceProvider</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">external_performance_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.mdperformance.MDPerformanceProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#malada.providers.provider.Provider" title="malada.providers.provider.Provider"><code class="xref py py-class docutils literal notranslate"><span class="pre">malada.providers.provider.Provider</span></code></a></p>
+<p>Determine parallelization parameters for optimal MD performance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parameters</strong> (<em>malada.utils.parametes.Parameters</em>) – Parameters used to create this object.</p></li>
+<li><p><strong>external_performance_file</strong> (<em>string</em>) – Path to file containing optimal DFT-MD performance. If not None,
+no DFT-MD calculations will be done.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="malada.providers.mdperformance.MDPerformanceProvider.provide">
+<code class="sig-name descname"><span class="pre">provide</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dft_convergence_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.mdperformance.MDPerformanceProvider.provide" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide parallelization parameters for optimal DFT-MD performance.</p>
+<p>This is not necessary when running in serial.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>provider_path</strong> (<em>string</em>) – Path in which to operate in.</p></li>
+<li><p><strong>dft_convergence_file</strong> (<em>string</em>) – Path to xml file containing the DFT convergence parameter.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-malada.providers.provider">
+<span id="malada-providers-provider-module"></span><h2>malada.providers.provider module<a class="headerlink" href="#module-malada.providers.provider" title="Permalink to this headline">¶</a></h2>
+<p>Base class for all pipeline providers.</p>
+<dl class="py class">
+<dt id="malada.providers.provider.Provider">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">malada.providers.provider.</span></code><code class="sig-name descname"><span class="pre">Provider</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.provider.Provider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstract base class for defining providers subclasses.</p>
+<p>Apart from the constructor, each provider should have a provide() method.</p>
+<dl class="py method">
+<dt id="malada.providers.provider.Provider.provide">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">provide</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.provider.Provider.provide" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use output from previous step to provide input for the next.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>provider_path</strong> (<em>string</em>) – Path in which to operate in.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-malada.providers.snapshots">
+<span id="malada-providers-snapshots-module"></span><h2>malada.providers.snapshots module<a class="headerlink" href="#module-malada.providers.snapshots" title="Permalink to this headline">¶</a></h2>
+<p>Provider for a set of snapshots from a MD trajectory.</p>
+<dl class="py class">
+<dt id="malada.providers.snapshots.SnapshotsProvider">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">malada.providers.snapshots.</span></code><code class="sig-name descname"><span class="pre">SnapshotsProvider</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">external_snapshots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.snapshots.SnapshotsProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#malada.providers.provider.Provider" title="malada.providers.provider.Provider"><code class="xref py py-class docutils literal notranslate"><span class="pre">malada.providers.provider.Provider</span></code></a></p>
+<p>Filters snapshots from a given MD trajectory, with a user specified metric.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parameters</strong> (<em>malada.utils.parametes.Parameters</em>) – Parameters used to create this object.</p></li>
+<li><p><strong>external_snapshots</strong> (<em>string</em>) – Path to a trajectory file containing snapshots. If not None,
+no parsing will be done.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="malada.providers.snapshots.SnapshotsProvider.provide">
+<code class="sig-name descname"><span class="pre">provide</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajectoryfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperaturefile</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.snapshots.SnapshotsProvider.provide" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide a trajectory file containing atomic snapshots.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>provider_path</strong> (<em>string</em>) – Path in which to operate in.</p></li>
+<li><p><strong>trajectoryfile</strong> (<em>string</em>) – Path to file containing the MD trajectory as ASE trajectory.</p></li>
+<li><p><strong>temperaturefile</strong> (<em>string</em>) – File containing the temperatures from the MD run as numpy array.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-malada.providers.supercell">
+<span id="malada-providers-supercell-module"></span><h2>malada.providers.supercell module<a class="headerlink" href="#module-malada.providers.supercell" title="Permalink to this headline">¶</a></h2>
+<p>Provider for creation of supercell from crystal structure.</p>
+<dl class="py class">
+<dt id="malada.providers.supercell.SuperCellProvider">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">malada.providers.supercell.</span></code><code class="sig-name descname"><span class="pre">SuperCellProvider</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">external_supercell_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.supercell.SuperCellProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#malada.providers.provider.Provider" title="malada.providers.provider.Provider"><code class="xref py py-class docutils literal notranslate"><span class="pre">malada.providers.provider.Provider</span></code></a></p>
+<p>Builds a supercell file (vasp format).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parameters</strong> (<em>malada.utils.parametes.Parameters</em>) – Parameters used to create this object.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="malada.providers.supercell.SuperCellProvider.provide">
+<code class="sig-name descname"><span class="pre">provide</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cif_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.supercell.SuperCellProvider.provide" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide supercell file in VASP format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>provider_path</strong> (<em>string</em>) – Path in which to operate in.</p></li>
+<li><p><strong>cif_file</strong> (<em>string</em>) – Path to cif file used for supercell creation.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-malada.providers">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-malada.providers" title="Permalink to this headline">¶</a></h2>
+<p>Module containing providers for data generation pipeline.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="malada.runners.html" class="btn btn-neutral float-right" title="malada.runners package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="malada.pipeline.html" class="btn btn-neutral float-left" title="malada.pipeline package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright noneyet.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+malada.providers package
+========================
+
+Submodules
+----------
+
+malada.providers.crystalstructure module
+----------------------------------------
+
+.. automodule:: malada.providers.crystalstructure
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+malada.providers.dft module
+---------------------------
+
+.. automodule:: malada.providers.dft
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+malada.providers.dftconvergence module
+--------------------------------------
+
+.. automodule:: malada.providers.dftconvergence
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+malada.providers.ldosconvergence module
+---------------------------------------
+
+.. automodule:: malada.providers.ldosconvergence
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+malada.providers.md module
+--------------------------
+
+.. automodule:: malada.providers.md
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+malada.providers.mdperformance module
+-------------------------------------
+
+.. automodule:: malada.providers.mdperformance
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+malada.providers.provider module
+--------------------------------
+
+.. automodule:: malada.providers.provider
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+malada.providers.snapshots module
+---------------------------------
+
+.. automodule:: malada.providers.snapshots
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+malada.providers.supercell module
+---------------------------------
+
+.. automodule:: malada.providers.supercell
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: malada.providers
+   :members:
+   :undoc-members:
+   :show-inheritance:
