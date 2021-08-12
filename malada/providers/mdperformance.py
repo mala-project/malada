@@ -1,3 +1,4 @@
+"""Provider for optimal MD performance parameters."""
 import os
 from shutil import copyfile
 from xml.etree.ElementTree import Element, SubElement, tostring
@@ -6,14 +7,38 @@ from .provider import Provider
 
 
 class MDPerformanceProvider(Provider):
-    """Determine parallelization parameters for optimal MD performance"""
+    """
+    Determine parallelization parameters for optimal MD performance.
+
+    Parameters
+    ----------
+    parameters : malada.utils.parametes.Parameters
+        Parameters used to create this object.
+
+    external_performance_file : string
+        Path to file containing optimal DFT-MD performance. If not None,
+        no DFT-MD calculations will be done.
+    """
 
     def __init__(self, parameters, external_performance_file=None):
         super(MDPerformanceProvider, self).__init__(parameters)
         self.md_performance_xml = None
         self.external_performance_file = external_performance_file
 
-    def provide(self, provider_path, dft_convergence_results):
+    def provide(self, provider_path, dft_convergence_file):
+        """
+        Provide parallelization parameters for optimal DFT-MD performance.
+
+        This is not necessary when running in serial.
+
+        Parameters
+        ----------
+        provider_path : string
+            Path in which to operate in.
+
+        dft_convergence_file : string
+            Path to xml file containing the DFT convergence parameter.
+        """
         file_name = self.parameters.element + \
                     str(self.parameters.number_of_atoms) + \
                     "_" + self.parameters.crystal_structure +\

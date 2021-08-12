@@ -1,3 +1,4 @@
+"""Provider for optimized DFT calculation parameters."""
 import os
 import numpy as np
 import glob
@@ -17,7 +18,30 @@ from .provider import Provider
 
 
 class DFTConvergenceProvider(Provider):
-    """For a given supercell and calculator, determine convergence."""
+    """
+    For a given supercell and calculator, determine convergence.
+
+    Parameters
+    ----------
+    parameters : malada.utils.parametes.Parameters
+        Parameters used to create this object.
+
+    external_convergence_results : string
+        Path to xml file containing previously calculated convergence
+        results. If not None, no DFT caclulations will be done.
+
+    external_convergence_folder : string
+        Path to a folder containing already calculated DFT convergence
+        results. If not none, no DFT calculations will be done.
+
+    predefined_kgrid : tuple
+        Tuple in the form (kx,ky,kz). If not None, this k grid will be
+        used and no attempt will be made to find a more optimal one.
+
+    predefined_cutoff : float
+        Kinetic energy cutoff. If not None, this cutoff will be used and
+        no attempt will be made to find a more optimal one.
+    """
 
     def __init__(self, parameters, external_convergence_results=None,
                  external_convergence_folder=None,
@@ -31,6 +55,18 @@ class DFTConvergenceProvider(Provider):
         self.converged_kgrid = predefined_kgrid
 
     def provide(self, provider_path, supercell_file):
+        """
+        Provide DFT parameters converged to within user specification.
+
+        The cutoff energy (=basis set size) and k-grid will be optimized.
+
+        Parameters
+        ----------
+        provider_path : string
+            Path in which to operate in.
+
+        supercell_file
+        """
         file_name = self.parameters.element + \
                     str(self.parameters.number_of_atoms) + \
                     "_" + self.parameters.crystal_structure +\

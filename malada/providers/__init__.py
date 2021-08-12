@@ -1,3 +1,5 @@
+"""Module containing providers for data generation pipeline."""
+
 from .crystalstructure import CrystalStructureProvider
 from .supercell import SuperCellProvider
 from .dftconvergence import DFTConvergenceProvider

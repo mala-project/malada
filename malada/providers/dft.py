@@ -1,3 +1,4 @@
+"""Provider for DFT calculations to get energies and LDOS."""
 from .provider import Provider
 import os
 from shutil import copyfile
@@ -9,8 +10,22 @@ from ..utils import kelvin_to_rydberg, second_to_rydberg_time, kelvin_to_eV
 from malada.utils.vasp_utils import VaspUtils
 import malada
 
+
 class DFTProvider(Provider):
-    """Performs a DFT calculation and provides an DFT output plus LDOS.."""
+    """
+    Performs a DFT calculation and provides an DFT output plus LDOS.
+
+    Parameters
+    ----------
+    parameters : malada.utils.parametes.Parameters
+        Parameters used to create this object.
+
+    external_calculation_folders:
+        Path to folders containing already (half) finished calculations.
+        If not None, MALADA will try to assess which calculations are still
+        missing and then perform those.
+    """
+
     def __init__(self, parameters, external_calculation_folders=None):
         super(DFTProvider, self).__init__(parameters)
         self.external_calculation_folders = external_calculation_folders
@@ -18,11 +33,29 @@ class DFTProvider(Provider):
 
     def provide(self, provider_path, dft_convergence_file,
                 ldos_convergence_file, possible_snapshots_file):
-        file_name = self.parameters.element + \
-                    str(self.parameters.number_of_atoms) + \
-                    "_" + self.parameters.crystal_structure +\
-                    "_" + str(self.parameters.temperature)
-        self.calculations_folders = provider_path
+        """
+        Provide a set of DFT calculations on predefined snapshots.
+
+        This includes DFT energies and snapshots.
+
+        Parameters
+        ----------
+        provider_path : string
+            Path in which to operate in.
+
+        dft_convergence_file : string
+            Path to xml file containing the DFT convergence parameter.
+
+        ldos_convergence_file : string
+            Path to xml file containing the LDOS convergence parameter.
+            This means a different set of DFT parameters needed for
+            LDOS calculation.
+
+        possible_snapshots_file : string
+            Path to a file containing an ASE trajectory containing atomic
+            snapshots for DFT/LDOS calculation.
+        """
+        self.calculation_folders = provider_path
         if self.external_calculation_folders is None:
             # Here we have to perform the actucal calculation.
             if self.parameters.dft_calculator != "qe":
@@ -41,13 +74,13 @@ class DFTProvider(Provider):
                 # Run the individul files.
                 snapshot_path = os.path.join(provider_path,"snapshot"+str(i))
                 print("Running DFT in", snapshot_path)
-                dftrunner.run_folder(snapshot_path,"dft",
+                dft_runner.run_folder(snapshot_path,"dft",
                                 qe_input_type="*.pw.scf.in")
-                dftrunner.run_folder(snapshot_path,"dft",
+                dft_runner.run_folder(snapshot_path,"dft",
                                      qe_input_type="*.dos.in")
-                dftrunner.run_folder(snapshot_path,"dft",
+                dft_runner.run_folder(snapshot_path,"dft",
                                      qe_input_type="*.pp.dens.in")
-                dftrunner.run_folder(snapshot_path,"dft",
+                dft_runner.run_folder(snapshot_path,"dft",
                                      qe_input_type="*.pp.ldos.in")
         else:
             # Here, we have to do a consistency check.

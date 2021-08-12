@@ -1,3 +1,4 @@
+"""Base class for all pipeline providers."""
 from abc import ABC, abstractmethod
 import xml.etree.ElementTree as ET
 import glob
@@ -5,6 +6,7 @@ import os
 import ase
 import ase.io
 import numpy as np
+
 
 class Provider:
     """
@@ -23,6 +25,14 @@ class Provider:
 
     @abstractmethod
     def provide(self, provider_path):
+        """
+        Using output from previous step, provide input for the next.
+
+        Parameters
+        ----------
+        provider_path : string
+            Path in which to operate in.
+        """
         pass
 
     def _read_convergence(self, filename):

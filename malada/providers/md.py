@@ -1,3 +1,5 @@
+"""Provider for DFT-MD calculations."""
+
 from .provider import Provider
 import os
 from shutil import copyfile
@@ -9,8 +11,37 @@ from ..utils import kelvin_to_rydberg, second_to_rydberg_time, kelvin_to_eV
 from malada.utils.vasp_utils import VaspUtils
 import malada
 
+
 class MDProvider(Provider):
-    """Performs a DFT-MD calculation and provides an ASE trjactory.."""
+    """
+    Performs a DFT-MD calculation and provides an ASE trjactory.
+
+    This can be done with a number of runners.
+
+    Parameters
+    ----------
+    parameters : malada.utils.parametes.Parameters
+        Parameters used to create this object.
+
+    external_trajectory : string
+        Path to a file containing an ASE trajectory.
+        If a MD trajectory has already been calculated, it can be provided
+        here. In this case no MD calculation or processing is done whatsoever.
+        Will be ignored if external_temperatures is None.
+
+    external_temperatures : string
+        Path to a file containing a numpy array with temperature values.
+        If an MD trajectory has already been calculated, the corresponding
+        temperatures can be provided here. In this case no MD calculation or
+        processing is done whatsoever.
+        Will be ignored if external_trajectory is None.
+
+    external_run_folder : string
+        Path to a folder containing a finished MD calculation.
+        If provided, this MD calculation will be preprocessed by this
+        file.
+    """
+
     def __init__(self, parameters, external_trajectory=None,
                  external_temperatures=None, external_run_folder=None):
         super(MDProvider, self).__init__(parameters)
@@ -22,6 +53,28 @@ class MDProvider(Provider):
 
     def provide(self, provider_path, supercell_file, dft_convergence_file,
                 md_performance_file):
+        """
+        Provide a MD trajectory and temperatures from previous steps.
+
+        Depending on arguments at creation, no actual MD calculation
+        may be necessary.
+
+        Parameters
+        ----------
+        provider_path : string
+            Path in which to operate in.
+
+        supercell_file : string
+            Path to file containing structue of the supercell in VASP format.
+
+        dft_convergence_file : string
+            Path to xml file containing the DFT convergence parameter.
+
+        md_performance_file : string
+            Path to xml file containing the optimal run parameters for
+            MD.
+        """
+        # Creating file for output.
         file_name = self.parameters.element + \
                     str(self.parameters.number_of_atoms) + \
                     "_" + self.parameters.crystal_structure +\
@@ -29,6 +82,10 @@ class MDProvider(Provider):
         self.trajectory_file = os.path.join(provider_path, file_name+".traj")
         self.temperature_file = os.path.join(provider_path, file_name +
                                              ".temp.npy")
+
+        # MD performance has to be loaded if SLURM is used.
+        # TODO: Fix this, the MD parameters should also contain the thermostat
+        # controller
         if self.parameters.run_system == "slurm_creator":
             self.parameters.md_slurm = malada.SlurmParameters.\
                                        from_xml(md_performance_file)
@@ -45,6 +102,9 @@ class MDProvider(Provider):
                 mdrunner.run_folder(provider_path,"md",
                                     qe_input_type="*.pw.md.in")
                 folder_to_parse = provider_path
+
+                # If SLURM is used as run tool, we stop here while the user
+                # runs.
                 if self.parameters.run_system == "slurm_creator":
                     print("Created run scripts. Please run via slurm.")
                     print("Quitting...")

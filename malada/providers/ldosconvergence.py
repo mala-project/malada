@@ -1,23 +1,23 @@
+"""Provider for optimal LDOS calculation parameters."""
 import os
-import numpy as np
-import glob
-
 from shutil import copyfile
-import ase
-import ase.io
-from ase.units import Rydberg
-from xml.etree.ElementTree import Element, SubElement, tostring
-from xml.dom import minidom
-
-import malada
-from malada.utils.convergence_guesses import *
-from malada.utils.custom_converter import *
-from malada.utils.vasp_utils import VaspUtils
 from .provider import Provider
 
 
 class LDOSConvergenceProvider(Provider):
-    """Determine number of k points needed for a smooth LDOS."""
+    """
+    Determine number of k points and energy levels needed for a smooth LDOS.
+
+    Parameters
+    ----------
+    parameters : malada.utils.parametes.Parameters
+        Parameters used to create this object.
+
+    external_ldos_configuration : string
+        Path xml file containing k grid for LDOS creation and energy levels.
+        If not None, no DFT calculations will be performed.
+
+    """
 
     def __init__(self, parameters, external_ldos_configuration=None):
         super(LDOSConvergenceProvider, self).__init__(parameters)
@@ -25,7 +25,27 @@ class LDOSConvergenceProvider(Provider):
         self.external_ldos_configuration = external_ldos_configuration
         self.ldos_configuration_file = None
 
-    def provide(self, provider_path, snapshot_file, dft_convergence_file):
+    def provide(self, provider_path, possible_snapshots_file, dft_convergence_file):
+        """
+        Provide correct number of k points and energy levels to calculate LDOS.
+
+        The results of LDOS based (ML) workflows is heaviliy dependent on
+        a correct choice of energy levels and the k-grid. If those are
+        chosen wrongly, any neural network training will be hard and yet
+        give insufficient accuracies.
+
+        Parameters
+        ----------
+        provider_path : string
+            Path in which to operate in.
+
+        dft_convergence_file : string
+            Path to xml file containing the DFT convergence parameter.
+
+        possible_snapshots_file : string
+            Path to a file containing an ASE trajectory containing atomic
+            snapshots for DFT/LDOS calculation.
+        """
         file_name = self.parameters.element + \
                     str(self.parameters.number_of_atoms) + \
                     "_" + self.parameters.crystal_structure +\

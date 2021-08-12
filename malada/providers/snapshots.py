@@ -1,3 +1,4 @@
+"""Provider for a set of snapshots from a MD trajectory."""
 from .provider import Provider
 import os
 from shutil import copyfile
@@ -9,13 +10,39 @@ from scipy.spatial.distance import cdist
 
 
 class SnapshotsProvider(Provider):
-    """Filter snapshots from a given MD trajectory."""
+    """
+    Filters snapshots from a given MD trajectory, with a user specified metric.
+
+    Parameters
+    ----------
+    parameters : malada.utils.parametes.Parameters
+        Parameters used to create this object.
+
+    external_snapshots : string
+        Path to a trajectory file containing snapshots. If not None,
+        no parsing will be done.
+    """
+
     def __init__(self, parameters, external_snapshots=None):
         super(SnapshotsProvider, self).__init__(parameters)
         self.external_snapshots = external_snapshots
         self.snapshot_file = None
 
     def provide(self, provider_path, trajectoryfile, temperaturefile):
+        """
+        Provide a trajectory file containing atomic snapshots.
+
+        Parameters
+        ----------
+        provider_path : string
+            Path in which to operate in.
+
+        trajectoryfile : string
+            Path to file containing the MD trajectory as ASE trajectory.
+
+        temperaturefile : string
+            File containing the temperatures from the MD run as numpy array.
+        """
         file_name = self.parameters.element + \
                     str(self.parameters.number_of_atoms) + \
                     "_" + self.parameters.crystal_structure +\
@@ -40,7 +67,6 @@ class SnapshotsProvider(Provider):
             copyfile(self.external_snapshots, self.snapshot_file)
             print("Getting <<snapshots>>.npy"
                   " files from disc.")
-
 
     def __get_first_snapshot(self, trajectoryfile):
         if self.parameters.snapshot_parsing_beginning < 0:
@@ -92,7 +118,6 @@ class SnapshotsProvider(Provider):
             raise Exception("Not enough snapshots found in MD trajectory. "
                             "Please run a longer MD calculation.")
 
-
     def __check_if_snapshot_is_valid(self, snapshot_to_test, temp_to_test,
                                      reference_snapshot, reference_temp,
                                      distance_metric,
@@ -103,7 +128,6 @@ class SnapshotsProvider(Provider):
             return True
         else:
             return False
-
 
     def __calculate_distance_between_snapshots(self, snapshot1, snapshot2, dist_type="simple_geometric"):
         positions1 = snapshot1.get_positions()
