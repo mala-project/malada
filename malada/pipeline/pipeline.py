@@ -105,7 +105,7 @@ class DataPipeline:
         # Step two: Build the supercell.
         print("Building supercell...")
         path01 = os.path.join(self.parameters.base_folder,
-                              "01_crystal_structure")
+                              "01_supercell")
         if not os.path.exists(path01):
             os.makedirs(path01)
         self.supercell_provider.provide(path01, self.crystal_structure_provider.cif_file)

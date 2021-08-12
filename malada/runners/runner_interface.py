@@ -21,7 +21,6 @@ def RunnerInterface(parameters):
     if parameters.run_system == "bash":
         runner = BashRunner(parameters)
     if parameters.run_system == "slurm_creator":
-        print("Here")
         runner = SlurmCreatorRunner(parameters)
 
     if runner is not None:
