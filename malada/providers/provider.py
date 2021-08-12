@@ -18,6 +18,7 @@ class Provider:
         - from_file() from providing its results from a user-defined file
         - provide() function to perform its calculation and provide the
         results.
+
     """
 
     def __init__(self, parameters):
