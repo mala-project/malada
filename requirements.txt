@@ -2,3 +2,4 @@ ase
 numpy
 abc
 scipy
+xml
