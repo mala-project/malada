@@ -88,19 +88,28 @@ class DFTConvergenceProvider(Provider):
                 while (self.converged_cutoff is None and cutoff_try
                        < self.parameters.maximum_cutoff_try):
 
+                    # First, we create the inputs.
                     cutoff_folders = self.\
                         __create_dft_convergence_inputs("cutoff", supercell_file,
                                                         provider_path, cutoff_try)
+
+                    # Then we run.
                     for cutoff_folder in cutoff_folders:
                         print("Running DFT in", cutoff_folder)
                         dft_runner.run_folder(cutoff_folder,
                                               "dft")
-                    if self.parameters.run_system == "slurm_creator":
-                        print("Created run scripts. Please run via slurm.")
-                        print("Quitting...")
-                        quit()
-                    self.converged_cutoff = self.__analyze_convergence_runs(provider_path, "cutoff",
-                                                                            fixed_kpoints=(1, 1, 1))
+
+                    # Afterwards, we check if running was succesful.
+                    if self.__check_run_success(provider_path, "cutoff", fixed_kpoints=(1,1,1)):
+                        self.converged_cutoff = self.__analyze_convergence_runs(provider_path, "cutoff",
+                                                                                fixed_kpoints=(1, 1, 1))
+                    else:
+                        if self.parameters.run_system == "slurm_creator":
+                            print("Run scripts created, please run via slurm.\n"
+                                  "Quitting now.")
+                            quit()
+                        else:
+                            raise Exception("DFT calculations failed.")
                     if self.converged_cutoff is None:
                         print("Could not find an aedaquate cutoff energy, "
                               "trying again with larger cutoff energies. "
@@ -119,9 +128,21 @@ class DFTConvergenceProvider(Provider):
                         print("Running DFT in", kpoint_folder)
                         dft_runner.run_folder(kpoint_folder,
                                               "dft")
-                    self.converged_kgrid = self.__analyze_convergence_runs(provider_path,
-                                                                           "kpoints",
-                                                                            fixed_cutoff=self.converged_cutoff)
+
+                    # Afterwards, we check if running was succesful.
+                    if self.__check_run_success(provider_path, "kpoints", fixed_cutoff=self.converged_cutoff):
+                        self.converged_kgrid = self.__analyze_convergence_runs(
+                            provider_path,
+                            "kpoints",
+                            fixed_cutoff=self.converged_cutoff)
+                    else:
+                        if self.parameters.run_system == "slurm_creator":
+                            print("Run scripts created, please run via slurm.\n"
+                                  "Quitting now.")
+                            quit()
+                        else:
+                            raise Exception("DFT calculations failed.")
+
                     if self.converged_kgrid is None:
                         print("Could not find an aedaquate k-grid, trying again"
                               "with larger k-grids. This will be try nr. "
@@ -233,12 +254,13 @@ class DFTConvergenceProvider(Provider):
             else:
                 spacing = kpoints_guesses[self.parameters.element][-1]-\
                           kpoints_guesses[self.parameters.element][-2]
-                converge_list.append(self.__k_edge_length_to_grid(kpoints_guesses[self.parameters.element][-1]+spacing*(try_number-1)*2+1))
-                converge_list.append(self.__k_edge_length_to_grid(kpoints_guesses[self.parameters.element][-1]+spacing*(try_number-1)*2+2))
+                print(kpoints_guesses[self.parameters.element][-1],spacing*(try_number-1)*2,1*spacing)
+                print(kpoints_guesses[self.parameters.element][-2],spacing*(try_number-1)*2,2*spacing)
+                converge_list.append(self.__k_edge_length_to_grid(kpoints_guesses[self.parameters.element][-1]+spacing*(try_number-1)*2+1*spacing))
+                converge_list.append(self.__k_edge_length_to_grid(kpoints_guesses[self.parameters.element][-2]+spacing*(try_number-1)*2+2*spacing))
             cutoff = self.converged_cutoff
         else:
             if self.parameters.dft_calculator == "qe":
-                converge_list = cutoff_guesses_qe[self.parameters.element]
                 if try_number == 0:
                     converge_list = cutoff_guesses_qe[self.parameters.element]
                 else:
@@ -246,10 +268,11 @@ class DFTConvergenceProvider(Provider):
                               cutoff_guesses_qe[self.parameters.element][-2]
                     converge_list.append(
                         cutoff_guesses_qe[self.parameters.element][
-                            -1] + spacing * (try_number - 1) * 2 + 1)
+                            -1] + spacing * (try_number - 1) * 2 + 1*spacing)
                     converge_list.append(
                         cutoff_guesses_qe[self.parameters.element][
-                            -1] + spacing * (try_number - 1) * 2 + 2)
+                            -1] + spacing * (try_number - 1) * 2 + 2*spacing)
+
 
             elif self.parameters.dft_calculator == "vasp":
                 converge_list = cutoff_guesses_vasp[self.parameters.element]
@@ -357,6 +380,43 @@ class DFTConvergenceProvider(Provider):
             os.makedirs(this_folder)
         return this_folder
 
+    def __check_run_success(self, base_folder, parameter_to_converge,
+                            fixed_cutoff=None, fixed_kpoints=None):
+        # First, parse the results out of the output files.
+        if parameter_to_converge == "cutoff":
+            if self.parameters.dft_calculator == "qe":
+                converge_list = glob.glob(os.path.join(base_folder,
+                                          "*Ry_k"+str(fixed_kpoints[0]) +
+                                          str(fixed_kpoints[1]) +
+                                          str(fixed_kpoints[2])))
+            elif self.parameters.dft_calculator == "vasp":
+                converge_list = glob.glob(os.path.join(base_folder,
+                                          "*eV_k"+str(fixed_kpoints[0]) +
+                                          str(fixed_kpoints[1]) +
+                                          str(fixed_kpoints[2])))
+        elif parameter_to_converge == "kpoints":
+            if self.parameters.dft_calculator == "qe":
+                converge_list = glob.glob(os.path.join(base_folder,
+                                                       str(fixed_cutoff)+"Ry_k*"))
+            elif self.parameters.dft_calculator == "vasp":
+                converge_list = glob.glob(os.path.join(base_folder,
+                                                       str(fixed_cutoff)+"eV_k*"))
+        else:
+            raise Exception("Unknown convergence parameter.")
+
+        for entry in converge_list:
+            if self.parameters.dft_calculator == "qe":
+                convergence_file_lists = glob.glob(os.path.join(entry,
+                                                   "*.out"))
+                if len(convergence_file_lists) != 1:
+                    return False
+            elif self.parameters.dft_calculator == "vasp":
+                if not os.path.isfile(os.path.join(entry, "OUTCAR")):
+                    return False
+            else:
+                raise Exception("Unknown calculator chosen.")
+        return True
+
     def __analyze_convergence_runs(self, base_folder, parameter_to_converge,
                                   fixed_cutoff=None, fixed_kpoints=None):
 
@@ -380,6 +440,7 @@ class DFTConvergenceProvider(Provider):
             raise Exception("Unknown convergence parameter.")
 
         for entry in converge_list:
+            energy = None
             if self.parameters.dft_calculator == "qe":
                 if parameter_to_converge == "cutoff":
                    argument = int(os.path.basename(entry).split("Ry")[0])
@@ -389,18 +450,23 @@ class DFTConvergenceProvider(Provider):
                                 int((os.path.basename(entry).split("k")[1])[2]))
                 convergence_file_lists = glob.glob(os.path.join(entry,
                                                    "*.out"))
-                if len(convergence_file_lists) != 1:
+                if len(convergence_file_lists) > 1:
                     print(convergence_file_lists)
                     raise Exception("Run folder with ambigous content.")
-                energy = self.__get_qe_energy(convergence_file_lists[0])
+                if len(convergence_file_lists) > 0:
+                    energy = self.__get_qe_energy(convergence_file_lists[0])
 
             elif self.parameters.dft_calculator == "vasp":
                 argument = int(os.path.basename(entry).split("eV")[0])
-                energy = self.__get_vasp_energy(os.path.join(entry,
-                                                               "OUTCAR"))
+                try:
+                    energy = self.__get_vasp_energy(os.path.join(entry,
+                                                                   "OUTCAR"))
+                except FileNotFoundError:
+                    pass
             else:
                 raise Exception("Unknown calculator chosen.")
-            result_list.append([argument, energy])
+            if energy is not None:
+                result_list.append([argument, energy])
         result_list = sorted(result_list, key=lambda d: [d[0]])
 
         # Next, analyze the convergence.
