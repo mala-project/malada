@@ -1,3 +1,4 @@
+"""Parameters to create a slurm run script."""
 from xml.etree.ElementTree import Element, SubElement, tostring, parse
 from xml.dom import minidom
 
@@ -5,6 +6,33 @@ from xml.dom import minidom
 class SlurmParameters:
     """
     Class holding slurm parameters.
+
+    Attributes
+    ----------
+    scf_executable : string
+        Executable called for the DFT/MD calculation.
+
+    module_loading_string : string
+        String to be executed prior to regular execution. Contains
+        e.g. module loading on HPC infrastructures.
+
+    execution_time : int
+        Runtime of job in hours.
+
+    partition_string : string
+        String to be written on the top of a batch script containing
+        information about which partition/account to use.
+
+    mpi_runner : string
+        MPI executable to be called for MPI jobs. There can be considerable
+        differences in using mpiexec vs. mpirun.
+
+    tasks_per_node : int
+        Number of tasks per node.
+
+    nodes : int
+        Number of nodes.
+
     """
 
     def __init__(self):
@@ -19,6 +47,14 @@ class SlurmParameters:
         self.nodes = 0
 
     def save(self, filename):
+        """
+        Save the parameters to a xml file.
+
+        Parameters
+        ----------
+        filename : string
+            Path to file to save parameters to.
+        """
         top = Element('slurmparameters')
         node = SubElement(top, "scf_executable",
                           {"type": "string"})
@@ -48,6 +84,20 @@ class SlurmParameters:
 
     @classmethod
     def from_xml(cls, filename):
+        """
+        Create a SlurmParameters object from an xml file.
+
+        Parameters
+        ----------
+        filename : string
+            Path to file from which to create the parameters.
+
+        Returns
+        -------
+        slurm_parameters : SlurmParameters
+            The new parameters with values from the file
+
+        """
         new_object = SlurmParameters()
         filecontents = parse(filename).getroot()
         new_object.scf_executable = filecontents.find("scf_executable").text

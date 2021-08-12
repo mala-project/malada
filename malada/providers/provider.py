@@ -26,7 +26,7 @@ class Provider:
     @abstractmethod
     def provide(self, provider_path):
         """
-        Using output from previous step, provide input for the next.
+        Use output from previous step to provide input for the next.
 
         Parameters
         ----------

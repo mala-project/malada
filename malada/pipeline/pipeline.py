@@ -1,3 +1,4 @@
+"""Data generation Pipeline."""
 from malada import CrystalStructureProvider, SuperCellProvider, \
                    DFTConvergenceProvider, MDPerformanceProvider, MDProvider, \
                    SnapshotsProvider, LDOSConvergenceProvider, DFTProvider
@@ -5,7 +6,38 @@ import os
 
 
 class DataPipeline:
-    """Uses providers to run an entire data pipeline, ending with the LDOS."""
+    """
+    Uses providers to run an entire data pipeline, ending with the LDOS.
+
+    Parameters
+    ----------
+    parameters : malada.utils.parametes.Parameters
+        Parameters used to create this object.
+
+    crystal_structure_provider: malada.CrystalStructureProvider
+        Provider for crystal structures.
+
+    supercell_provider: malada.SuperCellProvider
+        Provider for supercells (=atomic positions).
+
+    dft_convergence_provider: malada.DFTConvergenceProvider
+        Provider for optimal DFT parameters (cutoff energy / k-grid)
+
+    md_performance_provider: malada.MDPerformanceProvider
+        Provider for optimal MD performance (parallelization).
+
+    md_provider: malada.MDProvider
+        Provider for MD trajectory and temperatures.
+
+    snapshots_provider: malada.SnapshotsProvider
+        Provider of set of atomic positions from MD trajectory.
+
+    ldos_configuration_provider: malada.LDOSConvergenceProvider
+        Provider for optimal LDOS calculation parameters (energy and k- grid).
+
+    dft_provider: malada.DFTProvider
+        Provider for final DFT calculations and LDOS calculation
+    """
 
     def __init__(self, parameters,
                  crystal_structure_provider: CrystalStructureProvider = None,
@@ -59,6 +91,7 @@ class DataPipeline:
             self.dft_provider = dft_provider
 
     def run(self):
+        """Run a full data generation pipeline."""
         # Step one: Get the crystal structure.
         print("Getting the crystal structure...")
         path00 = os.path.join(self.parameters.base_folder,

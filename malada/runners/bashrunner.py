@@ -1,3 +1,4 @@
+"""Bash based runner. This will be replaced by an ASE based system."""
 import glob
 import os
 import ase.io
@@ -17,11 +18,25 @@ class BashRunner(Runner):
     def __init__(self, parameters):
         super(BashRunner, self).__init__(parameters)
 
-    def run_folder(self, folder, calculcation_type,
+    def run_folder(self, folder, calculation_type,
                    qe_input_type="*.pw.scf.in"):
-        if calculcation_type == "dft":
+        """
+        Run a folder on the command line.
+
+        Parameters
+        ----------
+        folder : string
+            Folder to run in.
+
+        calculation_type : string
+            Type of calculation, currently supported are "dft" and "md".
+
+        qe_input_type : string
+            Details the type of DFT calculation to be performed by QE.
+        """
+        if calculation_type == "dft":
             calculator_type = self.parameters.dft_calculator
-        if calculcation_type == "md":
+        if calculation_type == "md":
             calculator_type = self.parameters.md_calculator
 
         if calculator_type == "qe":

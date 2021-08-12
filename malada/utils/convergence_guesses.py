@@ -1,3 +1,4 @@
+"""Initial guesses for convergence calculations."""
 # TODO: Find a smarter way to do this.
 
 cutoff_guesses_qe = {"Fe": [40, 50, 60, 70, 80, 90, 100],

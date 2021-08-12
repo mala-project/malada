@@ -1,10 +1,17 @@
+"""Runner that only creates SLURM input files."""
 from .runner import Runner
 from malada import SlurmParameters
 import os
 
+
 class SlurmCreatorRunner(Runner):
     """
-    Creates slurm input scripts without running them.
+    Create slurm input scripts without running them.
+
+    Parameters
+    ----------
+    parameters : malada.utils.parametes.Parameters
+        Parameters used to create this object.
     """
 
     def __init__(self, parameters):
@@ -12,6 +19,21 @@ class SlurmCreatorRunner(Runner):
 
     def run_folder(self, folder, calculation_type,
                    qe_input_type="*.pw.scf.in"):
+        """
+        Run a folder (=create submit.slurm for it).
+
+        Parameters
+        ----------
+        folder : string
+            Folder to run in.
+
+        calculation_type : string
+            Type of calculation, currently supported are "dft" and "md".
+
+        qe_input_type : string
+            Details the type of DFT calculation to be performed by QE.
+
+        """
         # Write a submit.slurm file.
         slurm_params : SlurmParameters
         if calculation_type == "dft":

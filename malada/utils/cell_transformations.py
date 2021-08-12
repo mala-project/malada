@@ -1,3 +1,5 @@
+"""WILL BE DELETED: Transformation matrices for supercell creation."""
+
 # TODO: I know this can be replaced by a mathematical expression. This is just
 # for the first tests.
 # Also it is not really correct in its current form.

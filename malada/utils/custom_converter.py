@@ -38,7 +38,6 @@ def kelvin_to_eV(temperature_K):
         Temperature expressed in electron volts.
 
     """
-
     return kelvin_to_rydberg(temperature_K) * ase.units.Rydberg
 
 
