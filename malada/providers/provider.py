@@ -113,7 +113,68 @@ class Provider:
                         i += 1
                 else:
                     break
-        np.save(file_name)
+        np.save(file_name, times)
+
+    def _vasp_out_to_temperature(self, out_folder, file_name):
+        file_list = glob.glob(os.path.join(out_folder, "slurm-*/"))
+        ordered_file_list = sorted(file_list)
+        temps = []
+        # I know this breaks down if one of the out files is for any reason incorrect.
+        i = 0
+        for file_to_open in ordered_file_list:
+            posfile = open(os.path.join(file_to_open, "OUTCAR"))
+            for line in posfile.readlines():
+                if i < self.parameters.maximum_number_of_timesteps:
+                    if "temperature" in line and "TEIN" not in line and "TEBEG" not in line:
+                        temp = float(
+                            (line.split("temperature")[1]).split("K")[0])
+                        temps.append(temp)
+                        i += 1
+                else:
+                    break
+        np.save(file_name, temps)
+
+    def _vasp_out_to_timing(self, out_folder, file_name):
+        file_list = glob.glob(os.path.join(out_folder, "slurm-*/"))
+        ordered_file_list = sorted(file_list)
+        temps = []
+        # I know this breaks down if one of the out files is for any reason incorrect.
+        i = 0
+        times = []
+        for file_to_open in ordered_file_list:
+            posfile = open(os.path.join(file_to_open, "OUTCAR"))
+            for line in posfile.readlines():
+                if i < self.parameters.maximum_number_of_timesteps:
+                    if "LOOP+" in line:
+                        current_time = float(line.split()[-1])
+                        times.append(current_time)
+                        i += 1
+                else:
+                    break
+        np.save(file_name, times)
+
+    def _vasp_out_to_trajectory(self, out_folder, file_name):
+        file_list = glob.glob(os.path.join(out_folder, "slurm-*/"))
+        ordered_file_list = sorted(file_list)
+        # I know this breaks down if one of the out files is for any reason incorrect.
+        i_actual = 0
+        for file_to_open in ordered_file_list:
+            current_atoms = ase.io.read(os.path.join(file_to_open, "OUTCAR")
+                                        , index=':',
+                                        format="vasp-out")
+            for i in range(0, len(current_atoms)):
+                if i_actual < self.parameters.maximum_number_of_timesteps:
+                    if i_actual == 0:
+                        traj_writer = ase.io.trajectory.TrajectoryWriter(file_name,  mode='w')
+                        traj_writer.write(atoms=current_atoms[i])
+                        i_actual += 1
+                    else:
+                        traj_writer = ase.io.trajectory.TrajectoryWriter(file_name,  mode='a')
+                        if i > 0:
+                            traj_writer.write(atoms=current_atoms[i])
+                            i_actual += 1
+                else:
+                    break
 
     def _get_number_of_bands(self):
         number_of_bands = int(self.parameters.number_of_atoms *

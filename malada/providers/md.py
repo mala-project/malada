@@ -113,9 +113,12 @@ class MDProvider(Provider):
                 folder_to_parse = self.external_run_folder
 
             # Now we parse the results.
-            self._qe_out_to_trajectory(folder_to_parse, self.trajectory_file)
-            self._qe_out_to_temperature(folder_to_parse, self.temperature_file)
-
+            if self.parameters.md_calculator == "qe":
+                self._qe_out_to_trajectory(folder_to_parse, self.trajectory_file)
+                self._qe_out_to_temperature(folder_to_parse, self.temperature_file)
+            else:
+                self._vasp_out_to_trajectory(folder_to_parse, self.trajectory_file)
+                self._vasp_out_to_temperature(folder_to_parse, self.temperature_file)
         else:
             copyfile(self.external_trajectory, self.trajectory_file)
             copyfile(self.external_temperatures, self.temperature_file)
