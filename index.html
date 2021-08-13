@@ -40,7 +40,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="General Usage" href="usage/general.html" /> 
+    <link rel="next" title="Installation of MALADA" href="install/install.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -85,7 +85,11 @@
               
             
             
-              <p class="caption"><span class="caption-text">Features</span></p>
+              <p class="caption"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install/install.html">Installation of MALADA</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Usage</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="usage/general.html">General Usage</a></li>
 </ul>
@@ -166,72 +170,23 @@
 </div>
 <div class="section" id="mala-data-acquistion-malada">
 <h1>MALA Data Acquistion (MALADA)<a class="headerlink" href="#mala-data-acquistion-malada" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="scope">
-<h2>Scope<a class="headerlink" href="#scope" title="Permalink to this headline">¶</a></h2>
-<p>MALADA provides helpful functions to automate the data acquisition process for the Materials Learning Algorithms (MALA) package. It helps the user create and run the typical MALA data acquisition pipelin, consisting of creation of suitable supercells from crystal structures, determination of suitable calculation parameters, molecular dynamics (MD) simulations, density functional theory simulations (DFT) and post-processing of the latter to acquire the local density of states (LDOS). At the end of a run, MALA can be used to preprocess the data and build surrogate models.</p>
+<p>Welcome to MALADA, the MALA Data Acquistion package. MALA is a python package for building and using neural networks in the context of materials science. It builds models that learn the local density of state (LDOS) from descriptor vectors on the grid, and uses it to calculate physical quantities of interest. MALADA assists in this endeavor by providing tools to generate the necessary data sets fast, reliably and reproducibly.</p>
+<p>DISCLAIMER: MALADA is currently in its very early development stages. Please feel free to report any bug or oddity you encounter. A lot functionalities, especially those concerning automated execution of simulations are rudimentary, with interfaces expected to drastically change in the future.</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Please refer to the <a class="reference internal" href="install/install.html"><span class="doc std std-doc">installation guide of MALADA</span></a>.</p>
 </div>
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="providers">
-<h3>Providers<a class="headerlink" href="#providers" title="Permalink to this headline">¶</a></h3>
-<p>MALADA is a python package and works by writing run scripts.
-It is based on “providers” that provide certain files for the next step. These can be directly linked in the python script or via files. The following providers exist, reflecting the steps of a data acquisition pipeline:</p>
-<ol class="simple">
-<li><p>CrystalStructureProvider</p>
-<ul class="simple">
-<li><p>input: Element name, element ID in MaterialsProject</p></li>
-<li><p>output: .cif file containing the crystal structure</p></li>
-</ul>
-</li>
-<li><p>SupercellProvider</p>
-<ul class="simple">
-<li><p>input: .cif file containing the crystal structure, number of atoms</p></li>
-<li><p>output: .vasp file containing the positions of the atoms</p></li>
-</ul>
-</li>
-<li><p>DFTConvergenceProvider</p>
-<ul class="simple">
-<li><p>input: temperature at which to perform the simulation, .vasp file containing the positions of the atoms</p></li>
-<li><p>output: .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)</p></li>
-</ul>
-</li>
-<li><p>MDPerformanceProvider</p>
-<ul class="simple">
-<li><p>input: .pkl file containing converged DFT parameters (k-grid and cutoff energy for basis set), temperature at which to perform the simulation, .vasp file containing the positions of the atoms</p></li>
-<li><p>output: .xml file containing optimal parameters for MD simulation</p></li>
-</ul>
-</li>
-<li><p>MDProvider</p>
-<ul class="simple">
-<li><p>input: .pkl file containing converged DFT parameters (k-grid and cutoff energy for basis set), temperature at which to perform the simulation, .vasp file containing the positions of the atoms, .xml file containing optimal parameters for MD simulation</p></li>
-<li><p>output: .traj file containing trajectory of the MD run, .npy files containing temperature</p></li>
-</ul>
-</li>
-<li><p>SnapshotProvider</p>
-<ul class="simple">
-<li><p>input: .traj file containing trajectory of the MD run</p></li>
-<li><p>output: .npy file containing potential snapshots for DFT calculation</p></li>
-</ul>
-</li>
-<li><p>LDOSConvergenceProvider</p>
-<ul class="simple">
-<li><p>input: .npy file containing potential snapshots for DFT calculation, .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)</p></li>
-<li><p>output: .xml file containing updated DFT parameters for post processing</p></li>
-</ul>
-</li>
-<li><p>DFTProvider:</p>
-<ul class="simple">
-<li><p>input: .xml file cotnaining DFT parameters (for both energy and LDOS), .npy file containing potential snapshots for DFT calculation</p></li>
-<li><p>output: DFT calculation output files and LDOS cube files</p></li>
-</ul>
-</li>
-</ol>
-</div>
-<div class="section" id="global-parameters">
-<h3>Global parameters<a class="headerlink" href="#global-parameters" title="Permalink to this headline">¶</a></h3>
-<p>Global parameters such as number of atoms, temperature and runner information (which run system, e.g. slurm, how many cores, etc.)</p>
+<p>Please refer to the guide for the <a class="reference internal" href="usage/general.html"><span class="doc std std-doc">general usage of MALADA</span></a></p>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Features</span></p>
+<p class="caption"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install/install.html">Installation of MALADA</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Usage</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="usage/general.html">General Usage</a></li>
 </ul>
@@ -241,7 +196,6 @@ It is based on “providers” that provide certain files for the next step. The
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api/modules.html">malada</a></li>
 </ul>
-</div>
 </div>
 </div>
 </div>
@@ -260,7 +214,7 @@ It is based on “providers” that provide certain files for the next step. The
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="usage/general.html" class="btn btn-neutral float-right" title="General Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="install/install.html" class="btn btn-neutral float-right" title="Installation of MALADA" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
