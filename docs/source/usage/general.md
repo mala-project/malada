@@ -1,6 +1,6 @@
 # General Usage
 
-### Providers
+## Providers
 
 MALADA is a python package and works by writing run scripts. 
 It is based on "providers" that provide certain files for the next step. These can be directly linked in the python script or via files. The following providers exist, reflecting the steps of a data acquisition pipeline: 
@@ -38,6 +38,6 @@ It is based on "providers" that provide certain files for the next step. These c
     - output: DFT calculation output files and LDOS cube files
 
 
-### Global parameters
+## Global parameters
 
 Global parameters such as number of atoms, temperature and runner information (which run system, e.g. slurm, how many cores, etc.)
