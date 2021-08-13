@@ -7,8 +7,17 @@
 
 ```{toctree}
 ---
-caption: Features
-maxdepth: 2
+caption: Installation
+maxdepth: 1
+---
+
+install/install
+```
+
+```{toctree}
+---
+caption: Usage
+maxdepth: 1
 ---
 
 usage/general
