@@ -6,9 +6,7 @@ In order to run MALA you have to have the following packages installed:
 
 * ase
 * numpy
-* abc
 * scipy
-* xml
 
 See also the `requirements.txt` file.
 You can install each Python package with
