@@ -1,36 +1,76 @@
 # List of providers
 
-1. CrystalStructureProvider
-    - input: Element name, element ID in MaterialsProject
-    - output: .cif file containing the crystal structure
+The following is a lit of providers. 
+"Input" in this context always refers to the variables that have to be given to the `provide()` function. "Output" values are attributes of the classes,
+that can be accessed after running. "Optional inputs" are inputs given upon creation, that allow to build complex workflows, by giving a provider half or fully processed data. Generally speaking, the following interactions with a provider are possible:
 
-2. SupercellProvider
-    - input: .cif file containing the crystal structure, number of atoms
-    - output: .vasp file containing the positions of the atoms
-    
-3. DFTConvergenceProvider
-    - input: temperature at which to perform the simulation, .vasp file containing the positions of the atoms
-    - output: .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)
-    
-4. MDPerformanceProvider
-    - input: .pkl file containing converged DFT parameters (k-grid and cutoff energy for basis set), temperature at which to perform the simulation, .vasp file containing the positions of the atoms
-    - output: .xml file containing optimal parameters for MD simulation
-    
-5. MDProvider
-    - input: .pkl file containing converged DFT parameters (k-grid and cutoff energy for basis set), temperature at which to perform the simulation, .vasp file containing the positions of the atoms, .xml file containing optimal parameters for MD simulation
-    - output: .traj file containing trajectory of the MD run, .npy files containing temperature
+```python 
+some_provider = SomeProvider(optional_param1=some_value)
+some_provider.provide()
+print(some_provider.some_output_quantity)
+```
 
-6. SnapshotProvider
-    - input: .traj file containing trajectory of the MD run
-    - output: .npy file containing potential snapshots for DFT calculation
+[Global parameters](global_parameters.md) will not be counted as inputs in this context. Every provider has access to them - they define how a pipeline is built.
+
+## CrystalStructureProvider
+
+Provides a crystal structure.
+
+- input: None
+- output: 
+  - .cif file containing the crystal structure
+
+## SupercellProvider
+
+Provides a supercell in VASP format.
+
+- input: .cif file containing the crystal structure
+- output: .vasp file containing the positions of the atoms
     
-7. LDOSConvergenceProvider
-    - input: .npy file containing potential snapshots for DFT calculation, .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)
-    - output: .xml file containing updated DFT parameters for post processing
+## DFTConvergenceProvider
+
+Calculates optimal DFT parameters (cutoff energy, k-grid).
+
+- input: 
+  - vasp file containing the positions of the atoms
+- output: 
+  - .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)
     
-8. DFTProvider:
-    - input: .xml file cotnaining DFT parameters (for both energy and LDOS), .npy file containing potential snapshots for DFT calculation
-    - output: DFT calculation output files and LDOS cube files
+## MDPerformanceProvider
+
+Determines optimal MD performance for large scale calculations.
+
+- input: 
+  - .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set), .vasp file containing the positions of the atoms
+- output: .xml file containing optimal parameters for MD simulation
+    
+## MDProvider
+
+Calculates DFT-MD trajectory.
+
+- input: .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set), .vasp file containing the positions of the atoms, .xml file containing optimal parameters for MD simulation
+- output: .traj file containing trajectory of the MD run, .npy file containing temperatures
+
+## SnapshotProvider
+
+Parses MD trajectory for suitable MD snapshots. 
+
+- input: .traj file containing trajectory of the MD run, .npy file containing temperatures
+- output: .traj file containing potential snapshots for DFT calculation
+    
+## LDOSConvergenceProvider
+
+Determines optimal parameters for LDOS calculation.
+
+ - input: .traj file containing potential snapshots for DFT calculation, .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)
+ - output: .xml file containing updated LDOS parameters for post processing
+    
+## DFTProvider:
+
+ - input: xml file containing converged DFT parameters (k-grid and cutoff energy for basis set), .xml file containing updated LDOS parameters for post processing, .traj file containing potential snapshots for DFT calculation
+ - output: DFT calculation output files and LDOS cube files
+
+
 
 
 

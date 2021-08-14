@@ -39,7 +39,7 @@ pipeline.run()
 ```
 
 This feature is especially helpful given that currently, some automation features are not yet implemented in MALADA.
-The providers can also be used in standalone to perform only a specific processing step 
+The providers can also be used in standalone to perform only a specific processing step. For this, such a provider object has to be called, and then executed via the `provide()` function.
 
 ```python 
 params = malada.Parameters()
@@ -47,11 +47,16 @@ params.number_of_atoms = 2
 params.temperature = 298
 params.element = "Be"
 
+# Run a custom MD calculation.
 md = malada.MDProvider(params)
-md.provide("path/to/folder", "some_supercell",
+md.provide("path/to/runfolder", "some_supercell",
            "some_convergence_parameters.xml",
             "some_parallelization_info.md")
 ```
 
-This piece of code will execute only an MD calculation in the specified folder. 
-For a full list of providers, see the [list of providers](list_of_providers.md).
+This piece of code will execute and analyse an MD calculation in the specified folder, using a specific supercell, DFT parameters and parallelization strategy. 
+Which inputs have to be given to the `provide` function differs. For a full list of providers, see the [list of providers](list_of_providers.md).
+
+## Runners 
+
+MALADA does NOT aim to interface with DFT/MD codes directly. It is NOT supposed to perform tasks similar to e.g. ASE, which can directly run DFT/MD calculations. Rather it just provides inputs, that can then be run with some run system (e.g. via slurm or ASE). See [current limitations](global_parameters.md) for an overview of what is currently implemented in that regard.
