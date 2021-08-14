@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>General Usage &mdash; Materials Learning Algorithms Data Acquisition (MALADA)  documentation</title>
+  <title>Pipeline &mdash; Materials Learning Algorithms Data Acquisition (MALADA)  documentation</title>
   
 
   
@@ -40,8 +40,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Pipeline" href="pipeline.html" />
-    <link rel="prev" title="Installation of MALADA" href="../install/install.html" /> 
+    <link rel="next" title="Global parameters" href="global_parameters.html" />
+    <link rel="prev" title="General Usage" href="general.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -92,8 +92,11 @@
 </ul>
 <p class="caption"><span class="caption-text">Usage</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">General Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="general.html">General Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#providers">Providers</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="global_parameters.html">Global parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="current_limitations.html">Current limitations</a></li>
 </ul>
@@ -148,14 +151,14 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>General Usage</li>
+      <li>Pipeline</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
           
             
-              <a href="https://github.com//mala-project/malada/blob/develop/docs/source/usage/general.md" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com//mala-project/malada/blob/develop/docs/source/usage/pipeline.md" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -169,20 +172,64 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="general-usage">
-<h1>General Usage<a class="headerlink" href="#general-usage" title="Permalink to this headline">¶</a></h1>
-<p>The idea of MALADA is to automate as many steps of the data generation for MALA workflow as posible. It is not meant to be a universal tool for DFT-MD workflows, and is specifically tailored to this application. In order to create training data for MALA networks, the following steps need to be undertaken:</p>
+  <div class="section" id="pipeline">
+<h1>Pipeline<a class="headerlink" href="#pipeline" title="Permalink to this headline">¶</a></h1>
+<p>The central class of MALADA workflows is the <code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> class. It (semi-automates) the entire MALADA workflow (see <a class="reference internal" href="global_parameters.html"><span class="doc std std-doc">current limitations</span></a>)</p>
+<div class="section" id="providers">
+<h2>Providers<a class="headerlink" href="#providers" title="Permalink to this headline">¶</a></h2>
+<p>MALADA is a python package and works by writing run scripts.
+It is based on “providers” that provide certain files for the next step. These can be directly linked in the python script or via files. The following providers exist, reflecting the steps of a data acquisition pipeline:</p>
 <ol class="simple">
-<li><p>Crystal structure determination (What element in what structure do you want to model?)</p></li>
-<li><p>Supercell construction (How many atoms will be in your supercell?)</p></li>
-<li><p>DFT convergence (Which cutoff energy and k-grid should be used for DFT calculations?)</p></li>
-<li><p>DFT-MD performance test (How do you need to parallelize a DFT-MD run so that you can get results in reasonable time?)</p></li>
-<li><p>DFT-MD simulations (Calculate a trajectory with your given parameters)</p></li>
-<li><p>Snapshot selection (Filter this trajectory)</p></li>
-<li><p>LDOS parameter determination (How should the LDOS be discretized? On which grid should it be discretized?)</p></li>
-<li><p>DFT simulations, LDOS calculation (Perform a DFT calculation and calculate the LDOS from the final wave functions)</p></li>
+<li><p>CrystalStructureProvider</p>
+<ul class="simple">
+<li><p>input: Element name, element ID in MaterialsProject</p></li>
+<li><p>output: .cif file containing the crystal structure</p></li>
+</ul>
+</li>
+<li><p>SupercellProvider</p>
+<ul class="simple">
+<li><p>input: .cif file containing the crystal structure, number of atoms</p></li>
+<li><p>output: .vasp file containing the positions of the atoms</p></li>
+</ul>
+</li>
+<li><p>DFTConvergenceProvider</p>
+<ul class="simple">
+<li><p>input: temperature at which to perform the simulation, .vasp file containing the positions of the atoms</p></li>
+<li><p>output: .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)</p></li>
+</ul>
+</li>
+<li><p>MDPerformanceProvider</p>
+<ul class="simple">
+<li><p>input: .pkl file containing converged DFT parameters (k-grid and cutoff energy for basis set), temperature at which to perform the simulation, .vasp file containing the positions of the atoms</p></li>
+<li><p>output: .xml file containing optimal parameters for MD simulation</p></li>
+</ul>
+</li>
+<li><p>MDProvider</p>
+<ul class="simple">
+<li><p>input: .pkl file containing converged DFT parameters (k-grid and cutoff energy for basis set), temperature at which to perform the simulation, .vasp file containing the positions of the atoms, .xml file containing optimal parameters for MD simulation</p></li>
+<li><p>output: .traj file containing trajectory of the MD run, .npy files containing temperature</p></li>
+</ul>
+</li>
+<li><p>SnapshotProvider</p>
+<ul class="simple">
+<li><p>input: .traj file containing trajectory of the MD run</p></li>
+<li><p>output: .npy file containing potential snapshots for DFT calculation</p></li>
+</ul>
+</li>
+<li><p>LDOSConvergenceProvider</p>
+<ul class="simple">
+<li><p>input: .npy file containing potential snapshots for DFT calculation, .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)</p></li>
+<li><p>output: .xml file containing updated DFT parameters for post processing</p></li>
+</ul>
+</li>
+<li><p>DFTProvider:</p>
+<ul class="simple">
+<li><p>input: .xml file cotnaining DFT parameters (for both energy and LDOS), .npy file containing potential snapshots for DFT calculation</p></li>
+<li><p>output: DFT calculation output files and LDOS cube files</p></li>
+</ul>
+</li>
 </ol>
-<p>To automate this, MALADA provides a <a class="reference internal" href="pipeline.html"><span class="doc std std-doc">pipeline</span></a>, that can be controlled using the <a class="reference internal" href="global_parameters.html"><span class="doc std std-doc">global parameters</span></a>.</p>
+</div>
 </div>
 
 
@@ -191,8 +238,8 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="pipeline.html" class="btn btn-neutral float-right" title="Pipeline" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="../install/install.html" class="btn btn-neutral float-left" title="Installation of MALADA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="global_parameters.html" class="btn btn-neutral float-right" title="Global parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="general.html" class="btn btn-neutral float-left" title="General Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

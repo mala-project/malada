@@ -21,6 +21,9 @@ maxdepth: 1
 ---
 
 usage/general
+usage/pipeline
+usage/global_parameters
+usage/current_limitations
 ```
 
 ```{toctree}

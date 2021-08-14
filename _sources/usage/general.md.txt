@@ -1,43 +1,14 @@
 # General Usage
 
-## Providers
+The idea of MALADA is to automate as many steps of the data generation for MALA workflow as posible. It is not meant to be a universal tool for DFT-MD workflows, and is specifically tailored to this application. In order to create training data for MALA networks, the following steps need to be undertaken:
 
-MALADA is a python package and works by writing run scripts. 
-It is based on "providers" that provide certain files for the next step. These can be directly linked in the python script or via files. The following providers exist, reflecting the steps of a data acquisition pipeline: 
+1. Crystal structure determination (What element in what structure do you want to model?)
+2. Supercell construction (How many atoms will be in your supercell?)
+3. DFT convergence (Which cutoff energy and k-grid should be used for DFT calculations?)
+4. DFT-MD performance test (How do you need to parallelize a DFT-MD run so that you can get results in reasonable time?)
+5. DFT-MD simulations (Calculate a trajectory with your given parameters)
+6. Snapshot selection (Filter this trajectory)
+7. LDOS parameter determination (How should the LDOS be discretized? On which grid should it be discretized?)
+8. DFT simulations, LDOS calculation (Perform a DFT calculation and calculate the LDOS from the final wave functions)
 
-1. CrystalStructureProvider
-    - input: Element name, element ID in MaterialsProject
-    - output: .cif file containing the crystal structure
-
-2. SupercellProvider
-    - input: .cif file containing the crystal structure, number of atoms
-    - output: .vasp file containing the positions of the atoms
-    
-3. DFTConvergenceProvider
-    - input: temperature at which to perform the simulation, .vasp file containing the positions of the atoms
-    - output: .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)
-    
-4. MDPerformanceProvider
-    - input: .pkl file containing converged DFT parameters (k-grid and cutoff energy for basis set), temperature at which to perform the simulation, .vasp file containing the positions of the atoms
-    - output: .xml file containing optimal parameters for MD simulation
-    
-5. MDProvider
-    - input: .pkl file containing converged DFT parameters (k-grid and cutoff energy for basis set), temperature at which to perform the simulation, .vasp file containing the positions of the atoms, .xml file containing optimal parameters for MD simulation
-    - output: .traj file containing trajectory of the MD run, .npy files containing temperature
-
-6. SnapshotProvider
-    - input: .traj file containing trajectory of the MD run
-    - output: .npy file containing potential snapshots for DFT calculation
-    
-7. LDOSConvergenceProvider
-    - input: .npy file containing potential snapshots for DFT calculation, .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)
-    - output: .xml file containing updated DFT parameters for post processing
-    
-8. DFTProvider:
-    - input: .xml file cotnaining DFT parameters (for both energy and LDOS), .npy file containing potential snapshots for DFT calculation
-    - output: DFT calculation output files and LDOS cube files
-
-
-## Global parameters
-
-Global parameters such as number of atoms, temperature and runner information (which run system, e.g. slurm, how many cores, etc.)
+To automate this, MALADA provides a [pipeline](pipeline.md), that can be controlled using the [global parameters](global_parameters.md).
