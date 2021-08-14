@@ -23,6 +23,7 @@ maxdepth: 1
 usage/general
 usage/pipeline
 usage/global_parameters
+usage/list_of_providers
 usage/current_limitations
 ```
 

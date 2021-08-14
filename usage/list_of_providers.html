@@ -1,0 +1,323 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>List of providers &mdash; Materials Learning Algorithms Data Acquisition (MALADA)  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../_static/mala_favicon.png"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Current limitations" href="current_limitations.html" />
+    <link rel="prev" title="Global parameters" href="global_parameters.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Materials Learning Algorithms Data Acquisition (MALADA)
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/install.html">Installation of MALADA</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Usage</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="general.html">General Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="global_parameters.html">Global parameters</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">List of providers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#crystalstructureprovider">CrystalStructureProvider</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#supercellprovider">SupercellProvider</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dftconvergenceprovider">DFTConvergenceProvider</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mdperformanceprovider">MDPerformanceProvider</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mdprovider">MDProvider</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#snapshotprovider">SnapshotProvider</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ldosconvergenceprovider">LDOSConvergenceProvider</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dftprovider">DFTProvider:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="current_limitations.html">Current limitations</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">malada</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Materials Learning Algorithms Data Acquisition (MALADA)</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>List of providers</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            
+              <a href="https://github.com//mala-project/malada/blob/develop/docs/source/usage/list_of_providers.md" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="list-of-providers">
+<h1>List of providers<a class="headerlink" href="#list-of-providers" title="Permalink to this headline">¶</a></h1>
+<p>The following is a lit of providers.
+“Input” in this context always refers to the variables that have to be given to the <code class="docutils literal notranslate"><span class="pre">provide()</span></code> function. “Output” values are attributes of the classes,
+that can be accessed after running. “Optional inputs” are inputs given upon creation, that allow to build complex workflows, by giving a provider half or fully processed data. Generally speaking, the following interactions with a provider are possible:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">some_provider</span> <span class="o">=</span> <span class="n">SomeProvider</span><span class="p">(</span><span class="n">optional_param1</span><span class="o">=</span><span class="n">some_value</span><span class="p">)</span>
+<span class="n">some_provider</span><span class="o">.</span><span class="n">provide</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">some_provider</span><span class="o">.</span><span class="n">some_output_quantity</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="global_parameters.html"><span class="doc std std-doc">Global parameters</span></a> will not be counted as inputs in this context. Every provider has access to them - they define how a pipeline is built.</p>
+<div class="section" id="crystalstructureprovider">
+<h2>CrystalStructureProvider<a class="headerlink" href="#crystalstructureprovider" title="Permalink to this headline">¶</a></h2>
+<p>Provides a crystal structure.</p>
+<ul class="simple">
+<li><p>input: None</p></li>
+<li><p>output:</p>
+<ul>
+<li><p>.cif file containing the crystal structure</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="supercellprovider">
+<h2>SupercellProvider<a class="headerlink" href="#supercellprovider" title="Permalink to this headline">¶</a></h2>
+<p>Provides a supercell in VASP format.</p>
+<ul class="simple">
+<li><p>input: .cif file containing the crystal structure</p></li>
+<li><p>output: .vasp file containing the positions of the atoms</p></li>
+</ul>
+</div>
+<div class="section" id="dftconvergenceprovider">
+<h2>DFTConvergenceProvider<a class="headerlink" href="#dftconvergenceprovider" title="Permalink to this headline">¶</a></h2>
+<p>Calculates optimal DFT parameters (cutoff energy, k-grid).</p>
+<ul class="simple">
+<li><p>input:</p>
+<ul>
+<li><p>vasp file containing the positions of the atoms</p></li>
+</ul>
+</li>
+<li><p>output:</p>
+<ul>
+<li><p>.xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="mdperformanceprovider">
+<h2>MDPerformanceProvider<a class="headerlink" href="#mdperformanceprovider" title="Permalink to this headline">¶</a></h2>
+<p>Determines optimal MD performance for large scale calculations.</p>
+<ul class="simple">
+<li><p>input:</p>
+<ul>
+<li><p>.xml file containing converged DFT parameters (k-grid and cutoff energy for basis set), .vasp file containing the positions of the atoms</p></li>
+</ul>
+</li>
+<li><p>output: .xml file containing optimal parameters for MD simulation</p></li>
+</ul>
+</div>
+<div class="section" id="mdprovider">
+<h2>MDProvider<a class="headerlink" href="#mdprovider" title="Permalink to this headline">¶</a></h2>
+<p>Calculates DFT-MD trajectory.</p>
+<ul class="simple">
+<li><p>input: .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set), .vasp file containing the positions of the atoms, .xml file containing optimal parameters for MD simulation</p></li>
+<li><p>output: .traj file containing trajectory of the MD run, .npy file containing temperatures</p></li>
+</ul>
+</div>
+<div class="section" id="snapshotprovider">
+<h2>SnapshotProvider<a class="headerlink" href="#snapshotprovider" title="Permalink to this headline">¶</a></h2>
+<p>Parses MD trajectory for suitable MD snapshots.</p>
+<ul class="simple">
+<li><p>input: .traj file containing trajectory of the MD run, .npy file containing temperatures</p></li>
+<li><p>output: .traj file containing potential snapshots for DFT calculation</p></li>
+</ul>
+</div>
+<div class="section" id="ldosconvergenceprovider">
+<h2>LDOSConvergenceProvider<a class="headerlink" href="#ldosconvergenceprovider" title="Permalink to this headline">¶</a></h2>
+<p>Determines optimal parameters for LDOS calculation.</p>
+<ul class="simple">
+<li><p>input: .traj file containing potential snapshots for DFT calculation, .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)</p></li>
+<li><p>output: .xml file containing updated LDOS parameters for post processing</p></li>
+</ul>
+</div>
+<div class="section" id="dftprovider">
+<h2>DFTProvider:<a class="headerlink" href="#dftprovider" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>input: xml file containing converged DFT parameters (k-grid and cutoff energy for basis set), .xml file containing updated LDOS parameters for post processing, .traj file containing potential snapshots for DFT calculation</p></li>
+<li><p>output: DFT calculation output files and LDOS cube files</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="current_limitations.html" class="btn btn-neutral float-right" title="Current limitations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="global_parameters.html" class="btn btn-neutral float-left" title="Global parameters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright noneyet.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

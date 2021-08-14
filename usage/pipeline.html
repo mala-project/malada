@@ -95,9 +95,11 @@
 <li class="toctree-l1"><a class="reference internal" href="general.html">General Usage</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Pipeline</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#providers">Providers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#runners">Runners</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="global_parameters.html">Global parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="list_of_providers.html">List of providers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="current_limitations.html">Current limitations</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
@@ -174,61 +176,59 @@
             
   <div class="section" id="pipeline">
 <h1>Pipeline<a class="headerlink" href="#pipeline" title="Permalink to this headline">¶</a></h1>
-<p>The central class of MALADA workflows is the <code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> class. It (semi-automates) the entire MALADA workflow (see <a class="reference internal" href="global_parameters.html"><span class="doc std std-doc">current limitations</span></a>)</p>
+<p>The central class of MALADA workflows is the <code class="docutils literal notranslate"><span class="pre">DataPipeline</span></code> class. It (semi-automates) the entire MALADA workflow (see <a class="reference internal" href="global_parameters.html"><span class="doc std std-doc">current limitations</span></a>)
+To use it, create a <code class="docutils literal notranslate"><span class="pre">Parameters</span></code> object, assign the parameters you want, create a <code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> object with it, and run:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create some parameters and fill them with life.</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">malada</span><span class="o">.</span><span class="n">Parameters</span><span class="p">()</span>
+<span class="n">params</span><span class="o">.</span><span class="n">number_of_atoms</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">params</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="mi">298</span>
+<span class="n">params</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="s2">&quot;Be&quot;</span>
+
+<span class="c1"># Create a pipeline and let it run.</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">malada</span><span class="o">.</span><span class="n">DataPipeline</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
 <div class="section" id="providers">
 <h2>Providers<a class="headerlink" href="#providers" title="Permalink to this headline">¶</a></h2>
-<p>MALADA is a python package and works by writing run scripts.
-It is based on “providers” that provide certain files for the next step. These can be directly linked in the python script or via files. The following providers exist, reflecting the steps of a data acquisition pipeline:</p>
-<ol class="simple">
-<li><p>CrystalStructureProvider</p>
-<ul class="simple">
-<li><p>input: Element name, element ID in MaterialsProject</p></li>
-<li><p>output: .cif file containing the crystal structure</p></li>
-</ul>
-</li>
-<li><p>SupercellProvider</p>
-<ul class="simple">
-<li><p>input: .cif file containing the crystal structure, number of atoms</p></li>
-<li><p>output: .vasp file containing the positions of the atoms</p></li>
-</ul>
-</li>
-<li><p>DFTConvergenceProvider</p>
-<ul class="simple">
-<li><p>input: temperature at which to perform the simulation, .vasp file containing the positions of the atoms</p></li>
-<li><p>output: .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)</p></li>
-</ul>
-</li>
-<li><p>MDPerformanceProvider</p>
-<ul class="simple">
-<li><p>input: .pkl file containing converged DFT parameters (k-grid and cutoff energy for basis set), temperature at which to perform the simulation, .vasp file containing the positions of the atoms</p></li>
-<li><p>output: .xml file containing optimal parameters for MD simulation</p></li>
-</ul>
-</li>
-<li><p>MDProvider</p>
-<ul class="simple">
-<li><p>input: .pkl file containing converged DFT parameters (k-grid and cutoff energy for basis set), temperature at which to perform the simulation, .vasp file containing the positions of the atoms, .xml file containing optimal parameters for MD simulation</p></li>
-<li><p>output: .traj file containing trajectory of the MD run, .npy files containing temperature</p></li>
-</ul>
-</li>
-<li><p>SnapshotProvider</p>
-<ul class="simple">
-<li><p>input: .traj file containing trajectory of the MD run</p></li>
-<li><p>output: .npy file containing potential snapshots for DFT calculation</p></li>
-</ul>
-</li>
-<li><p>LDOSConvergenceProvider</p>
-<ul class="simple">
-<li><p>input: .npy file containing potential snapshots for DFT calculation, .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)</p></li>
-<li><p>output: .xml file containing updated DFT parameters for post processing</p></li>
-</ul>
-</li>
-<li><p>DFTProvider:</p>
-<ul class="simple">
-<li><p>input: .xml file cotnaining DFT parameters (for both energy and LDOS), .npy file containing potential snapshots for DFT calculation</p></li>
-<li><p>output: DFT calculation output files and LDOS cube files</p></li>
-</ul>
-</li>
-</ol>
+<p>Internally, the MALADA pipeline works with “Providers”. Each such a class has a specific task, and specific in/outputs. Each provider uses the output of the preceding step to generate input for the next one. The pipeline can be customized by giving it a customized provider upon creation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create some parameters and fill them with life.</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">malada</span><span class="o">.</span><span class="n">Parameters</span><span class="p">()</span>
+<span class="n">params</span><span class="o">.</span><span class="n">number_of_atoms</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">params</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="mi">298</span>
+<span class="n">params</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="s2">&quot;Be&quot;</span>
+
+<span class="c1"># Create a custom CrystalStructureProvider, because we already have a crystal</span>
+<span class="c1"># structure downloaded to file.</span>
+<span class="n">crystal_structure</span> <span class="o">=</span> <span class="n">malada</span><span class="o">.</span><span class="n">CrystalStructureProvider</span><span class="p">(</span><span class="n">params</span><span class="p">,</span>
+                                                    <span class="n">external_cif_file</span><span class="o">=</span>
+                                                    <span class="s2">&quot;path/to/some/file&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create a pipeline and let it run.</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">malada</span><span class="o">.</span><span class="n">DataPipeline</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">crystal_structure_provider</span><span class="o">=</span><span class="n">crystal_structure</span><span class="p">)</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This feature is especially helpful given that currently, some automation features are not yet implemented in MALADA.
+The providers can also be used in standalone to perform only a specific processing step. For this, such a provider object has to be called, and then executed via the <code class="docutils literal notranslate"><span class="pre">provide()</span></code> function.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">params</span> <span class="o">=</span> <span class="n">malada</span><span class="o">.</span><span class="n">Parameters</span><span class="p">()</span>
+<span class="n">params</span><span class="o">.</span><span class="n">number_of_atoms</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">params</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="mi">298</span>
+<span class="n">params</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="s2">&quot;Be&quot;</span>
+
+<span class="c1"># Run a custom MD calculation.</span>
+<span class="n">md</span> <span class="o">=</span> <span class="n">malada</span><span class="o">.</span><span class="n">MDProvider</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="n">md</span><span class="o">.</span><span class="n">provide</span><span class="p">(</span><span class="s2">&quot;path/to/runfolder&quot;</span><span class="p">,</span> <span class="s2">&quot;some_supercell&quot;</span><span class="p">,</span>
+           <span class="s2">&quot;some_convergence_parameters.xml&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;some_parallelization_info.md&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This piece of code will execute and analyse an MD calculation in the specified folder, using a specific supercell, DFT parameters and parallelization strategy.
+Which inputs have to be given to the <code class="docutils literal notranslate"><span class="pre">provide</span></code> function differs. For a full list of providers, see the <a class="reference internal" href="list_of_providers.html"><span class="doc std std-doc">list of providers</span></a>.</p>
+</div>
+<div class="section" id="runners">
+<h2>Runners<a class="headerlink" href="#runners" title="Permalink to this headline">¶</a></h2>
+<p>MALADA does NOT aim to interface with DFT/MD codes directly. It is NOT supposed to perform tasks similar to e.g. ASE, which can directly run DFT/MD calculations. Rather it just provides inputs, that can then be run with some run system (e.g. via slurm or ASE). See <a class="reference internal" href="global_parameters.html"><span class="doc std std-doc">current limitations</span></a> for an overview of what is currently implemented in that regard.</p>
 </div>
 </div>
 
