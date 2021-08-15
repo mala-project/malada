@@ -183,10 +183,10 @@
   <div class="section" id="list-of-providers">
 <h1>List of providers<a class="headerlink" href="#list-of-providers" title="Permalink to this headline">¶</a></h1>
 <p>The following is a lit of providers.
-“Input” in this context always refers to the variables that have to be given to the <code class="docutils literal notranslate"><span class="pre">provide()</span></code> function. “Output” values are attributes of the classes,
+“Input” in this context always refers to the variables that have to be given to the <code class="docutils literal notranslate"><span class="pre">provide()</span></code> function. Each provider requires a path to operate in as input, which will be omitted further down. “Output” values are attributes of the classes,
 that can be accessed after running. “Optional inputs” are inputs given upon creation, that allow to build complex workflows, by giving a provider half or fully processed data. Generally speaking, the following interactions with a provider are possible:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">some_provider</span> <span class="o">=</span> <span class="n">SomeProvider</span><span class="p">(</span><span class="n">optional_param1</span><span class="o">=</span><span class="n">some_value</span><span class="p">)</span>
-<span class="n">some_provider</span><span class="o">.</span><span class="n">provide</span><span class="p">()</span>
+<span class="n">some_provider</span><span class="o">.</span><span class="n">provide</span><span class="p">(</span><span class="n">provier_path</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">some_provider</span><span class="o">.</span><span class="n">some_output_quantity</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -198,7 +198,12 @@ that can be accessed after running. “Optional inputs” are inputs given upon 
 <li><p>input: None</p></li>
 <li><p>output:</p>
 <ul>
-<li><p>.cif file containing the crystal structure</p></li>
+<li><p>cif_file: .cif file containing the crystal structure</p></li>
+</ul>
+</li>
+<li><p>optional inputs:</p>
+<ul>
+<li><p>external_cif_file: path to a .cif file previously downloaded that is to be used by MALADA. If given, no calculation/download will be performed.</p></li>
 </ul>
 </li>
 </ul>
@@ -207,8 +212,21 @@ that can be accessed after running. “Optional inputs” are inputs given upon 
 <h2>SupercellProvider<a class="headerlink" href="#supercellprovider" title="Permalink to this headline">¶</a></h2>
 <p>Provides a supercell in VASP format.</p>
 <ul class="simple">
-<li><p>input: .cif file containing the crystal structure</p></li>
-<li><p>output: .vasp file containing the positions of the atoms</p></li>
+<li><p>input:</p>
+<ul>
+<li><p>cif_file: .cif file containing the crystal structure</p></li>
+</ul>
+</li>
+<li><p>output:</p>
+<ul>
+<li><p>supercell_file: .vasp file containing the positions of the atoms</p></li>
+</ul>
+</li>
+<li><p>optional inputs:</p>
+<ul>
+<li><p>external_supercell_file: path to a.vasp file containing the positions of the atoms to be used by MALADA. If given, no calculation will be performed.</p></li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="section" id="dftconvergenceprovider">
@@ -217,12 +235,20 @@ that can be accessed after running. “Optional inputs” are inputs given upon 
 <ul class="simple">
 <li><p>input:</p>
 <ul>
-<li><p>vasp file containing the positions of the atoms</p></li>
+<li><p>supercell_file: .vasp file containing the positions of the atoms</p></li>
 </ul>
 </li>
 <li><p>output:</p>
 <ul>
-<li><p>.xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)</p></li>
+<li><p>convergence_results_file: .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)</p></li>
+</ul>
+</li>
+<li><p>optional inputs:</p>
+<ul>
+<li><p>external_convergence_results: path to a .xml file containing converged DFT parameters, if given, no DFT calculations will be performed</p></li>
+<li><p>external_convergence_folder: path to a folder containing already calculated DFT results from which convergence can be determined; if given, no (or less) DFT calculations will be performed</p></li>
+<li><p>predefined_kgrid: If an optimal k-grid is known, it can be provided and then no k-grid convergence calculations will be performed</p></li>
+<li><p>predefined_cutoff: If an optimal cutoff energy is known, it can be provided and then no cutoff energy convergence calculations will be performed</p></li>
 </ul>
 </li>
 </ul>
@@ -233,41 +259,112 @@ that can be accessed after running. “Optional inputs” are inputs given upon 
 <ul class="simple">
 <li><p>input:</p>
 <ul>
-<li><p>.xml file containing converged DFT parameters (k-grid and cutoff energy for basis set), .vasp file containing the positions of the atoms</p></li>
+<li><p>dft_convergence_file: .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)</p></li>
+<li><p>supercell_file: .vasp file containing the positions of the atoms</p></li>
 </ul>
 </li>
-<li><p>output: .xml file containing optimal parameters for MD simulation</p></li>
+<li><p>output:</p>
+<ul>
+<li><p>md_performance_xml: .xml file containing optimal parameters for MD simulation</p></li>
+</ul>
+</li>
+<li><p>optional inputs:</p>
+<ul>
+<li><p>external_performance_file: path to a .xml file containing optimal parameters for MD simulation, if given, no calculations will be performed</p></li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="section" id="mdprovider">
 <h2>MDProvider<a class="headerlink" href="#mdprovider" title="Permalink to this headline">¶</a></h2>
 <p>Calculates DFT-MD trajectory.</p>
 <ul class="simple">
-<li><p>input: .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set), .vasp file containing the positions of the atoms, .xml file containing optimal parameters for MD simulation</p></li>
-<li><p>output: .traj file containing trajectory of the MD run, .npy file containing temperatures</p></li>
+<li><p>input:</p>
+<ul>
+<li><p>dft_convergence_file: .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)</p></li>
+<li><p>supercell_file: .vasp file containing the positions of the atoms</p></li>
+<li><p>md_performance_xml: .xml file containing optimal parameters for MD simulation</p></li>
+</ul>
+</li>
+<li><p>output:</p>
+<ul>
+<li><p>trajectory_file: .traj file containing trajectory of the MD run</p></li>
+<li><p>temperature_file: .npy file containing temperatures</p></li>
+</ul>
+</li>
+<li><p>optional inputs:</p>
+<ul>
+<li><p>external_trajectory: path to a .traj file containing trajectory of the MD run, if given in conjucntion with external_temperatures, no calculations will be performed</p></li>
+<li><p>external_temperatures: path to a .npy file containing temperatures, if given in conjucntion with external_trajectory, no calculations will be performed</p></li>
+<li><p>external_run_folder: path to a directory in which a MD simulation was performed, if given, only analysis will be performed on this MD run</p></li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="section" id="snapshotprovider">
 <h2>SnapshotProvider<a class="headerlink" href="#snapshotprovider" title="Permalink to this headline">¶</a></h2>
 <p>Parses MD trajectory for suitable MD snapshots.</p>
 <ul class="simple">
-<li><p>input: .traj file containing trajectory of the MD run, .npy file containing temperatures</p></li>
-<li><p>output: .traj file containing potential snapshots for DFT calculation</p></li>
+<li><p>input:</p>
+<ul>
+<li><p>trajectory_file: .traj file containing trajectory of the MD run</p></li>
+<li><p>temperature_file: .npy file containing temperatures</p></li>
+</ul>
+</li>
+<li><p>output:</p>
+<ul>
+<li><p>snapshot_file: .traj file containing potential snapshots for DFT calculation</p></li>
+</ul>
+</li>
+<li><p>optional inputs:</p>
+<ul>
+<li><p>external_snapshots: path to a .traj file containing potential snapshots for DFT calculation, if given, no analysis will be performed on MD data</p></li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="section" id="ldosconvergenceprovider">
 <h2>LDOSConvergenceProvider<a class="headerlink" href="#ldosconvergenceprovider" title="Permalink to this headline">¶</a></h2>
 <p>Determines optimal parameters for LDOS calculation.</p>
 <ul class="simple">
-<li><p>input: .traj file containing potential snapshots for DFT calculation, .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)</p></li>
-<li><p>output: .xml file containing updated LDOS parameters for post processing</p></li>
+<li><p>input:</p>
+<ul>
+<li><p>snapshot_file: .traj file containing potential snapshots for DFT calculation</p></li>
+<li><p>dft_convergence_file: .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)</p></li>
+</ul>
+</li>
+<li><p>output:</p>
+<ul>
+<li><p>ldos_configuration_file: .xml file containing updated LDOS parameters for post processing</p></li>
+</ul>
+</li>
+<li><p>optional inputs:</p>
+<ul>
+<li><p>external_ldos_configuration: path to a .xml file containing updated LDOS parameters for post processing, if given, no calculation will be performed</p></li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="section" id="dftprovider">
 <h2>DFTProvider:<a class="headerlink" href="#dftprovider" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>input: xml file containing converged DFT parameters (k-grid and cutoff energy for basis set), .xml file containing updated LDOS parameters for post processing, .traj file containing potential snapshots for DFT calculation</p></li>
-<li><p>output: DFT calculation output files and LDOS cube files</p></li>
+<li><p>input:</p>
+<ul>
+<li><p>dft_convergence_file: .xml file containing converged DFT parameters (k-grid and cutoff energy for basis set)</p></li>
+<li><p>ldos_configuration_file: .xml file containing updated LDOS parameters for post processing</p></li>
+<li><p>snapshot_file: .traj file containing potential snapshots for DFT calculation</p></li>
+</ul>
+</li>
+<li><p>output:</p>
+<ul>
+<li><p>calculation_folders: directory containing DFT calculation output files and LDOS cube files</p></li>
+</ul>
+</li>
+<li><p>optional inputs:</p>
+<ul>
+<li><p>external_calculation_folders: directory containing DFT calculation output files and LDOS cube files, if given, no calculations will be provided, only a consistency check</p></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>

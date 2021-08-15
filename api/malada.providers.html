@@ -328,7 +328,7 @@ If not None, no DFT calculations will be performed.</p></li>
 </dl>
 <dl class="py method">
 <dt id="malada.providers.ldosconvergence.LDOSConvergenceProvider.provide">
-<code class="sig-name descname"><span class="pre">provide</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">possible_snapshots_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dft_convergence_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.ldosconvergence.LDOSConvergenceProvider.provide" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">provide</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshot_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dft_convergence_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.ldosconvergence.LDOSConvergenceProvider.provide" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide correct number of k points and energy levels to calculate LDOS.</p>
 <p>The results of LDOS based (ML) workflows is heaviliy dependent on
 a correct choice of energy levels and the k-grid. If those are
@@ -339,7 +339,7 @@ give insufficient accuracies.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>provider_path</strong> (<em>string</em>) – Path in which to operate in.</p></li>
 <li><p><strong>dft_convergence_file</strong> (<em>string</em>) – Path to xml file containing the DFT convergence parameter.</p></li>
-<li><p><strong>possible_snapshots_file</strong> (<em>string</em>) – Path to a file containing an ASE trajectory containing atomic
+<li><p><strong>snapshot_file</strong> (<em>string</em>) – Path to a file containing an ASE trajectory containing atomic
 snapshots for DFT/LDOS calculation.</p></li>
 </ul>
 </dd>

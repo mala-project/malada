@@ -94,7 +94,11 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="general.html">General Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Global parameters</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Global parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#required-parameters">Required parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optional-parameters">Optional parameters</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="list_of_providers.html">List of providers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="current_limitations.html">Current limitations</a></li>
 </ul>
@@ -172,7 +176,42 @@
             
   <div class="section" id="global-parameters">
 <h1>Global parameters<a class="headerlink" href="#global-parameters" title="Permalink to this headline">¶</a></h1>
-<p>Global parameters such as number of atoms, temperature and runner information (which run system, e.g. slurm, how many cores, etc.)</p>
+<p>Each object in the MALADA workflow needs a <code class="docutils literal notranslate"><span class="pre">Parameters</span></code> object provided at time of instantiation. It holds information such as number of atoms, temperature and runner information (which run system, e.g. slurm, how many cores, etc.). Some of these are optional, and default values can be used. Others have to be explicitly set for the workflow not to fail. For a detailed description of each parameter, see the API documentation.</p>
+<div class="section" id="required-parameters">
+<h2>Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>temperature</p></li>
+<li><p>number_of_atoms</p></li>
+<li><p>element</p></li>
+</ul>
+</div>
+<div class="section" id="optional-parameters">
+<h2>Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>crystal_structure</p></li>
+<li><p>base_folder</p></li>
+<li><p>dft_calculator</p></li>
+<li><p>md_calculator</p></li>
+<li><p>pseudopotential</p></li>
+<li><p>run_system</p></li>
+<li><p>dft_slurm</p></li>
+<li><p>md_slurm</p></li>
+<li><p>dft_conv_accuracy_meVperatom</p></li>
+<li><p>maximum_cutoff_try</p></li>
+<li><p>maximum_kpoint_try</p></li>
+<li><p>dft_scf_accuracy_per_atom_Ry</p></li>
+<li><p>md_at_gamma_point</p></li>
+<li><p>maximum_number_of_timesteps</p></li>
+<li><p>time_step_fs</p></li>
+<li><p>md_thermostat_controller</p></li>
+<li><p>snapshot_parsing_beginning</p></li>
+<li><p>snapshot_parsing_temperature_tolerance_percent</p></li>
+<li><p>snapshot_parsing_criterion</p></li>
+<li><p>number_of_snapshots</p></li>
+<li><p>distance_metric_snapshots</p></li>
+<li><p>distance_metric_snapshots_cutoff</p></li>
+</ul>
+</div>
 </div>
 
 
