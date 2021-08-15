@@ -3,6 +3,8 @@ from malada.utils import structure_to_transformation
 from .provider import Provider
 import os
 import ase.io
+import ase.build
+from shutil import copyfile
 
 
 class SuperCellProvider(Provider):
@@ -46,5 +48,5 @@ class SuperCellProvider(Provider):
             ase.io.write(self.supercell_file,
                          super_cell, format="vasp", long_format=True)
         else:
-            copyfile(self.external_cif_file, self.supercell_file)
+            copyfile(self.external_supercell_file, self.supercell_file)
             print("Getting <<supercell>>.vasp file from disc.")

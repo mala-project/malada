@@ -25,7 +25,7 @@ class LDOSConvergenceProvider(Provider):
         self.external_ldos_configuration = external_ldos_configuration
         self.ldos_configuration_file = None
 
-    def provide(self, provider_path, possible_snapshots_file, dft_convergence_file):
+    def provide(self, provider_path, snapshot_file, dft_convergence_file):
         """
         Provide correct number of k points and energy levels to calculate LDOS.
 
@@ -42,7 +42,7 @@ class LDOSConvergenceProvider(Provider):
         dft_convergence_file : string
             Path to xml file containing the DFT convergence parameter.
 
-        possible_snapshots_file : string
+        snapshot_file : string
             Path to a file containing an ASE trajectory containing atomic
             snapshots for DFT/LDOS calculation.
         """

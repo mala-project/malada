@@ -302,6 +302,9 @@ class DFTConvergenceProvider(Provider):
             if self.parameters.dft_calculator == "qe":
                 qe_pseudopotentials = {self.parameters.element :
                                        self.parameters.pseudopotential["name"]}
+
+            # TODO: Find a better way to calculate this
+            # With increasing temperature, this breaks of fairly quickly.
             nbands = int(self.parameters.number_of_atoms *
                          self.parameters.pseudopotential["valence_electrons"]
                          * 1.05)
