@@ -305,9 +305,7 @@ class DFTConvergenceProvider(Provider):
 
             # TODO: Find a better way to calculate this
             # With increasing temperature, this breaks of fairly quickly.
-            nbands = int(self.parameters.number_of_atoms *
-                         self.parameters.pseudopotential["valence_electrons"]
-                         * 1.05)
+            nbands = self._get_number_of_bands()
 
             # Get the run parameters.
             # TODO: Find some metric for the mixing!

@@ -178,6 +178,6 @@ class Provider:
 
     def _get_number_of_bands(self):
         number_of_bands = int(self.parameters.number_of_atoms *
-                     self.parameters.pseudopotential["valence_electrons"]
-                     * 1.05)
+                          self.parameters.pseudopotential["valence_electrons"]
+                          * (1.05 + self.parameters.band_tolerance))
         return number_of_bands

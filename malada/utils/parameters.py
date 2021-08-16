@@ -103,6 +103,12 @@ class Parameters:
     distance_metric_snapshots_cutoff : float
         Minimum distance in terms of distance_metric_snapshots after which
         after which two snapshots are considered distinct by the algorithm.
+
+    number_of_bands_factor : float
+        Determines how many more many more bands then number of electrons will
+        be used. E.g. if =0.05, the overall number of bands will be the number
+        of electrons times 1.05. Has to be scaled with temperature. Default
+        is 0.05, which should be ok up to ~2500K.
     """
 
     def __init__(self):
@@ -132,6 +138,7 @@ class Parameters:
         self.maximum_number_of_timesteps = 10000
         self.time_step_fs = 1
         self.md_thermostat_controller = 0.001
+        self.number_of_bands_factor = 0.05
 
         # Information about MD parsing.
         # TODO: Implement negative values, meaning automatic detection.
