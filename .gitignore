@@ -15,3 +15,5 @@ examples/develop*/
 examples/develop.py
 .idea
 docs/_build
+docs/source/api
+docs/build_docs.sh
