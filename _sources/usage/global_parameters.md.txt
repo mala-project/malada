@@ -32,3 +32,4 @@ Each object in the MALADA workflow needs a `Parameters` object provided at time 
 - number_of_snapshots 
 - distance_metric_snapshots
 - distance_metric_snapshots_cutoff
+- number_of_bands_factor
