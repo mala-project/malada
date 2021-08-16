@@ -64,7 +64,7 @@ class SlurmCreatorRunner(Runner):
                     raise Exception("Run folder with ambigous content.")
                 filename = os.path.basename(filelist[0])
                 submit_file.write(slurm_params.mpi_runner+" -np "+
-                                  str(slurm_params.nodes*slurm_params.tasks_per_node)+
+                                  str(slurm_params.nodes*slurm_params.tasks_per_node)+" "+
                                   " pw.x -in "+filename+"\n")
             elif calculation_type == "dft+pp":
                 # Get the filenames.
@@ -79,19 +79,19 @@ class SlurmCreatorRunner(Runner):
                     print(scf_file, ldos_file, dens_file, dos_file, folder)
                     raise Exception("Run folder with ambigous content.")
                 submit_file.write(slurm_params.mpi_runner+" -np "+
-                                  str(slurm_params.nodes*slurm_params.tasks_per_node)+
+                                  str(slurm_params.nodes*slurm_params.tasks_per_node)+" "+
                                   slurm_params.scf_executable +
                                   " -in "+os.path.basename(scf_file[0])+" \n")
                 submit_file.write(slurm_params.mpi_runner+" -np "+
-                                  str(slurm_params.nodes*slurm_params.tasks_per_node)+
+                                  str(slurm_params.nodes*slurm_params.tasks_per_node)+" "+
                                   slurm_params.pp_executable +
                                   " -in "+os.path.basename(dens_file[0])+" \n")
                 submit_file.write(slurm_params.mpi_runner+" -np "+
-                                  str(slurm_params.nodes*slurm_params.tasks_per_node)+
+                                  str(slurm_params.nodes*slurm_params.tasks_per_node)+" "+
                                   slurm_params.dos_executable +
                                   " -in "+os.path.basename(dos_file[0])+" \n")
                 submit_file.write(slurm_params.mpi_runner+" -np "+
-                                  str(slurm_params.nodes*slurm_params.tasks_per_node)+
+                                  str(slurm_params.nodes*slurm_params.tasks_per_node)+" "+
                                   slurm_params.pp_executable +
                                   " -in "+os.path.basename(ldos_file[0])+" \n")
             elif calculation_type == "md":
@@ -100,7 +100,7 @@ class SlurmCreatorRunner(Runner):
                     print(md_file, folder)
                     raise Exception("Run folder with ambigous content.")
                 submit_file.write(slurm_params.mpi_runner+" -np " +
-                                  str(slurm_params.nodes*slurm_params.tasks_per_node) +
+                                  str(slurm_params.nodes*slurm_params.tasks_per_node) +" "+
                                   slurm_params.scf_executable +
                                   " -in "+os.path.basename(md_file[0])+" \n")
         elif calculator_type == "vasp":
