@@ -99,8 +99,7 @@ class MDProvider(Provider):
                 # Run the MD calculation.
                 mdrunner = malada.RunnerInterface(
                     self.parameters)
-                mdrunner.run_folder(provider_path,"md",
-                                    qe_input_type="*.pw.md.in")
+                mdrunner.run_folder(provider_path, "md")
                 folder_to_parse = provider_path
 
                 # If SLURM is used as run tool, we stop here while the user

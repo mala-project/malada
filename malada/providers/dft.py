@@ -61,7 +61,7 @@ class DFTProvider(Provider):
             if self.parameters.dft_calculator != "qe":
                 raise Exception("Currently only QE is supported for "
                                 "DFT calculations.")
-            dft_runner = malada.RunnerInterface(self.parameters.run_system)
+            dft_runner = malada.RunnerInterface(self.parameters)
             all_valid_snapshots = ase.io.Trajectory(possible_snapshots_file)
             for i in range(0, self.parameters.number_of_snapshots):
                 snapshot_path = os.path.join(provider_path,"snapshot"+str(i))
@@ -74,14 +74,7 @@ class DFTProvider(Provider):
                 # Run the individul files.
                 snapshot_path = os.path.join(provider_path,"snapshot"+str(i))
                 print("Running DFT in", snapshot_path)
-                dft_runner.run_folder(snapshot_path,"dft",
-                                qe_input_type="*.pw.scf.in")
-                dft_runner.run_folder(snapshot_path,"dft",
-                                     qe_input_type="*.dos.in")
-                dft_runner.run_folder(snapshot_path,"dft",
-                                     qe_input_type="*.pp.dens.in")
-                dft_runner.run_folder(snapshot_path,"dft",
-                                     qe_input_type="*.pp.ldos.in")
+                dft_runner.run_folder(snapshot_path, "dft+pp")
         else:
             # Here, we have to do a consistency check.
             pass

@@ -17,7 +17,7 @@ class Runner:
         pass
 
     @abstractmethod
-    def run_folder(self, folder, calculation_type, qe_input_type=".pw.scf.in"):
+    def run_folder(self, folder, calculation_type):
         """
         Run a simulation in a folder.
 
@@ -28,8 +28,5 @@ class Runner:
 
         calculation_type : string
             Type of calculation, currently supported are "dft" and "md".
-
-        qe_input_type : string
-            Details the type of DFT calculation to be performed by QE.
         """
         pass

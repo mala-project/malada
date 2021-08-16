@@ -37,6 +37,8 @@ class SlurmParameters:
 
     def __init__(self):
         self.scf_executable = "pw.x"
+        self.pp_executable = "pp.x"
+        self.dos_executable = "pp.x"
         self.module_loading_string = ""
         self.execution_time = 0
         self.partition_string = ""

@@ -254,10 +254,8 @@ class DFTConvergenceProvider(Provider):
             else:
                 spacing = kpoints_guesses[self.parameters.element][-1]-\
                           kpoints_guesses[self.parameters.element][-2]
-                print(kpoints_guesses[self.parameters.element][-1],spacing*(try_number-1)*2,1*spacing)
-                print(kpoints_guesses[self.parameters.element][-2],spacing*(try_number-1)*2,2*spacing)
                 converge_list.append(self.__k_edge_length_to_grid(kpoints_guesses[self.parameters.element][-1]+spacing*(try_number-1)*2+1*spacing))
-                converge_list.append(self.__k_edge_length_to_grid(kpoints_guesses[self.parameters.element][-2]+spacing*(try_number-1)*2+2*spacing))
+                converge_list.append(self.__k_edge_length_to_grid(kpoints_guesses[self.parameters.element][-1]+spacing*(try_number-1)*2+2*spacing))
             cutoff = self.converged_cutoff
         else:
             if self.parameters.dft_calculator == "qe":

@@ -2,6 +2,7 @@
 from .runner import Runner
 from malada import SlurmParameters
 import os
+import glob
 
 
 class SlurmCreatorRunner(Runner):
@@ -17,8 +18,7 @@ class SlurmCreatorRunner(Runner):
     def __init__(self, parameters):
         super(SlurmCreatorRunner, self).__init__(parameters)
 
-    def run_folder(self, folder, calculation_type,
-                   qe_input_type="*.pw.scf.in"):
+    def run_folder(self, folder, calculation_type):
         """
         Run a folder (=create submit.slurm for it).
 
@@ -29,19 +29,17 @@ class SlurmCreatorRunner(Runner):
 
         calculation_type : string
             Type of calculation, currently supported are "dft" and "md".
-
-        qe_input_type : string
-            Details the type of DFT calculation to be performed by QE.
-
         """
         # Write a submit.slurm file.
-        slurm_params : SlurmParameters
-        if calculation_type == "dft":
+        slurm_params: SlurmParameters
+        if calculation_type == "dft" or calculation_type == "dft+pp":
             calculator_type = self.parameters.dft_calculator
             slurm_params = self.parameters.dft_slurm
-        if calculation_type == "md":
+        elif calculation_type == "md":
             calculator_type = self.parameters.md_calculator
             slurm_params = self.parameters.md_slurm
+        else:
+            raise Exception("Unknown calculation type encountered.")
 
         job_name = os.path.basename(os.path.normpath(folder))
         submit_file = open(folder+"submit.slurm", mode='w')
@@ -58,9 +56,53 @@ class SlurmCreatorRunner(Runner):
         submit_file.write("\n")
         if calculator_type == "qe":
             # TODO: Fix this.
-            submit_file.write(slurm_params.mpi_runner+" -np "+
-                              str(slurm_params.nodes*slurm_params.tasks_per_node)+
-                              " pw.x -in "+self.parameters.element+".pw.scf.in \n")
+            if calculation_type == "dft":
+                # Get the filename.
+                filelist = glob.glob(os.path.join(folder, "*.pw.scf.in"))
+                if len(filelist) != 1:
+                    print(filelist, folder)
+                    raise Exception("Run folder with ambigous content.")
+                filename = os.path.basename(filelist[0])
+                submit_file.write(slurm_params.mpi_runner+" -np "+
+                                  str(slurm_params.nodes*slurm_params.tasks_per_node)+
+                                  " pw.x -in "+filename+"\n")
+            elif calculation_type == "dft+pp":
+                # Get the filenames.
+                scf_file = glob.glob(os.path.join(folder, "*.pw.scf.in"))
+                ldos_file = glob.glob(os.path.join(folder, "*.pp.ldos.in"))
+                dens_file = glob.glob(os.path.join(folder, "*.pp.dens.in"))
+                dos_file = glob.glob(os.path.join(folder, "*.dos.in"))
+                if len(scf_file) != 1 or \
+                   len(ldos_file) != 1 or \
+                   len(dens_file) != 1 or \
+                   len(dos_file) != 1:
+                    print(scf_file, ldos_file, dens_file, dos_file, folder)
+                    raise Exception("Run folder with ambigous content.")
+                submit_file.write(slurm_params.mpi_runner+" -np "+
+                                  str(slurm_params.nodes*slurm_params.tasks_per_node)+
+                                  slurm_params.scf_executable +
+                                  " -in "+os.path.basename(scf_file[0])+" \n")
+                submit_file.write(slurm_params.mpi_runner+" -np "+
+                                  str(slurm_params.nodes*slurm_params.tasks_per_node)+
+                                  slurm_params.pp_executable +
+                                  " -in "+os.path.basename(dens_file[0])+" \n")
+                submit_file.write(slurm_params.mpi_runner+" -np "+
+                                  str(slurm_params.nodes*slurm_params.tasks_per_node)+
+                                  slurm_params.dos_executable +
+                                  " -in "+os.path.basename(dos_file[0])+" \n")
+                submit_file.write(slurm_params.mpi_runner+" -np "+
+                                  str(slurm_params.nodes*slurm_params.tasks_per_node)+
+                                  slurm_params.pp_executable +
+                                  " -in "+os.path.basename(ldos_file[0])+" \n")
+            elif calculation_type == "md":
+                md_file = glob.glob(os.path.join(folder, "*.pw.md.in"))
+                if len(md_file) != 1:
+                    print(md_file, folder)
+                    raise Exception("Run folder with ambigous content.")
+                submit_file.write(slurm_params.mpi_runner+" -np " +
+                                  str(slurm_params.nodes*slurm_params.tasks_per_node) +
+                                  slurm_params.scf_executable +
+                                  " -in "+os.path.basename(md_file[0])+" \n")
         elif calculator_type == "vasp":
             if calculation_type == "dft":
                 submit_file.write("bash potcar_copy.sh\n")
