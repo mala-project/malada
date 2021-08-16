@@ -42,7 +42,7 @@ class SlurmCreatorRunner(Runner):
             raise Exception("Unknown calculation type encountered.")
 
         job_name = os.path.basename(os.path.normpath(folder))
-        submit_file = open(folder+"submit.slurm", mode='w')
+        submit_file = open(os.path.join(folder,"submit.slurm"), mode='w')
         submit_file.write("#!/bin/bash\n")
         submit_file.write("#SBATCH --nodes="+str(slurm_params.nodes)+"\n")
         submit_file.write("#SBATCH --ntasks-per-node="+str(slurm_params.tasks_per_node)+"\n")
