@@ -206,14 +206,13 @@
 out for a better, ASE based runner.</p>
 <dl class="py method">
 <dt id="malada.runners.bashrunner.BashRunner.run_folder">
-<code class="sig-name descname"><span class="pre">run_folder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculation_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qe_input_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'*.pw.scf.in'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.runners.bashrunner.BashRunner.run_folder" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">run_folder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculation_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.runners.bashrunner.BashRunner.run_folder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run a folder on the command line.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>folder</strong> (<em>string</em>) – Folder to run in.</p></li>
 <li><p><strong>calculation_type</strong> (<em>string</em>) – Type of calculation, currently supported are “dft” and “md”.</p></li>
-<li><p><strong>qe_input_type</strong> (<em>string</em>) – Details the type of DFT calculation to be performed by QE.</p></li>
 </ul>
 </dd>
 </dl>
@@ -237,14 +236,13 @@ out for a better, ASE based runner.</p>
 </dl>
 <dl class="py method">
 <dt id="malada.runners.runner.Runner.run_folder">
-<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">run_folder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculation_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qe_input_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.pw.scf.in'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.runners.runner.Runner.run_folder" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">run_folder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculation_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.runners.runner.Runner.run_folder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run a simulation in a folder.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>folder</strong> (<em>string</em>) – Folder to run in.</p></li>
 <li><p><strong>calculation_type</strong> (<em>string</em>) – Type of calculation, currently supported are “dft” and “md”.</p></li>
-<li><p><strong>qe_input_type</strong> (<em>string</em>) – Details the type of DFT calculation to be performed by QE.</p></li>
 </ul>
 </dd>
 </dl>
@@ -289,14 +287,13 @@ out for a better, ASE based runner.</p>
 </dl>
 <dl class="py method">
 <dt id="malada.runners.slurm_creator.SlurmCreatorRunner.run_folder">
-<code class="sig-name descname"><span class="pre">run_folder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculation_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qe_input_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'*.pw.scf.in'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.runners.slurm_creator.SlurmCreatorRunner.run_folder" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">run_folder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculation_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.runners.slurm_creator.SlurmCreatorRunner.run_folder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run a folder (=create submit.slurm for it).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>folder</strong> (<em>string</em>) – Folder to run in.</p></li>
 <li><p><strong>calculation_type</strong> (<em>string</em>) – Type of calculation, currently supported are “dft” and “md”.</p></li>
-<li><p><strong>qe_input_type</strong> (<em>string</em>) – Details the type of DFT calculation to be performed by QE.</p></li>
 </ul>
 </dd>
 </dl>
