@@ -172,7 +172,18 @@
             
   <div class="section" id="current-limitations">
 <h1>Current limitations<a class="headerlink" href="#current-limitations" title="Permalink to this headline">¶</a></h1>
-<p>a lot</p>
+<p>MALADA is currently in its very early development stages. Please feel free to report any bug or oddity you encounter. The following is a list of known limitations users currently have to work around, please excuse the inconveniences.</p>
+<ul class="simple">
+<li><p>Run system: The run system is currently rudimentary, and uses system calls (bash), or the automatic creation of slurm batch scripts. This of course comes with some problems and will fail on some machines. In the future, a more stable run system will be provided drawing on ASE and python-slurm interfaces.</p></li>
+<li><p>Automatic .cif download: This feature is currently not implemented and users will have to provide their own crystal structures.</p></li>
+<li><p>MD performance detection: This feature is currently not implemented, and users will have to provide their own performance parameter</p></li>
+<li><p>LDOS convergence: This feature is currently not implemented, and users will have to provide their own parameters</p></li>
+<li><p>Species: MALADA can currently only handle one chemical species at a time</p></li>
+<li><p>Temperature: MALADA has not been tested with higher temperatures, there could be some automated parameter estimations that fail</p></li>
+<li><p>Mass densities: MALADA currently has no feature to automatically work with higher mass densities, and will use the one from the .cif file</p></li>
+<li><p>MD trajectory parsing: This is currently limited to randomly sampling snapshots; other metrics will follow soon</p></li>
+<li><p>Also see https://github.com/mala-project/malada/issues</p></li>
+</ul>
 </div>
 
 
