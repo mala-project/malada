@@ -149,7 +149,7 @@ class DFTConvergenceProvider(Provider):
                               +str(kpoint_try+2))
                     kpoint_try += 1
             else:
-                # TODO: Add a sanity check here. It could be the provided
+                # TODO: Add a consistency check here. It could be the provided
                 # folder does not match!
                 print("Reading precalculated convergence results.")
                 # Analyze the convergence analsyis.

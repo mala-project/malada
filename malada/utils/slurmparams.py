@@ -42,7 +42,7 @@ class SlurmParameters:
         self.partition_string = ""
         self.mpi_runner = "mpirun"
 
-        # TODO: Maybe some sanity checks here?
+        # TODO: Maybe some consistency checks here?
         self.tasks_per_node = 0
         self.nodes = 0
 
