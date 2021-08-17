@@ -339,8 +339,7 @@ class DFTConvergenceProvider(Provider):
                                 ase.units.Rydberg,
                 "ISMEAR": -1,
                 "SIGMA": round(kelvin_to_eV(
-                               self.parameters.temperature) *
-                               ase.units.Rydberg, 7),
+                               self.parameters.temperature), 7),
                 "ISYM": 0,
                 "NBANDS": nbands,
                 "LREAL": "A",
