@@ -77,7 +77,8 @@ class SnapshotsProvider(Provider):
             return self.parameters.snapshot_parsing_beginning
 
     def __determine_distance_metric(self, trajectoryfile):
-        if self.parameters.distance_metric_snapshots_cutoff < 0:
+        if self.parameters.distance_metric_snapshots_cutoff < 0 and \
+                self.parameters.snapshot_parsing_criterion != "random":
             raise Exception(
                 "Automatic detection of distance cutoff not supported")
         else:
