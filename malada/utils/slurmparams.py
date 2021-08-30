@@ -104,6 +104,7 @@ class SlurmParameters:
         filecontents = parse(filename).getroot()
         new_object.scf_executable = filecontents.find("scf_executable").text
         new_object.module_loading_string = filecontents.find("module_loading_string").text
+        new_object.mpi_runner = filecontents.find("mpi_runner").text
         new_object.execution_time = int(filecontents.find("execution_time").text)
         new_object.partition_string = filecontents.find("partition_string").text
         new_object.tasks_per_node = int(filecontents.find("tasks_per_node").text)

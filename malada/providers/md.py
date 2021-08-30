@@ -181,7 +181,7 @@ class MDProvider(Provider):
             # thermostat. It corresponds to tau/dt in e.g. eq. 1.12
             # of https://link.springer.com/content/pdf/10.1007%2F978-3-540-74686-7_1.pdf
             # By default it is 1, but I think we have to increase it a bit.
-            "nraise": 1#self.parameters.md_thermostat_controller,
+            "nraise": self.parameters.md_thermostat_controller,
         }
         vasp_input_data = {
             "ISTART": 0,
