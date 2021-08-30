@@ -111,7 +111,7 @@ class SnapshotsProvider(Provider):
                 traj_writer = ase.io.trajectory.TrajectoryWriter(filename_traj, mode='w')
             else:
                 traj_writer = ase.io.trajectory.TrajectoryWriter(filename_traj, mode='a')
-            atoms_to_write = self.__enforce_pbc(trajectory[md_iteration[i]])
+            atoms_to_write = self._enforce_pbc(trajectory[md_iteration[i]])
             traj_writer.write(atoms=atoms_to_write)
         np.save(filename_numbers, md_iteration)
         print(j, "possible snapshots found in MD trajectory.")
@@ -138,38 +138,5 @@ class SnapshotsProvider(Provider):
             result = np.mean(result)
         return result
 
-    @staticmethod
-    def __enforce_pbc(atoms):
-        """
-        Explictly enforeces the PBC on an ASE atoms object.
-
-        QE (and potentially other codes?) do that internally. Meaning that the
-        raw positions of atoms (in Angstrom) can lie outside of the unit cell.
-        When setting up the DFT calculation, these atoms get shifted into
-        the unit cell. Since we directly use these raw positions for the
-        descriptor calculation, we need to enforce that in the ASE atoms
-        objects, the atoms are explicitly in the unit cell.
-
-        Parameters
-        ----------
-        atoms : ase.atoms
-            The ASE atoms object for which the PBC need to be enforced.
-
-        Returns
-        -------
-        new_atoms : ase.atoms
-            The ASE atoms object for which the PBC have been enforced.
-        """
-        new_atoms = atoms.copy()
-        new_atoms.set_scaled_positions(new_atoms.get_scaled_positions())
-
-        # This might be unecessary, but I think it is nice to have some sort of
-        # metric here.
-        rescaled_atoms = 0
-        for i in range(0, len(atoms)):
-            if False in (np.isclose(new_atoms[i].position,
-                          atoms[i].position, atol=0.001)):
-                rescaled_atoms += 1
-        return new_atoms
 
 
