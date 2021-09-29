@@ -214,7 +214,7 @@ class MDProvider(Provider):
             "IBRION": 0,
             "MDALGO": 2,
             # We want to do 10000 time steps
-            "NSW": 10000,
+            "NSW": self.parameters.maximum_number_of_timesteps,
             # This enables the Nose Hoover thermostat, it is controlled by this
             # parameter
             "SMASS": self.parameters.md_thermostat_controller,
