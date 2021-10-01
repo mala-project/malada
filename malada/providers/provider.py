@@ -126,7 +126,8 @@ class Provider:
             posfile = open(os.path.join(file_to_open, "OUTCAR"))
             for line in posfile.readlines():
                 if i < self.parameters.maximum_number_of_timesteps:
-                    if "temperature" in line and "TEIN" not in line and "TEBEG" not in line:
+                    if "temperature" in line and "TEIN" not in line and\
+                            "TEBEG" not in line and "mean" not in line:
                         temp = float(
                             (line.split("temperature")[1]).split("K")[0])
                         temps.append(temp)
