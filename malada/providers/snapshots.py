@@ -6,7 +6,8 @@ import ase.io
 import ase
 import ase.io
 import numpy as np
-from scipy.spatial.distance import cdist
+from scipy.spatial import distance
+from asap3.analysis.rdf import RadialDistributionFunction
 
 
 class SnapshotsProvider(Provider):
@@ -27,6 +28,8 @@ class SnapshotsProvider(Provider):
         super(SnapshotsProvider, self).__init__(parameters)
         self.external_snapshots = external_snapshots
         self.snapshot_file = None
+        self.fitted_trajectory = None
+        self.__equilibrated_rdf = None
 
     def provide(self, provider_path, trajectoryfile, temperaturefile):
         """
@@ -68,11 +71,12 @@ class SnapshotsProvider(Provider):
             print("Getting <<snapshots>>.npy"
                   " files from disc.")
 
-    def __get_first_snapshot(self, trajectoryfile):
+    def __get_first_snapshot(self, trajectory):
         if self.parameters.snapshot_parsing_beginning < 0:
-            raise Exception(
-                "Automatic detection of first equilibrated snapshot"
-                " not supported")
+            # In this case we automatically fit a function to the trajectory
+            # and use that to detect from where to begin parsing.
+            self.__fit_trajectory(trajectory)
+
         else:
             return self.parameters.snapshot_parsing_beginning
 
@@ -130,13 +134,73 @@ class SnapshotsProvider(Provider):
         else:
             return False
 
-    def __calculate_distance_between_snapshots(self, snapshot1, snapshot2, dist_type="simple_geometric"):
-        positions1 = snapshot1.get_positions()
-        positions2 = snapshot2.get_positions()
-        if self.parameters.distance_metric_snapshots=="realspace":
-            result = np.amin(cdist(positions1, positions2), axis=0)
-            result = np.mean(result)
+    def __calculate_distance_between_snapshots(self, snapshot1, snapshot2,
+                                               dist_type="simple_geometric",
+                                               save_rdf1 = False):
+        if self.parameters.distance_metric_snapshots == "realspace":
+            positions1 = snapshot1.get_positions()
+            positions2 = snapshot2.get_positions()
+            if self.parameters.distance_metric_snapshots_reduction == "minimal_distance":
+                result = np.amin(distance.cdist(positions1, positions2), axis=0)
+                result = np.mean(result)
+
+            elif self.parameters.distance_metric_snapshots_reduction == "cosine_distance":
+                number_of_atoms = snapshot1.get_number_of_atoms()
+                result = distance.cosine(np.reshape(positions1, [number_of_atoms*3]),
+                                         np.reshape(positions2, [number_of_atoms*3]))
+
+            else:
+                raise Exception("Unknown distance metric reduction.")
+        elif self.parameters.distance_metric_snapshots == "rdf":
+            rng = np.min(
+                np.linalg.norm(snapshot1.get_cell(), axis=0)) - self.\
+                parameters.distance_metric_snapshots_rdf_tolerance
+            if save_rdf1 is True:
+                if self.__equilibrated_rdf is None:
+                    self.__equilibrated_rdf = RadialDistributionFunction(snapshot1, \
+                                                  rng, \
+                                                  self.parameters.distance_metric_snapshots_rdf_bins).get_rdf()
+                rdf1 = self.__equilibrated_rdf
+            else:
+                rdf1 = RadialDistributionFunction(snapshot1, \
+                                                  rng, \
+                                                  self.parameters.distance_metric_snapshots_rdf_bins).get_rdf()
+            rdf2 = RadialDistributionFunction(snapshot2, \
+                                              rng, \
+                                              self.parameters.distance_metric_snapshots_rdf_bins).get_rdf()
+
+            if self.parameters.distance_metric_snapshots_reduction == "minimal_distance":
+                raise Exception("Combination of distance metric and reduction "
+                                "not supported.")
+
+            elif self.parameters.distance_metric_snapshots_reduction == "cosine_distance":
+                result = distance.cosine(rdf1, rdf2)
+
+            else:
+                raise Exception("Unknown distance metric reduction.")
+        else:
+            raise Exception("Unknown distance metric selected.")
+
         return result
+
+    def __denoise(self, signal):
+        denoised_signal = np.convolve(signal, np.ones(
+            self.parameters.distance_metrics_denoising_width) / self.parameters.distance_metrics_denoising_width, mode='same')
+        return denoised_signal
+
+    def fit_trajectory(self, trajectory):
+        # First, we ned to calculate the reduced metrics for the trajectory.
+        # For this, we calculate the distance between all the snapshots
+        # and the last one.
+        distance_to_last = []
+        for idx, step in enumerate(trajectory):
+            distance_to_last.append(self.__calculate_distance_between_snapshots(trajectory[-1], step, save_rdf1=True))
+
+        # Now, we denoise the distance metrics.
+        distance_to_last = self.__denoise(distance_to_last)
+
+        return distance_to_last
+
 
 
 

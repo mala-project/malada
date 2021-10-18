@@ -147,6 +147,26 @@ class Parameters:
         # TODO: Implement other criteria here.
         self.snapshot_parsing_criterion = "random"
         self.number_of_snapshots = 10
+        # This is the metric that will be used to compare snapshots.
+        # "realspace" means position of the atoms.
+        # "rdf" means the radial distribution function.
+        # Of couse the direct distance metrics will be vector-valued,
+        # thus we need a further reduction. Possible here are
+        # "minimal_value", so the minimal value of the resulting vector
+        # or "cosine_distance", which is the vector distance between these
+        # quantities. Not all the combinations make sense; rdf +
+        # cosine_distance e.g. don't.
         self.distance_metric_snapshots = "realspace"
+        self.distance_metric_snapshots_reduction = "cosine_distance"
+        # Technical parameters; for certain types of crystals, without
+        # such a tolerance, the RDF calculation might fail. Also we need
+        # to specify the number of bins. Usually, we do not have to temper
+        # with these values, the defaults should give pretty steady results.
+        self.distance_metric_snapshots_rdf_tolerance = 0.0001
+        self.distance_metric_snapshots_rdf_bins = 500
+        # The distance metric is denoised prior to fitting using a certain
+        # width. This should be adjusted if there is reason to believe
+        # the trajectory will be noise for some reason.
+        self.distance_metrics_denoising_width = 100
         # TODO: Implement negative values, meaning automatic detection.
         self.distance_metric_snapshots_cutoff = -0.1
