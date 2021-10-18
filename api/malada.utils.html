@@ -683,6 +683,21 @@ differences in using mpiexec vs. mpirun.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="malada.utils.slurmparams.SlurmParameters.get_mpirunner_process_params">
+<code class="sig-name descname"><span class="pre">get_mpirunner_process_params</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#malada.utils.slurmparams.SlurmParameters.get_mpirunner_process_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the correct call parameter for the number of processes.</p>
+<p>For srun it is “-n”, for mpiexec it is “-np”, etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>processparameter</strong> – The correct call parameter for this type of MPI runner.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="malada.utils.slurmparams.SlurmParameters.save">
 <code class="sig-name descname"><span class="pre">save</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.utils.slurmparams.SlurmParameters.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save the parameters to a xml file.</p>
