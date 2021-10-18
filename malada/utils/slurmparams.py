@@ -111,4 +111,19 @@ class SlurmParameters:
         new_object.nodes = int(filecontents.find("nodes").text)
         return new_object
 
+    def get_mpirunner_process_params(self):
+        """
+        Get the correct call parameter for the number of processes.
 
+        For srun it is "-n", for mpiexec it is "-np", etc.
+
+        Returns
+        -------
+        processparameter : string
+            The correct call parameter for this type of MPI runner.
+
+        """
+        if self.mpi_runner == "mpiexec" or self.mpi_runner == "mpirun":
+            return "-np"
+        elif self.mpi_runner == "srun":
+            return "-n"
