@@ -65,7 +65,7 @@ class SlurmCreatorRunner(Runner):
                 filename = os.path.basename(filelist[0])
                 submit_file.write(slurm_params.mpi_runner+" "+slurm_params.get_mpirunner_process_params()+" "+
                                   str(slurm_params.nodes*slurm_params.tasks_per_node)+" "+
-                                  " pw.x -in "+filename+"\n")
+                                    slurm_params.scf_executable +" -in "+filename+"\n")
             elif calculation_type == "dft+pp":
                 # Get the filenames.
                 scf_file = glob.glob(os.path.join(folder, "*.pw.scf.in"))

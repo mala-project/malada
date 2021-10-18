@@ -2,7 +2,8 @@
 # TODO: Find a smarter way to do this.
 
 cutoff_guesses_qe = {"Fe": [40, 50, 60, 70, 80, 90, 100],
-                     "Be": [40, 50, 60, 70]}
+                     "Be": [40, 50, 60, 70],
+                     "Al": [20, 30, 40, 50, 60, 70]}
 
 cutoff_guesses_vasp = {"Fe": [268, 368, 468, 568, 668, 768],
                        "Al": [240, 340, 440, 540]}
