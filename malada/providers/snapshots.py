@@ -28,8 +28,12 @@ class SnapshotsProvider(Provider):
         super(SnapshotsProvider, self).__init__(parameters)
         self.external_snapshots = external_snapshots
         self.snapshot_file = None
-        self.__distance_metrics = None
-        self.__equilibrated_rdf = None
+        self.distance_metrics_denoised = None
+        self.distance_metrics = None
+        self.__saved_rdf = None
+        self.first_snapshot = None
+        self.distance_metric_cutoff = None
+        self.average_distance_equilibrated = None
 
     def provide(self, provider_path, trajectoryfile, temperaturefile):
         """
@@ -57,46 +61,44 @@ class SnapshotsProvider(Provider):
         temperatures = np.load(temperaturefile)
         if self.external_snapshots is None:
             # Find out where to begin with the parsing.
-            first_snapshot = self.__get_first_snapshot(md_trajectory,
-                                                       provider_path)
+            self.first_snapshot = self.__get_first_snapshot(md_trajectory)
 
             # Now determine the value for the distance metric.
-            distance_metric = self.__determine_distance_metric(md_trajectory)
+            self.distance_metric_cutoff = self.__determine_distance_metric(md_trajectory)
 
             # Now parse the entire trajectory.
-            self.__parse_trajectory(md_trajectory, first_snapshot,
-                                    temperatures, distance_metric,
-                                    self.snapshot_file, iteration_numbers)
+            self.__parse_trajectory(md_trajectory,
+                                    temperatures,
+                                    self.snapshot_file,
+                                    iteration_numbers)
         else:
             copyfile(self.external_snapshots, self.snapshot_file)
             print("Getting <<snapshots>>.npy"
                   " files from disc.")
 
-    def __get_first_snapshot(self, trajectory, provider_path):
+    def __get_first_snapshot(self, trajectory):
         if self.parameters.snapshot_parsing_beginning < 0:
             # In this case we automatically fit a function to the trajectory
             # and use that to detect from where to begin parsing.
-            self.__analyze_trajectory(trajectory, provider_path)
+            return self.__analyze_trajectory(trajectory)
 
         else:
             return self.parameters.snapshot_parsing_beginning
 
-    def __determine_distance_metric(self, trajectoryfile):
-        if self.parameters.distance_metric_snapshots_cutoff < 0 and \
-                self.parameters.snapshot_parsing_criterion != "random":
-            raise Exception(
-                "Automatic detection of distance cutoff not supported")
+    def __determine_distance_metric(self, trajectory):
+        if self.parameters.distance_metric_snapshots_cutoff < 0:
+            return self.__analyze_distance_metric(trajectory)
         else:
             return self.parameters.distance_metric_snapshots_cutoff
 
-    def __parse_trajectory(self, trajectory, beginning_snapshot, temperatures,
-                           distance_metric, filename_traj,
+    def __parse_trajectory(self, trajectory, temperatures,
+                           filename_traj,
                            filename_numbers):
         allowed_temp_diff_K = (self.parameters.
                                snapshot_parsing_temperature_tolerance_percent
                                / 100) * self.parameters.temperature
-        current_snapshot = beginning_snapshot
-        begin_snapshot = beginning_snapshot+1
+        current_snapshot = self.first_snapshot
+        begin_snapshot = self.first_snapshot+1
         end_snapshot = len(trajectory)
         j = 0
         md_iteration = []
@@ -105,7 +107,7 @@ class SnapshotsProvider(Provider):
                                                  temperatures[i],
                                                  trajectory[current_snapshot],
                                                  temperatures[current_snapshot],
-                                                 distance_metric,
+                                                 self.distance_metric_cutoff,
                                                  allowed_temp_diff_K):
                 current_snapshot = i
                 md_iteration.append(current_snapshot)
@@ -136,45 +138,45 @@ class SnapshotsProvider(Provider):
             return False
 
     def __calculate_distance_between_snapshots(self, snapshot1, snapshot2,
-                                               dist_type="simple_geometric",
-                                               save_rdf1 = False):
-        if self.parameters.distance_metric_snapshots == "realspace":
+                                               distance_metric, reduction,
+                                               save_rdf1=False):
+        if distance_metric == "realspace":
             positions1 = snapshot1.get_positions()
             positions2 = snapshot2.get_positions()
-            if self.parameters.distance_metric_snapshots_reduction == "minimal_distance":
+            if reduction == "minimal_distance":
                 result = np.amin(distance.cdist(positions1, positions2), axis=0)
                 result = np.mean(result)
 
-            elif self.parameters.distance_metric_snapshots_reduction == "cosine_distance":
+            elif reduction == "cosine_distance":
                 number_of_atoms = snapshot1.get_number_of_atoms()
                 result = distance.cosine(np.reshape(positions1, [number_of_atoms*3]),
                                          np.reshape(positions2, [number_of_atoms*3]))
 
             else:
                 raise Exception("Unknown distance metric reduction.")
-        elif self.parameters.distance_metric_snapshots == "rdf":
+        elif distance_metric == "rdf":
             rng = np.min(
                 np.linalg.norm(snapshot1.get_cell(), axis=0)) - self.\
                 parameters.distance_metric_snapshots_rdf_tolerance
             if save_rdf1 is True:
-                if self.__equilibrated_rdf is None:
-                    self.__equilibrated_rdf = RadialDistributionFunction(snapshot1, \
-                                                  rng, \
-                                                  self.parameters.distance_metric_snapshots_rdf_bins).get_rdf()
-                rdf1 = self.__equilibrated_rdf
+                if self.__saved_rdf is None:
+                    self.__saved_rdf = RadialDistributionFunction(snapshot1,
+                                                                  rng,
+                                                                  self.parameters.distance_metric_snapshots_rdf_bins).get_rdf()
+                rdf1 = self.__saved_rdf
             else:
-                rdf1 = RadialDistributionFunction(snapshot1, \
-                                                  rng, \
+                rdf1 = RadialDistributionFunction(snapshot1,
+                                                  rng,
                                                   self.parameters.distance_metric_snapshots_rdf_bins).get_rdf()
-            rdf2 = RadialDistributionFunction(snapshot2, \
-                                              rng, \
+            rdf2 = RadialDistributionFunction(snapshot2,
+                                              rng,
                                               self.parameters.distance_metric_snapshots_rdf_bins).get_rdf()
 
-            if self.parameters.distance_metric_snapshots_reduction == "minimal_distance":
+            if reduction == "minimal_distance":
                 raise Exception("Combination of distance metric and reduction "
                                 "not supported.")
 
-            elif self.parameters.distance_metric_snapshots_reduction == "cosine_distance":
+            elif reduction == "cosine_distance":
                 result = distance.cosine(rdf1, rdf2)
 
             else:
@@ -189,52 +191,58 @@ class SnapshotsProvider(Provider):
             self.parameters.distance_metrics_denoising_width) / self.parameters.distance_metrics_denoising_width, mode='same')
         return denoised_signal
 
-    def __analyze_trajectory(self, trajectory, provider_path):
+    def __analyze_trajectory(self, trajectory):
         # First, we ned to calculate the reduced metrics for the trajectory.
         # For this, we calculate the distance between all the snapshots
         # and the last one.
-        self.__distance_metrics = []
+        self.distance_metrics = []
         for idx, step in enumerate(trajectory):
-            self.__distance_metrics.append(self.__calculate_distance_between_snapshots(trajectory[-1], step, save_rdf1=True))
+            self.distance_metrics.append(self.__calculate_distance_between_snapshots(trajectory[-1], step, "rdf", "cosine_distance",
+                                                                                     save_rdf1=True))
 
         # Now, we denoise the distance metrics.
-        self.__distance_metrics = self.__denoise(self.__distance_metrics)
+        self.distance_metrics_denoised = self.__denoise(self.distance_metrics)
 
         # Next, the average of the presumed equilibrated part is calculated,
         # and then the first N number of times teps which are below this
         # average is calculated.
-        average_distance_equilibrated = np.mean(
-            self.__distance_metrics[np.shape(self.__distance_metrics)[0]-
-                                    int(0.1*np.shape(self.__distance_metrics)[0]):])
+        self.average_distance_equilibrated = np.mean(
+            self.distance_metrics_denoised[np.shape(self.distance_metrics_denoised)[0] -
+                                           int(self.parameters.distance_metrics_estimated_equilibrium * np.shape(self.distance_metrics_denoised)[0]):])
         is_below = True
         counter = 0
         first_snapshot = None
-        for idx, dist in enumerate(self.__distance_metrics):
+        for idx, dist in enumerate(self.distance_metrics_denoised):
             if is_below:
                 counter += 1
-            if dist < average_distance_equilibrated:
+            if dist < self.average_distance_equilibrated:
                 is_below = True
-            if dist >= average_distance_equilibrated:
+            if dist >= self.average_distance_equilibrated:
                 counter = 0
                 is_below = False
             if counter == self.parameters.distance_metrics_below_average_counter:
                 first_snapshot = idx
                 break
 
-
-        # Save the results, because the user might want to hand check them.
-
-
-        if first_snapshot is None:
-            raise Exception("Trajectory analysis failed.")
-
-        with open(os.path.join(provider_path,"trajectory_analysis.pkl"),
-                  'wb') as handle:
-            pickle.dump([self.__distance_metrics, first_snapshot,
-                        average_distance_equilibrated], handle, protocol=4)
-
+        print("First equilibrated timestep of trajectory is", first_snapshot)
         return first_snapshot
 
+    def __analyze_distance_metric(self, trajectory):
+        # distance metric usef for the snapshot parsing (realspace similarity
+        # of the snapshot), we first find the center of the equilibrated part
+        # of the trajectory and calculate the differences w.r.t to to it.
+        center = int((np.shape(self.distance_metrics_denoised)[0]-self.first_snapshot)/2)
+        width = int(self.parameters.distance_metrics_estimated_equilibrium *
+                    np.shape(self.distance_metrics_denoised)[0])
+        self.distances_realspace = []
+        self.__saved_rdf = None
+        for i in range(center-width, center+width):
+            self.distances_realspace.append(self.__calculate_distance_between_snapshots(trajectory[center], trajectory[i],
+                                                                                        "realspace", "minimal_distance", save_rdf1=True))
 
-
-
+        # From these metrics, we assume mean - 2.576 std as limit.
+        # This translates to a confidence interval of ~99%, which should
+        # make any coincidental similarites unlikely.
+        cutoff = np.mean(self.distances_realspace)+2.576*np.std(self.distances_realspace)
+        print("Distance metric cutoff is", cutoff)
+        return cutoff

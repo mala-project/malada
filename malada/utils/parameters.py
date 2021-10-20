@@ -141,23 +141,9 @@ class Parameters:
         self.number_of_bands_factor = 0.05
 
         # Information about MD parsing.
-        # TODO: Implement negative values, meaning automatic detection.
         self.snapshot_parsing_beginning = -1
         self.snapshot_parsing_temperature_tolerance_percent = 1
-        # TODO: Implement other criteria here.
-        self.snapshot_parsing_criterion = "random"
         self.number_of_snapshots = 10
-        # This is the metric that will be used to compare snapshots.
-        # "realspace" means position of the atoms.
-        # "rdf" means the radial distribution function.
-        # Of couse the direct distance metrics will be vector-valued,
-        # thus we need a further reduction. Possible here are
-        # "minimal_value", so the minimal value of the resulting vector
-        # or "cosine_distance", which is the vector distance between these
-        # quantities. Not all the combinations make sense; rdf +
-        # cosine_distance e.g. don't.
-        self.distance_metric_snapshots = "realspace"
-        self.distance_metric_snapshots_reduction = "cosine_distance"
         # Technical parameters; for certain types of crystals, without
         # such a tolerance, the RDF calculation might fail. Also we need
         # to specify the number of bins. Usually, we do not have to temper
@@ -179,6 +165,4 @@ class Parameters:
         # from the end). Usually, 10% is a fine assumption. This value usually
         # does not need to be changed.
         self.distance_metrics_estimated_equilibrium = 0.1
-
-        # TODO: Implement negative values, meaning automatic detection.
         self.distance_metric_snapshots_cutoff = -0.1
