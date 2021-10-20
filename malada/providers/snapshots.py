@@ -8,7 +8,7 @@ import ase.io
 import numpy as np
 from scipy.spatial import distance
 from asap3.analysis.rdf import RadialDistributionFunction
-
+import pickle
 
 class SnapshotsProvider(Provider):
     """
@@ -28,7 +28,7 @@ class SnapshotsProvider(Provider):
         super(SnapshotsProvider, self).__init__(parameters)
         self.external_snapshots = external_snapshots
         self.snapshot_file = None
-        self.fitted_trajectory = None
+        self.__distance_metrics = None
         self.__equilibrated_rdf = None
 
     def provide(self, provider_path, trajectoryfile, temperaturefile):
@@ -57,7 +57,8 @@ class SnapshotsProvider(Provider):
         temperatures = np.load(temperaturefile)
         if self.external_snapshots is None:
             # Find out where to begin with the parsing.
-            first_snapshot = self.__get_first_snapshot(md_trajectory)
+            first_snapshot = self.__get_first_snapshot(md_trajectory,
+                                                       provider_path)
 
             # Now determine the value for the distance metric.
             distance_metric = self.__determine_distance_metric(md_trajectory)
@@ -71,11 +72,11 @@ class SnapshotsProvider(Provider):
             print("Getting <<snapshots>>.npy"
                   " files from disc.")
 
-    def __get_first_snapshot(self, trajectory):
+    def __get_first_snapshot(self, trajectory, provider_path):
         if self.parameters.snapshot_parsing_beginning < 0:
             # In this case we automatically fit a function to the trajectory
             # and use that to detect from where to begin parsing.
-            self.__fit_trajectory(trajectory)
+            self.__analyze_trajectory(trajectory, provider_path)
 
         else:
             return self.parameters.snapshot_parsing_beginning
@@ -188,18 +189,51 @@ class SnapshotsProvider(Provider):
             self.parameters.distance_metrics_denoising_width) / self.parameters.distance_metrics_denoising_width, mode='same')
         return denoised_signal
 
-    def fit_trajectory(self, trajectory):
+    def __analyze_trajectory(self, trajectory, provider_path):
         # First, we ned to calculate the reduced metrics for the trajectory.
         # For this, we calculate the distance between all the snapshots
         # and the last one.
-        distance_to_last = []
+        self.__distance_metrics = []
         for idx, step in enumerate(trajectory):
-            distance_to_last.append(self.__calculate_distance_between_snapshots(trajectory[-1], step, save_rdf1=True))
+            self.__distance_metrics.append(self.__calculate_distance_between_snapshots(trajectory[-1], step, save_rdf1=True))
 
         # Now, we denoise the distance metrics.
-        distance_to_last = self.__denoise(distance_to_last)
+        self.__distance_metrics = self.__denoise(self.__distance_metrics)
 
-        return distance_to_last
+        # Next, the average of the presumed equilibrated part is calculated,
+        # and then the first N number of times teps which are below this
+        # average is calculated.
+        average_distance_equilibrated = np.mean(
+            self.__distance_metrics[np.shape(self.__distance_metrics)[0]-
+                                    int(0.1*np.shape(self.__distance_metrics)[0]):])
+        is_below = True
+        counter = 0
+        first_snapshot = None
+        for idx, dist in enumerate(self.__distance_metrics):
+            if is_below:
+                counter += 1
+            if dist < average_distance_equilibrated:
+                is_below = True
+            if dist >= average_distance_equilibrated:
+                counter = 0
+                is_below = False
+            if counter == self.parameters.distance_metrics_below_average_counter:
+                first_snapshot = idx
+                break
+
+
+        # Save the results, because the user might want to hand check them.
+
+
+        if first_snapshot is None:
+            raise Exception("Trajectory analysis failed.")
+
+        with open(os.path.join(provider_path,"trajectory_analysis.pkl"),
+                  'wb') as handle:
+            pickle.dump([self.__distance_metrics, first_snapshot,
+                        average_distance_equilibrated], handle, protocol=4)
+
+        return first_snapshot
 
 
 
