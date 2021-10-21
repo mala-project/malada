@@ -141,12 +141,28 @@ class Parameters:
         self.number_of_bands_factor = 0.05
 
         # Information about MD parsing.
-        # TODO: Implement negative values, meaning automatic detection.
         self.snapshot_parsing_beginning = -1
         self.snapshot_parsing_temperature_tolerance_percent = 1
-        # TODO: Implement other criteria here.
-        self.snapshot_parsing_criterion = "random"
         self.number_of_snapshots = 10
-        self.distance_metric_snapshots = "realspace"
-        # TODO: Implement negative values, meaning automatic detection.
+        # Technical parameters; for certain types of crystals, without
+        # such a tolerance, the RDF calculation might fail. Also we need
+        # to specify the number of bins. Usually, we do not have to temper
+        # with these values, the defaults should give pretty steady results.
+        self.distance_metric_snapshots_rdf_tolerance = 0.0001
+        self.distance_metric_snapshots_rdf_bins = 500
+        # The distance metric is denoised prior to analysis using a certain
+        # width. This should be adjusted if there is reason to believe
+        # the trajectory will be noise for some reason.
+        self.distance_metrics_denoising_width = 100
+        # Number of time steps that have to consecutively below the average
+        # of the distance metric curve, before we consider the trajectory
+        # to be equilibrated.
+        # Usually does not have to be changed.
+        self.distance_metrics_below_average_counter = 50
+        # The analysis of the trajectory builds on the assumption that at some
+        # point of the trajectory, the system is equilibrated.
+        # For this, we need to provide the fraction of the trajectory (counted
+        # from the end). Usually, 10% is a fine assumption. This value usually
+        # does not need to be changed.
+        self.distance_metrics_estimated_equilibrium = 0.1
         self.distance_metric_snapshots_cutoff = -0.1
