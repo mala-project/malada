@@ -30,6 +30,7 @@ class SnapshotsProvider(Provider):
         self.snapshot_file = None
         self.distance_metrics_denoised = None
         self.distance_metrics = None
+        self.distances_realspace = None
         self.__saved_rdf = None
         self.first_snapshot = None
         self.distance_metric_cutoff = None
@@ -130,7 +131,11 @@ class SnapshotsProvider(Provider):
                                      reference_snapshot, reference_temp,
                                      distance_metric,
                                      allowed_temp_diff):
-        distance = self.__calculate_distance_between_snapshots(snapshot_to_test, reference_snapshot)
+        distance = self.\
+            __calculate_distance_between_snapshots(snapshot_to_test,
+                                                   reference_snapshot,
+                                                   "realspace",
+                                                   "minimal_distance")
         temp_diff = np.abs(temp_to_test-reference_temp)
         if distance > distance_metric and temp_diff < allowed_temp_diff:
             return True
@@ -243,6 +248,6 @@ class SnapshotsProvider(Provider):
         # From these metrics, we assume mean - 2.576 std as limit.
         # This translates to a confidence interval of ~99%, which should
         # make any coincidental similarites unlikely.
-        cutoff = np.mean(self.distances_realspace)+2.576*np.std(self.distances_realspace)
+        cutoff = np.mean(self.distances_realspace)-2.576*np.std(self.distances_realspace)
         print("Distance metric cutoff is", cutoff)
         return cutoff
