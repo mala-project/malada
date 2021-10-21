@@ -9,5 +9,4 @@ MALADA is currently in its very early development stages. Please feel free to re
 - Species: MALADA can currently only handle one chemical species at a time 
 - Temperature: MALADA has not been tested with higher temperatures, there could be some automated parameter estimations that fail
 - Mass densities: MALADA currently has no feature to automatically work with higher mass densities, and will use the one from the .cif file
-- MD trajectory parsing: This is currently limited to randomly sampling snapshots; other metrics will follow soon
 - Also see https://github.com/mala-project/malada/issues
