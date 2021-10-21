@@ -475,6 +475,51 @@ no parsing will be done.</p></li>
 </dd>
 </dl>
 <dl class="py method">
+<dt id="malada.providers.snapshots.SnapshotsProvider.analyze_distance_metric">
+<code class="sig-name descname"><span class="pre">analyze_distance_metric</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectory</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.snapshots.SnapshotsProvider.analyze_distance_metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the cutoff for the distance metric.</p>
+<p>The distance metric used here is realspace (i.e. the smallest
+displacement of an atom between two snapshots). The cutoff gives
+a lower estimate for the oscillations of the trajectory. Any distance
+above this cutoff can be attributed to the oscillations in the
+trajectory. Any cutoff below is the consquence of temporal
+neighborhood of these snapshots.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>trajectory</strong> (<em>ase.io.Trajectory</em>) – Trajectory to be analyzed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>cutoff</strong> – Cutoff below which two snapshots can be assumed to be similar
+to each other to a degree that suggests temporal neighborhood.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="malada.providers.snapshots.SnapshotsProvider.analyze_trajectory">
+<code class="sig-name descname"><span class="pre">analyze_trajectory</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectory</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.snapshots.SnapshotsProvider.analyze_trajectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate distance metrics/first equilibrated timestep on a trajectory.</p>
+<p>For this step, the RDF+Cosine distance will be used as a distance
+metric. Only the first snapshot is return, all the other quantities
+can be accessed as member variables of the object calling this
+function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>trajectory</strong> (<em>ase.io.Trajectory</em>) – Trajectory to be analyzed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>first_snapshot</strong> – First snapshot for which the trajectory is equilibrated.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="malada.providers.snapshots.SnapshotsProvider.provide">
 <code class="sig-name descname"><span class="pre">provide</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajectoryfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperaturefile</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.snapshots.SnapshotsProvider.provide" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide a trajectory file containing atomic snapshots.</p>
