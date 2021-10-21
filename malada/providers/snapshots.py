@@ -81,14 +81,14 @@ class SnapshotsProvider(Provider):
         if self.parameters.snapshot_parsing_beginning < 0:
             # In this case we automatically fit a function to the trajectory
             # and use that to detect from where to begin parsing.
-            return self.__analyze_trajectory(trajectory)
+            return self.analyze_trajectory(trajectory)
 
         else:
             return self.parameters.snapshot_parsing_beginning
 
     def __determine_distance_metric(self, trajectory):
         if self.parameters.distance_metric_snapshots_cutoff < 0:
-            return self.__analyze_distance_metric(trajectory)
+            return self.analyze_distance_metric(trajectory)
         else:
             return self.parameters.distance_metric_snapshots_cutoff
 
@@ -132,8 +132,8 @@ class SnapshotsProvider(Provider):
                                      distance_metric,
                                      allowed_temp_diff):
         distance = self.\
-            __calculate_distance_between_snapshots(snapshot_to_test,
-                                                   reference_snapshot,
+            _calculate_distance_between_snapshots(snapshot_to_test,
+                                                  reference_snapshot,
                                                    "realspace",
                                                    "minimal_distance")
         temp_diff = np.abs(temp_to_test-reference_temp)
@@ -142,9 +142,9 @@ class SnapshotsProvider(Provider):
         else:
             return False
 
-    def __calculate_distance_between_snapshots(self, snapshot1, snapshot2,
-                                               distance_metric, reduction,
-                                               save_rdf1=False):
+    def _calculate_distance_between_snapshots(self, snapshot1, snapshot2,
+                                              distance_metric, reduction,
+                                              save_rdf1=False):
         if distance_metric == "realspace":
             positions1 = snapshot1.get_positions()
             positions2 = snapshot2.get_positions()
@@ -196,14 +196,14 @@ class SnapshotsProvider(Provider):
             self.parameters.distance_metrics_denoising_width) / self.parameters.distance_metrics_denoising_width, mode='same')
         return denoised_signal
 
-    def __analyze_trajectory(self, trajectory):
+    def analyze_trajectory(self, trajectory):
         # First, we ned to calculate the reduced metrics for the trajectory.
         # For this, we calculate the distance between all the snapshots
         # and the last one.
         self.distance_metrics = []
         for idx, step in enumerate(trajectory):
-            self.distance_metrics.append(self.__calculate_distance_between_snapshots(trajectory[-1], step, "rdf", "cosine_distance",
-                                                                                     save_rdf1=True))
+            self.distance_metrics.append(self._calculate_distance_between_snapshots(trajectory[-1], step, "rdf", "cosine_distance",
+                                                                                    save_rdf1=True))
 
         # Now, we denoise the distance metrics.
         self.distance_metrics_denoised = self.__denoise(self.distance_metrics)
@@ -232,7 +232,7 @@ class SnapshotsProvider(Provider):
         print("First equilibrated timestep of trajectory is", first_snapshot)
         return first_snapshot
 
-    def __analyze_distance_metric(self, trajectory):
+    def analyze_distance_metric(self, trajectory):
         # distance metric usef for the snapshot parsing (realspace similarity
         # of the snapshot), we first find the center of the equilibrated part
         # of the trajectory and calculate the differences w.r.t to to it.
@@ -242,7 +242,7 @@ class SnapshotsProvider(Provider):
         self.distances_realspace = []
         self.__saved_rdf = None
         for i in range(center-width, center+width):
-            self.distances_realspace.append(self.__calculate_distance_between_snapshots(trajectory[center], trajectory[i],
+            self.distances_realspace.append(self._calculate_distance_between_snapshots(trajectory[center], trajectory[i],
                                                                                         "realspace", "minimal_distance", save_rdf1=True))
 
         # From these metrics, we assume mean - 2.576 std as limit.
