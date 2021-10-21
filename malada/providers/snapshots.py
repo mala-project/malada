@@ -197,6 +197,24 @@ class SnapshotsProvider(Provider):
         return denoised_signal
 
     def analyze_trajectory(self, trajectory):
+        """
+        Calculate distance metrics/first equilibrated timestep on a trajectory.
+
+        For this step, the RDF+Cosine distance will be used as a distance
+        metric. Only the first snapshot is return, all the other quantities
+        can be accessed as member variables of the object calling this
+        function.
+
+        Parameters
+        ----------
+        trajectory : ase.io.Trajectory
+            Trajectory to be analyzed.
+
+        Returns
+        -------
+        first_snapshot : int
+            First snapshot for which the trajectory is equilibrated.
+        """
         # First, we ned to calculate the reduced metrics for the trajectory.
         # For this, we calculate the distance between all the snapshots
         # and the last one.
@@ -233,6 +251,28 @@ class SnapshotsProvider(Provider):
         return first_snapshot
 
     def analyze_distance_metric(self, trajectory):
+        """
+        Calculate the cutoff for the distance metric.
+
+        The distance metric used here is realspace (i.e. the smallest
+        displacement of an atom between two snapshots). The cutoff gives
+        a lower estimate for the oscillations of the trajectory. Any distance
+        above this cutoff can be attributed to the oscillations in the
+        trajectory. Any cutoff below is the consquence of temporal
+        neighborhood of these snapshots.
+
+        Parameters
+        ----------
+        trajectory : ase.io.Trajectory
+            Trajectory to be analyzed.
+
+        Returns
+        -------
+        cutoff : float
+            Cutoff below which two snapshots can be assumed to be similar
+            to each other to a degree that suggests temporal neighborhood.
+
+        """
         # distance metric usef for the snapshot parsing (realspace similarity
         # of the snapshot), we first find the center of the equilibrated part
         # of the trajectory and calculate the differences w.r.t to to it.
