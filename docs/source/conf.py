@@ -63,6 +63,7 @@ autodoc_mock_imports = [
     'horovod',
     'lammps',
     'total_energy',
+    'asap3'
 ]
 
 autodoc_member_order = 'groupwise'
