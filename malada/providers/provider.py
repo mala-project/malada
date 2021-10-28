@@ -59,7 +59,7 @@ class Provider:
             current_atoms = ase.io.read(posfile,index = ':', format="espresso-out")
             for i in range(0, len(current_atoms)):
                 if i_actual < self.parameters.maximum_number_of_timesteps:
-                    atoms_to_write = self._enforce_pbc(current_atoms[i])
+                    atoms_to_write = self.enforce_pbc(current_atoms[i])
                     if i_actual == 0:
                         traj_writer = ase.io.trajectory.TrajectoryWriter(file_name, mode='w')
                         traj_writer.write(atoms=atoms_to_write)
@@ -185,7 +185,7 @@ class Provider:
         return number_of_bands
 
     @staticmethod
-    def _enforce_pbc(atoms):
+    def enforce_pbc(atoms):
         """
         Explictly enforeces the PBC on an ASE atoms object.
 

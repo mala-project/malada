@@ -119,7 +119,7 @@ class SnapshotsProvider(Provider):
                 traj_writer = ase.io.trajectory.TrajectoryWriter(filename_traj, mode='w')
             else:
                 traj_writer = ase.io.trajectory.TrajectoryWriter(filename_traj, mode='a')
-            atoms_to_write = self._enforce_pbc(trajectory[md_iteration[i]])
+            atoms_to_write = self.enforce_pbc(trajectory[md_iteration[i]])
             traj_writer.write(atoms=atoms_to_write)
         np.save(filename_numbers, md_iteration)
         print(j, "possible snapshots found in MD trajectory.")

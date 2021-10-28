@@ -8,3 +8,4 @@ from .md import MDProvider
 from .snapshots import SnapshotsProvider
 from .ldosconvergence import LDOSConvergenceProvider
 from .dft import DFTProvider
+from .provider import Provider
