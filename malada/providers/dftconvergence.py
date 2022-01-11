@@ -250,12 +250,12 @@ class DFTConvergenceProvider(Provider):
         if parameters_to_converge == "kpoints":
             if try_number == 0:
                 for grids in kpoints_guesses[self.parameters.element]:
-                    converge_list.append(self.__k_edge_length_to_grid(grids))
+                    converge_list.append(self.__k_edge_length_to_grid(grids, atoms_Angstrom))
             else:
                 spacing = kpoints_guesses[self.parameters.element][-1]-\
                           kpoints_guesses[self.parameters.element][-2]
-                converge_list.append(self.__k_edge_length_to_grid(kpoints_guesses[self.parameters.element][-1]+spacing*(try_number-1)*2+1*spacing))
-                converge_list.append(self.__k_edge_length_to_grid(kpoints_guesses[self.parameters.element][-1]+spacing*(try_number-1)*2+2*spacing))
+                converge_list.append(self.__k_edge_length_to_grid(kpoints_guesses[self.parameters.element][-1]+spacing*(try_number-1)*2+1*spacing, atoms_Angstrom))
+                converge_list.append(self.__k_edge_length_to_grid(kpoints_guesses[self.parameters.element][-1]+spacing*(try_number-1)*2+2*spacing, atoms_Angstrom))
             cutoff = self.converged_cutoff
         else:
             if self.parameters.dft_calculator == "qe":
@@ -516,6 +516,12 @@ class DFTConvergenceProvider(Provider):
 
         return float((energy * 1000)/self.parameters.number_of_atoms)
 
-    def __k_edge_length_to_grid(self, edge_length):
+    def __k_edge_length_to_grid(self, edge_length, atoms_Angstrom):
         # TODO: Reflect geometry here.
-        return (edge_length, edge_length, edge_length)
+        scaling_x = int(np.ceil(
+            atoms_Angstrom.cell.cellpar()[0] / atoms_Angstrom.cell.cellpar()[
+                2]))
+        scaling_y= int(np.ceil(
+            atoms_Angstrom.cell.cellpar()[1] / atoms_Angstrom.cell.cellpar()[
+                2]))
+        return (edge_length*scaling_x, edge_length*scaling_y, edge_length)
