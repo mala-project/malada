@@ -199,7 +199,7 @@ class DFTProvider(Provider):
                        "ldos_length": int(filecontents.find("ldos_length").text),
                        "smearing_factor": float(filecontents.find("smearing_factor").text),}
         kpoints = filecontents.find("kpoints")
-        kgrid = (int(kpoints.find("kx").text),int(kpoints.find("kx").text),
-                 int(kpoints.find("kx").text))
+        kgrid = (int(kpoints.find("kx").text),int(kpoints.find("ky").text),
+                 int(kpoints.find("kz").text))
 
         return ldos_params, kgrid

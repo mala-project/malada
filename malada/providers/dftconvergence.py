@@ -102,6 +102,7 @@ class DFTConvergenceProvider(Provider):
                     # Afterwards, we check if running was succesful.
                     if self.__check_run_success(provider_path, "cutoff", fixed_kpoints=(1,1,1)):
                         self.converged_cutoff = self.__analyze_convergence_runs(provider_path, "cutoff",
+                                                                                supercell_file,
                                                                                 fixed_kpoints=(1, 1, 1))
                     else:
                         if self.parameters.run_system == "slurm_creator":
@@ -133,7 +134,7 @@ class DFTConvergenceProvider(Provider):
                     if self.__check_run_success(provider_path, "kpoints", fixed_cutoff=self.converged_cutoff):
                         self.converged_kgrid = self.__analyze_convergence_runs(
                             provider_path,
-                            "kpoints",
+                            "kpoints", supercell_file,
                             fixed_cutoff=self.converged_cutoff)
                     else:
                         if self.parameters.run_system == "slurm_creator":
@@ -156,7 +157,7 @@ class DFTConvergenceProvider(Provider):
                 # First: cutoffs.
                 if self.converged_cutoff is None:
                     self.converged_cutoff = self.__analyze_convergence_runs(self.external_convergence_folder, "cutoff",
-                                                                            fixed_kpoints=(1, 1, 1))
+                                                                            supercell_file, fixed_kpoints=(1, 1, 1))
                 if self.converged_cutoff is None:
                     raise Exception("Provided convergence data not sufficient,"
                                     "please perform additional calculations"
@@ -165,7 +166,7 @@ class DFTConvergenceProvider(Provider):
                 # Second: kgrid.
                 if self.converged_kgrid is None:
                     self.converged_kgrid = self.__analyze_convergence_runs(self.external_convergence_folder,
-                                                                           "kpoints",
+                                                                           "kpoints",supercell_file,
                                                                             fixed_cutoff=self.converged_cutoff)
                 if self.converged_kgrid is None:
                     raise Exception("Provided convergence data not sufficient,"
@@ -416,7 +417,9 @@ class DFTConvergenceProvider(Provider):
         return True
 
     def __analyze_convergence_runs(self, base_folder, parameter_to_converge,
-                                  fixed_cutoff=None, fixed_kpoints=None):
+                                   supercell_file,
+                                   fixed_cutoff=None, fixed_kpoints=None):
+        atoms_Angstrom = ase.io.read(supercell_file, format="vasp")
 
         # First, parse the results out of the output files.
         result_list = []
@@ -443,9 +446,38 @@ class DFTConvergenceProvider(Provider):
                 if parameter_to_converge == "cutoff":
                    argument = int(os.path.basename(entry).split("Ry")[0])
                 elif parameter_to_converge == "kpoints":
-                    argument = (int((os.path.basename(entry).split("k")[1])[0]),
-                                int((os.path.basename(entry).split("k")[1])[1]),
-                                int((os.path.basename(entry).split("k")[1])[2]))
+                    k_argument = os.path.basename(entry).split("k")[1]
+                    if len(k_argument) == 3:
+                        argument = (int((os.path.basename(entry).split("k")[1])[0]),
+                                    int((os.path.basename(entry).split("k")[1])[1]),
+                                    int((os.path.basename(entry).split("k")[1])[2]))
+                    else:
+                        # One of the k-dimensions is a double digit.
+                        # We will attempt to recover by making an educated
+                        # guess which one it is.
+                        scaling_x = int(np.ceil(
+                            atoms_Angstrom.cell.cellpar()[0] /
+                            atoms_Angstrom.cell.cellpar()[
+                                2]))
+                        scaling_y = int(np.ceil(
+                            atoms_Angstrom.cell.cellpar()[1] /
+                            atoms_Angstrom.cell.cellpar()[
+                                2]))
+                        argument_x = int((os.path.basename(entry).split("k")[1])[0])
+                        argument_y = int((os.path.basename(entry).split("k")[1])[1])
+                        argument_z = int((os.path.basename(entry).split("k")[1])[2])
+
+                        if scaling_x != 1:
+                            argument_x = int((os.path.basename(entry).split("k")[1])[0:2])
+                            argument_y = int((os.path.basename(entry).split("k")[1])[2:3])
+
+                        if scaling_y != 1:
+                            if scaling_x == 1:
+                                argument_y = int((os.path.basename(entry).split("k")[1])[1:3])
+                            else:
+                                argument_y = int((os.path.basename(entry).split("k")[1])[2:4])
+                        argument = (argument_x, argument_y, argument_z)
+
                 convergence_file_lists = glob.glob(os.path.join(entry,
                                                    "*.out"))
                 if len(convergence_file_lists) > 1:
