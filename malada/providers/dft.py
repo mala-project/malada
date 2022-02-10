@@ -32,7 +32,8 @@ class DFTProvider(Provider):
         self.calculation_folders = None
 
     def provide(self, provider_path, dft_convergence_file,
-                ldos_convergence_file, possible_snapshots_file):
+                ldos_convergence_file, possible_snapshots_file,
+                do_postprocessing=True):
         """
         Provide a set of DFT calculations on predefined snapshots.
 
@@ -69,18 +70,23 @@ class DFTProvider(Provider):
                                       ldos_convergence_file,
                                       all_valid_snapshots[i],
                                       snapshot_path,
-                                      "snapshot"+str(i))
+                                      "snapshot"+str(i),
+                                      do_postprocessing)
             for i in range(0, self.parameters.number_of_snapshots):
                 # Run the individul files.
                 snapshot_path = os.path.join(provider_path,"snapshot"+str(i))
                 print("Running DFT in", snapshot_path)
-                dft_runner.run_folder(snapshot_path, "dft+pp")
+                if do_postprocessing:
+                    dft_runner.run_folder(snapshot_path, "dft+pp")
+                else:
+                    dft_runner.run_folder(snapshot_path, "dft")
         else:
             # Here, we have to do a consistency check.
             pass
 
     def __create_dft_run(self, dft_convergence_file, ldos_convergence_file,
-                        atoms, snapshot_path, snapshot_name):
+                        atoms, snapshot_path, snapshot_name,
+                        do_postprocessing):
         # Get cluster info
         # TODO: Use DFT kgrid for scf and LDOS kgrid for NSCF calculations.
         cutoff, kgrid = self._read_convergence(dft_convergence_file)
@@ -129,59 +135,60 @@ class DFTProvider(Provider):
         emax = ldos_params["ldos_length"]*ldos_params["ldos_spacing_eV"]+ldos_params["ldos_offset_eV"]
         smearing_factor = ldos_params["smearing_factor"]
 
-        # DOS file
-        dos_file = open(
-            os.path.join(snapshot_path,id_string+".dos.in"),
-            mode='w')
-        dos_file.write("&dos\n")
-        dos_file.write(" outdir='" + outdir+"',\n")
-        dos_file.write(" prefix='" + self.parameters.element + "',\n")
-        dos_file.write(" Emin=" + str(emin) + ",\n")
-        dos_file.write(" Emax=" + str(emax) + ",\n")
-        dos_file.write(" DeltaE=" + str(deltae) + ",\n")
-        dos_file.write(
-            " degauss=" + str(deltae * smearing_factor / Rydberg) + ",\n")
-        dos_file.write(" fildos='" + id_string + ".dos'\n")
-        dos_file.write("/\n")
+        if do_postprocessing:
+            # DOS file
+            dos_file = open(
+                os.path.join(snapshot_path,id_string+".dos.in"),
+                mode='w')
+            dos_file.write("&dos\n")
+            dos_file.write(" outdir='" + outdir+"',\n")
+            dos_file.write(" prefix='" + self.parameters.element + "',\n")
+            dos_file.write(" Emin=" + str(emin) + ",\n")
+            dos_file.write(" Emax=" + str(emax) + ",\n")
+            dos_file.write(" DeltaE=" + str(deltae) + ",\n")
+            dos_file.write(
+                " degauss=" + str(deltae * smearing_factor / Rydberg) + ",\n")
+            dos_file.write(" fildos='" + id_string + ".dos'\n")
+            dos_file.write("/\n")
 
-        # LDOS file
-        ldos_file = open(os.path.join(snapshot_path,id_string+".pp.ldos.in"),
-            mode='w')
-        ldos_file.write("&inputpp\n")
-        ldos_file.write(" outdir='" + outdir+"',\n")
-        ldos_file.write(" prefix='" + self.parameters.element + "',\n")
-        ldos_file.write(" plot_num=3,\n")
-        ldos_file.write(" emin=" + str(emin) + ",\n")
-        ldos_file.write(" emax=" + str(emax) + ",\n")
-        ldos_file.write(" delta_e=" + str(deltae) + ",\n")
-        ldos_file.write(
-            " degauss_ldos=" + str(deltae * smearing_factor) + ",\n")
-        ldos_file.write("/\n")
-        ldos_file.write("&plot\n")
-        ldos_file.write(" iflag=3,\n")
-        ldos_file.write(" output_format=6,\n")
-        ldos_file.write(
-            " fileout='" + id_string + "_ldos.cube',\n")
-        ldos_file.write("/\n")
+            # LDOS file
+            ldos_file = open(os.path.join(snapshot_path,id_string+".pp.ldos.in"),
+                mode='w')
+            ldos_file.write("&inputpp\n")
+            ldos_file.write(" outdir='" + outdir+"',\n")
+            ldos_file.write(" prefix='" + self.parameters.element + "',\n")
+            ldos_file.write(" plot_num=3,\n")
+            ldos_file.write(" emin=" + str(emin) + ",\n")
+            ldos_file.write(" emax=" + str(emax) + ",\n")
+            ldos_file.write(" delta_e=" + str(deltae) + ",\n")
+            ldos_file.write(
+                " degauss_ldos=" + str(deltae * smearing_factor) + ",\n")
+            ldos_file.write("/\n")
+            ldos_file.write("&plot\n")
+            ldos_file.write(" iflag=3,\n")
+            ldos_file.write(" output_format=6,\n")
+            ldos_file.write(
+                " fileout='" + id_string + "_ldos.cube',\n")
+            ldos_file.write("/\n")
 
-        # Density file
-        dens_file = open(os.path.join(snapshot_path,id_string+".pp.dens.in"),
-            mode='w')
-        dens_file.write("&inputpp\n")
-        dens_file.write(" outdir='" + outdir+"',\n")
-        dens_file.write(" prefix='" + self.parameters.element + "',\n")
-        dens_file.write(" plot_num=0,\n")
-        dens_file.write("/\n")
-        dens_file.write("&plot\n")
-        dens_file.write(" iflag=3,\n")
-        dens_file.write(" output_format=6,\n")
-        dens_file.write(
-            " fileout='" + id_string + "_dens.cube',\n")
-        dens_file.write("/\n")
+            # Density file
+            dens_file = open(os.path.join(snapshot_path,id_string+".pp.dens.in"),
+                mode='w')
+            dens_file.write("&inputpp\n")
+            dens_file.write(" outdir='" + outdir+"',\n")
+            dens_file.write(" prefix='" + self.parameters.element + "',\n")
+            dens_file.write(" plot_num=0,\n")
+            dens_file.write("/\n")
+            dens_file.write("&plot\n")
+            dens_file.write(" iflag=3,\n")
+            dens_file.write(" output_format=6,\n")
+            dens_file.write(
+                " fileout='" + id_string + "_dens.cube',\n")
+            dens_file.write("/\n")
 
-        dos_file.close()
-        ldos_file.close()
-        dens_file.close()
+            dos_file.close()
+            ldos_file.close()
+            dens_file.close()
 
     def __read_ldos_convergence(self, filename):
 
