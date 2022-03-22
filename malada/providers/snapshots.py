@@ -196,7 +196,7 @@ class SnapshotsProvider(Provider):
             self.parameters.distance_metrics_denoising_width) / self.parameters.distance_metrics_denoising_width, mode='same')
         return denoised_signal
 
-    def analyze_trajectory(self, trajectory):
+    def analyze_trajectory(self, trajectory, equilibrated_snapshot=None):
         """
         Calculate distance metrics/first equilibrated timestep on a trajectory.
 
@@ -210,6 +210,10 @@ class SnapshotsProvider(Provider):
         trajectory : ase.io.Trajectory
             Trajectory to be analyzed.
 
+        equilibrated_snapshot : ase.Atoms
+            An equilibrated snapshot. Will usually be read from the trajectory
+            itself, but may be provided by the user if desired.
+
         Returns
         -------
         first_snapshot : int
@@ -219,8 +223,10 @@ class SnapshotsProvider(Provider):
         # For this, we calculate the distance between all the snapshots
         # and the last one.
         self.distance_metrics = []
+        if equilibrated_snapshot is None:
+            equilibrated_snapshot = trajectory[-1]
         for idx, step in enumerate(trajectory):
-            self.distance_metrics.append(self._calculate_distance_between_snapshots(trajectory[-1], step, "rdf", "cosine_distance",
+            self.distance_metrics.append(self._calculate_distance_between_snapshots(equilibrated_snapshot, step, "rdf", "cosine_distance",
                                                                                     save_rdf1=True))
 
         # Now, we denoise the distance metrics.
