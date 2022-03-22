@@ -247,7 +247,7 @@ missing and then perform those.</p></li>
 </dl>
 <dl class="py method">
 <dt id="malada.providers.dft.DFTProvider.provide">
-<code class="sig-name descname"><span class="pre">provide</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dft_convergence_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ldos_convergence_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">possible_snapshots_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.dft.DFTProvider.provide" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">provide</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dft_convergence_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ldos_convergence_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">possible_snapshots_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_postprocessing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.dft.DFTProvider.provide" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide a set of DFT calculations on predefined snapshots.</p>
 <p>This includes DFT energies and snapshots.</p>
 <dl class="field-list simple">
@@ -523,7 +523,7 @@ to each other to a degree that suggests temporal neighborhood.</p>
 
 <dl class="py method">
 <dt id="malada.providers.snapshots.SnapshotsProvider.analyze_trajectory">
-<code class="sig-name descname"><span class="pre">analyze_trajectory</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectory</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.snapshots.SnapshotsProvider.analyze_trajectory" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">analyze_trajectory</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equilibrated_snapshot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#malada.providers.snapshots.SnapshotsProvider.analyze_trajectory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate distance metrics/first equilibrated timestep on a trajectory.</p>
 <p>For this step, the RDF+Cosine distance will be used as a distance
 metric. Only the first snapshot is return, all the other quantities
@@ -531,7 +531,11 @@ can be accessed as member variables of the object calling this
 function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>trajectory</strong> (<em>ase.io.Trajectory</em>) – Trajectory to be analyzed.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajectory</strong> (<em>ase.io.Trajectory</em>) – Trajectory to be analyzed.</p></li>
+<li><p><strong>equilibrated_snapshot</strong> (<em>ase.Atoms</em>) – An equilibrated snapshot. Will usually be read from the trajectory
+itself, but may be provided by the user if desired.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>first_snapshot</strong> – First snapshot for which the trajectory is equilibrated.</p>
