@@ -37,8 +37,8 @@ class SlurmParameters:
 
     def __init__(self):
         self.scf_executable = "pw.x"
-        self.pp_executable = "pp.x"
-        self.dos_executable = "pp.x"
+        self.pp_executable = None
+        self.dos_executable = None
         self.module_loading_string = ""
         self.execution_time = 0
         self.partition_string = ""
@@ -103,8 +103,11 @@ class SlurmParameters:
         new_object = SlurmParameters()
         filecontents = parse(filename).getroot()
         new_object.scf_executable = filecontents.find("scf_executable").text
-        new_object.pp_executable = filecontents.find("pp_executable").text
-        new_object.dos_executable = filecontents.find("dos_executable").text
+        try:
+            new_object.pp_executable = filecontents.find("pp_executable").text
+            new_object.dos_executable = filecontents.find("dos_executable").text
+        except:
+            pass
         new_object.module_loading_string = filecontents.find("module_loading_string").text
         new_object.mpi_runner = filecontents.find("mpi_runner").text
         new_object.execution_time = int(filecontents.find("execution_time").text)
