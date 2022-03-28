@@ -196,7 +196,8 @@ class SnapshotsProvider(Provider):
             self.parameters.distance_metrics_denoising_width) / self.parameters.distance_metrics_denoising_width, mode='same')
         return denoised_signal
 
-    def analyze_trajectory(self, trajectory, equilibrated_snapshot=None):
+    def analyze_trajectory(self, trajectory, equilibrated_snapshot=None,
+                           distance_threshold=None):
         """
         Calculate distance metrics/first equilibrated timestep on a trajectory.
 
@@ -213,6 +214,11 @@ class SnapshotsProvider(Provider):
         equilibrated_snapshot : ase.Atoms
             An equilibrated snapshot. Will usually be read from the trajectory
             itself, but may be provided by the user if desired.
+
+        distance_threshold : float
+            Distance threshold to be used. Usually determined by analyzing
+            the end of the trajectory, but may be provided by user if
+            e.g. multiple trajectories are to be compared.
 
         Returns
         -------
@@ -235,9 +241,11 @@ class SnapshotsProvider(Provider):
         # Next, the average of the presumed equilibrated part is calculated,
         # and then the first N number of times teps which are below this
         # average is calculated.
-        self.average_distance_equilibrated = np.mean(
-            self.distance_metrics_denoised[np.shape(self.distance_metrics_denoised)[0] -
-                                           int(self.parameters.distance_metrics_estimated_equilibrium * np.shape(self.distance_metrics_denoised)[0]):])
+        self.average_distance_equilibrated = distance_threshold
+        if self.average_distance_equilibrated is None:
+            self.average_distance_equilibrated = np.mean(
+                self.distance_metrics_denoised[np.shape(self.distance_metrics_denoised)[0] -
+                                               int(self.parameters.distance_metrics_estimated_equilibrium * np.shape(self.distance_metrics_denoised)[0]):])
         is_below = True
         counter = 0
         first_snapshot = None
