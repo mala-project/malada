@@ -123,13 +123,12 @@ class Provider:
         # I know this breaks down if one of the out files is for any reason incorrect.
         i = 0
         for file_to_open in ordered_file_list:
-            posfile = open(os.path.join(file_to_open, "OUTCAR"))
+            posfile = open(os.path.join(file_to_open, "REPORT"))
             for line in posfile.readlines():
                 if i < self.parameters.maximum_number_of_timesteps:
-                    if "temperature" in line and "TEIN" not in line and\
-                            "TEBEG" not in line and "mean" not in line:
+                    if "tmprt" in line:
                         temp = float(
-                            (line.split("temperature")[1]).split("K")[0])
+                            line.split()[2])
                         temps.append(temp)
                         i += 1
                 else:
