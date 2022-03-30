@@ -33,7 +33,7 @@ class DFTProvider(Provider):
 
     def provide(self, provider_path, dft_convergence_file,
                 ldos_convergence_file, possible_snapshots_file,
-                do_postprocessing=True):
+                do_postprocessing=True, starts_at=0):
         """
         Provide a set of DFT calculations on predefined snapshots.
 
@@ -55,6 +55,10 @@ class DFTProvider(Provider):
         possible_snapshots_file : string
             Path to a file containing an ASE trajectory containing atomic
             snapshots for DFT/LDOS calculation.
+
+        starts_at : int
+            Number from which to start the numbering of the snapshots.
+            Zero by default. Useful for incremental data generation.
         """
         self.calculation_folders = provider_path
         if self.external_calculation_folders is None:
@@ -65,16 +69,18 @@ class DFTProvider(Provider):
             dft_runner = malada.RunnerInterface(self.parameters)
             all_valid_snapshots = ase.io.Trajectory(possible_snapshots_file)
             for i in range(0, self.parameters.number_of_snapshots):
-                snapshot_path = os.path.join(provider_path,"snapshot"+str(i))
+                snapshot_number = i + starts_at
+                snapshot_path = os.path.join(provider_path,"snapshot"+str(snapshot_number))
                 self.__create_dft_run(dft_convergence_file,
                                       ldos_convergence_file,
-                                      all_valid_snapshots[i],
+                                      all_valid_snapshots[snapshot_number],
                                       snapshot_path,
-                                      "snapshot"+str(i),
+                                      "snapshot"+str(snapshot_number),
                                       do_postprocessing)
             for i in range(0, self.parameters.number_of_snapshots):
                 # Run the individul files.
-                snapshot_path = os.path.join(provider_path,"snapshot"+str(i))
+                snapshot_number = i + starts_at
+                snapshot_path = os.path.join(provider_path,"snapshot"+str(snapshot_number))
                 print("Running DFT in", snapshot_path)
                 if do_postprocessing:
                     dft_runner.run_folder(snapshot_path, "dft+pp")
