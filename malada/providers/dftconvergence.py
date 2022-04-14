@@ -435,22 +435,39 @@ class DFTConvergenceProvider(Provider):
                                           str(fixed_kpoints[1]) +
                                           str(fixed_kpoints[2])))
         elif parameter_to_converge == "kpoints":
-            converge_list = glob.glob(os.path.join(base_folder,
-                                                   str(fixed_cutoff)+"Ry_k*"))
+            if self.parameters.dft_calculator == "qe":
+                converge_list = glob.glob(os.path.join(base_folder,
+                                                       str(fixed_cutoff)+"Ry_k*"))
+            elif self.parameters.dft_calculator == "vasp":
+                converge_list = glob.glob(os.path.join(base_folder,
+                                                       str(fixed_cutoff)+"eV_k*"))
         else:
             raise Exception("Unknown convergence parameter.")
 
         for entry in converge_list:
             energy = None
-            if self.parameters.dft_calculator == "qe":
-                if parameter_to_converge == "cutoff":
-                   argument = int(os.path.basename(entry).split("Ry")[0])
-                elif parameter_to_converge == "kpoints":
-                    k_argument = os.path.basename(entry).split("k")[1]
-                    if len(k_argument) == 3:
-                        argument = (int((os.path.basename(entry).split("k")[1])[0]),
-                                    int((os.path.basename(entry).split("k")[1])[1]),
-                                    int((os.path.basename(entry).split("k")[1])[2]))
+            if parameter_to_converge == "cutoff":
+                if self.parameters.dft_calculator == "qe":
+                    argument = int(os.path.basename(entry).split("Ry")[0])
+                elif self.parameters.dft_calculator == "vasp":
+                    argument = int(os.path.basename(entry).split("eV")[0])
+                else:
+                    raise Exception("Unknown calculator chosen.")
+
+            elif parameter_to_converge == "kpoints":
+                k_argument = os.path.basename(entry).split("k")[1]
+                if len(k_argument) == 3:
+                    argument = (
+                    int((os.path.basename(entry).split("k")[1])[0]),
+                    int((os.path.basename(entry).split("k")[1])[1]),
+                    int((os.path.basename(entry).split("k")[1])[2]))
+                else:
+                    # All three dimensions are double digits.
+                    if len(k_argument) == 6:
+                        argument = (
+                            int((os.path.basename(entry).split("k")[1])[0:2]),
+                            int((os.path.basename(entry).split("k")[1])[2:4]),
+                            int((os.path.basename(entry).split("k")[1])[4:6]))
                     else:
                         # One of the k-dimensions is a double digit.
                         # We will attempt to recover by making an educated
@@ -463,21 +480,32 @@ class DFTConvergenceProvider(Provider):
                             atoms_Angstrom.cell.cellpar()[1] /
                             atoms_Angstrom.cell.cellpar()[
                                 2]))
-                        argument_x = int((os.path.basename(entry).split("k")[1])[0])
-                        argument_y = int((os.path.basename(entry).split("k")[1])[1])
-                        argument_z = int((os.path.basename(entry).split("k")[1])[2])
+                        argument_x = int(
+                            (os.path.basename(entry).split("k")[1])[0])
+                        argument_y = int(
+                            (os.path.basename(entry).split("k")[1])[1])
+                        argument_z = int(
+                            (os.path.basename(entry).split("k")[1])[2])
 
                         if scaling_x != 1:
-                            argument_x = int((os.path.basename(entry).split("k")[1])[0:2])
-                            argument_y = int((os.path.basename(entry).split("k")[1])[2:3])
+                            argument_x = int(
+                                (os.path.basename(entry).split("k")[1])[0:2])
+                            argument_y = int(
+                                (os.path.basename(entry).split("k")[1])[2:3])
 
                         if scaling_y != 1:
                             if scaling_x == 1:
-                                argument_y = int((os.path.basename(entry).split("k")[1])[1:3])
+                                argument_y = int(
+                                    (os.path.basename(entry).split("k")[1])[1:3])
                             else:
-                                argument_y = int((os.path.basename(entry).split("k")[1])[2:4])
+                                argument_y = int(
+                                    (os.path.basename(entry).split("k")[1])[2:4])
                         argument = (argument_x, argument_y, argument_z)
 
+            else:
+                raise Exception("Unknown parameter chosen.")
+
+            if self.parameters.dft_calculator == "qe":
                 convergence_file_lists = glob.glob(os.path.join(entry,
                                                    "*.out"))
                 if len(convergence_file_lists) > 1:
@@ -487,12 +515,9 @@ class DFTConvergenceProvider(Provider):
                     energy = self.__get_qe_energy(convergence_file_lists[0])
 
             elif self.parameters.dft_calculator == "vasp":
-                argument = int(os.path.basename(entry).split("eV")[0])
-                try:
-                    energy = self.__get_vasp_energy(os.path.join(entry,
+                energy = self.__get_vasp_energy(os.path.join(entry,
                                                                    "OUTCAR"))
-                except FileNotFoundError:
-                    pass
+
             else:
                 raise Exception("Unknown calculator chosen.")
             if energy is not None:
