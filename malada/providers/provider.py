@@ -165,14 +165,15 @@ class Provider:
                                         format="vasp-out")
             for i in range(0, len(current_atoms)):
                 if i_actual < self.parameters.maximum_number_of_timesteps:
+                    atoms_to_write = self.enforce_pbc(current_atoms[i])
                     if i_actual == 0:
                         traj_writer = ase.io.trajectory.TrajectoryWriter(file_name,  mode='w')
-                        traj_writer.write(atoms=current_atoms[i])
+                        traj_writer.write(atoms=atoms_to_write)
                         i_actual += 1
                     else:
                         traj_writer = ase.io.trajectory.TrajectoryWriter(file_name,  mode='a')
                         if i > 0:
-                            traj_writer.write(atoms=current_atoms[i])
+                            traj_writer.write(atoms=atoms_to_write)
                             i_actual += 1
                 else:
                     break
@@ -206,6 +207,7 @@ class Provider:
             The ASE atoms object for which the PBC have been enforced.
         """
         new_atoms = atoms.copy()
+        new_atoms.pbc = True
         new_atoms.set_scaled_positions(new_atoms.get_scaled_positions())
 
         # This might be unecessary, but I think it is nice to have some sort of
