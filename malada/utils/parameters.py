@@ -114,6 +114,7 @@ class Parameters:
     def __init__(self):
         # General information about the system.
         self.temperature = 0
+        self.compression = 1
         self.number_of_atoms = 0
         self.crystal_structure = "bcc"
         self.element = None

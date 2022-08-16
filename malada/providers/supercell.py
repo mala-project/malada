@@ -4,7 +4,9 @@ from .provider import Provider
 import os
 import ase.io
 import ase.build
+from ase.units import m, kg, Bohr
 from shutil import copyfile
+import numpy as np
 
 
 class SuperCellProvider(Provider):
@@ -45,8 +47,60 @@ class SuperCellProvider(Provider):
 
             super_cell = ase.build.make_supercell(primitive_cell,
                                                   transformation_matrix)
+            super_cell = self.get_compressed_cell(super_cell,
+                                                  self.parameters.compression)
             ase.io.write(self.supercell_file,
                          super_cell, format="vasp", long_format=True)
         else:
             copyfile(self.external_supercell_file, self.supercell_file)
             print("Getting <<supercell>>.vasp file from disc.")
+
+    @staticmethod
+    def get_compressed_cell(supercell, compression_factor):
+        supercell.set_cell(supercell.get_cell() * compression_factor,
+                           scale_atoms=True)
+        return supercell
+
+    @staticmethod
+    def get_number_density(supercell, unit="Angstrom^3"):
+        nr_atoms = len(supercell)
+        volume_atoms = supercell.get_volume()
+        nr_electrons = 0
+        for i in range(0, nr_atoms):
+            nr_electrons += supercell[i].number
+        number_density = nr_electrons/volume_atoms
+        angstrom3_in_m3 = 1 / (m * m * m)
+        angstrom3_in_cm3 = angstrom3_in_m3 * 1000000
+        if unit == "Angstrom^3":
+            return number_density
+        elif unit == "cm^3":
+            return number_density/angstrom3_in_cm3
+        else:
+            raise Exception("Unit not implemented")
+
+    @staticmethod
+    def get_wigner_seitz_radius(supercell):
+        number_density = SuperCellProvider.\
+            get_number_density(supercell, unit="Angstrom^3")
+        rs_angstrom = (3 / (4 * np.pi * number_density)) ** (1 / 3)
+        return rs_angstrom / Bohr
+
+    @staticmethod
+    def get_mass_density(supercell, unit="g_cm^3"):
+        nr_atoms = len(supercell)
+        mass_atom = supercell[0].mass
+        mass_atoms = nr_atoms * mass_atom
+        volume_atoms = supercell.get_volume()
+        mass_density = mass_atoms / volume_atoms
+        u_angstrom3_in_kg_m3 = kg / (m * m * m)
+        u_angstrom3_in_g_cm3 = u_angstrom3_in_kg_m3 * 1000
+        if unit == "kg_m^3":
+            return mass_density/u_angstrom3_in_kg_m3
+        elif unit == "g_cm^3":
+            return mass_density/u_angstrom3_in_g_cm3
+        elif unit == "u_Angstrom^3":
+            return mass_density
+        else:
+            raise Exception("Unit not implemented")
+
+
