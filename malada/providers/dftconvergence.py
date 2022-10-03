@@ -274,7 +274,6 @@ class DFTConvergenceProvider(Provider):
 
 
             elif self.parameters.dft_calculator == "vasp":
-                converge_list = cutoff_guesses_vasp[self.parameters.element]
                 if try_number == 0:
                     converge_list = cutoff_guesses_vasp[self.parameters.element]
                 else:
@@ -282,10 +281,10 @@ class DFTConvergenceProvider(Provider):
                               cutoff_guesses_vasp[self.parameters.element][-2]
                     converge_list.append(
                         cutoff_guesses_vasp[self.parameters.element][
-                            -1] + spacing * (try_number - 1) * 2 + 1)
+                            -1] + spacing * (try_number - 1) * 2 + 1*spacing)
                     converge_list.append(
                         cutoff_guesses_vasp[self.parameters.element][
-                            -1] + spacing * (try_number - 1) * 2 + 2)
+                            -1] + spacing * (try_number - 1) * 2 + 2*spacing)
             kpoints = (1, 1, 1)
 
         # Create files for submission.
