@@ -140,6 +140,10 @@ class Parameters:
         self.time_step_fs = 1
         self.md_thermostat_controller = 0.001
         self.number_of_bands_factor = 0.05
+        self.dft_calculate_stress = True
+        self.dft_calculate_force = True
+        self.dft_use_inversion_symmetry = False
+        self.dft_mixing_beta = 0.1
 
         # Information about MD parsing.
         self.snapshot_parsing_beginning = -1

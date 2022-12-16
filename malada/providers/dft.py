@@ -33,7 +33,8 @@ class DFTProvider(Provider):
 
     def provide(self, provider_path, dft_convergence_file,
                 ldos_convergence_file, possible_snapshots_file,
-                do_postprocessing=True, starts_at=0):
+                do_postprocessing=True, numbering_starts_at=0,
+                parsing_starts_at=0):
         """
         Provide a set of DFT calculations on predefined snapshots.
 
@@ -56,10 +57,20 @@ class DFTProvider(Provider):
             Path to a file containing an ASE trajectory containing atomic
             snapshots for DFT/LDOS calculation.
 
-        starts_at : int
+        numbering_starts_at : int
             Number from which to start the numbering of the snapshots.
             Zero by default. Useful for incremental data generation.
+            THIS WILL ONLY AFFECT THE NUMBERING! NOT THE SNAPSHOTS USED.
+            E.g. if this value is set to 10, the 1st snapshot of the
+            selected snapshots will be set as number 10. If you want to add
+            more snapshots to an existing data set, use parsing_starts_at.
+
+        parsing_starts_at : int
+            Overwrites numbering_starts_at. Number from which to start
+            processing snapshots.
         """
+        if parsing_starts_at > 0:
+            numbering_starts_at = parsing_starts_at
         self.calculation_folders = provider_path
         if self.external_calculation_folders is None:
             # Here we have to perform the actucal calculation.
@@ -69,17 +80,17 @@ class DFTProvider(Provider):
             dft_runner = malada.RunnerInterface(self.parameters)
             all_valid_snapshots = ase.io.Trajectory(possible_snapshots_file)
             for i in range(0, self.parameters.number_of_snapshots):
-                snapshot_number = i + starts_at
+                snapshot_number = i + numbering_starts_at
                 snapshot_path = os.path.join(provider_path,"snapshot"+str(snapshot_number))
                 self.__create_dft_run(dft_convergence_file,
                                       ldos_convergence_file,
-                                      all_valid_snapshots[snapshot_number],
+                                      all_valid_snapshots[snapshot_number-numbering_starts_at+parsing_starts_at],
                                       snapshot_path,
                                       "snapshot"+str(snapshot_number),
                                       do_postprocessing)
             for i in range(0, self.parameters.number_of_snapshots):
                 # Run the individul files.
-                snapshot_number = i + starts_at
+                snapshot_number = i + numbering_starts_at
                 snapshot_path = os.path.join(provider_path,"snapshot"+str(snapshot_number))
                 print("Running DFT in", snapshot_path)
                 if do_postprocessing:
@@ -123,13 +134,20 @@ class DFTProvider(Provider):
             "tprnfor": True,
             "nbnd": nbands,
             "mixing_mode": "plain",
-            "mixing_beta": 0.1,
+            "mixing_beta": self.parameters.dft_mixing_beta,
             "conv_thr": self.parameters.dft_scf_accuracy_per_atom_Ry * self.parameters.number_of_atoms,
             # "verbosity" : "high", # This is maybe a bit high
             "nosym": True,
             "noinv": True
 
         }
+        if self.parameters.dft_use_inversion_symmetry is True:
+            qe_input_data["noinv"] = False
+        if self.parameters.dft_calculate_stress is False:
+            qe_input_data["tstress"] = False
+        if self.parameters.dft_calculate_force is False:
+            qe_input_data["tprnfor"] = False
+
         id_string = self.parameters.element+"_"+snapshot_name
         ase.io.write(os.path.join(snapshot_path,id_string+".pw.scf.in"),
             atoms,
