@@ -328,7 +328,8 @@ class DFTConvergenceProvider(Provider):
                 "mixing_beta": mixing,
                 "conv_thr": self.parameters.dft_scf_accuracy_per_atom_Ry * self.parameters.number_of_atoms,
                 "nosym": True,
-                "noinv": True
+                "noinv": True,
+                "verbosity": "high"
             }
 
             vasp_input_data = {
