@@ -56,9 +56,29 @@ class SuperCellProvider(Provider):
             print("Getting <<supercell>>.vasp file from disc.")
 
     @staticmethod
-    def get_compressed_cell(supercell, compression_factor):
-        supercell.set_cell(supercell.get_cell() * compression_factor,
-                           scale_atoms=True)
+    def get_compressed_cell(
+        supercell,
+        compression_factor=None,
+        density=None,
+        radius=None,
+        units_density="g_cm^3",
+    ):
+
+        if compression_factor is None and density is None and radius is None:
+            raise ValueError(
+                "At least one of compression_factor, density and radius must be speficied"
+            )
+        elif density is not None:
+            density_ambient = SuperCellProvider.get_mass_density(
+                supercell, unit=units_density
+            )
+            compression_factor = (density_ambient / density) ** (1.0 / 3.0)
+        elif radius is not None:
+            radius_ambient = SuperCellProvider.get_wigner_seitz_radius(supercell)
+            compression_factor = radius / radius_ambient
+
+        supercell.set_cell(supercell.get_cell() * compression_factor, scale_atoms=True)
+
         return supercell
 
     @staticmethod
@@ -102,5 +122,3 @@ class SuperCellProvider(Provider):
             return mass_density
         else:
             raise Exception("Unit not implemented")
-
-
