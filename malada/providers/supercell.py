@@ -48,7 +48,9 @@ class SuperCellProvider(Provider):
             super_cell = ase.build.make_supercell(primitive_cell,
                                                   transformation_matrix)
             super_cell = self.get_compressed_cell(super_cell,
-                                                  self.parameters.compression)
+                                                  compression_factor = self.parameters.compression,
+                                                  density = self.parameters.mass_density,
+                                                  radius = self.parameters.WS_radius)
             ase.io.write(self.supercell_file,
                          super_cell, format="vasp", long_format=True)
         else:
@@ -122,3 +124,5 @@ class SuperCellProvider(Provider):
             return mass_density
         else:
             raise Exception("Unit not implemented")
+
+
