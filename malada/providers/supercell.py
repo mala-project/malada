@@ -66,16 +66,20 @@ class SuperCellProvider(Provider):
         units_density="g/(cm^3)",
     ):
 
-        if compression_factor is None and density is None and radius is None:
+        if sum([compression_factor is None, density is None, radius is None]) == 3:
             raise ValueError(
                 "At least one of compression_factor, density and radius must be speficied"
             )
-        elif density is not None:
+        elif sum([compression_factor is None, density is None, radius is None]) < 2:
+            print("Warning: More than one of compression factor, density, "
+                  "and radius is specified.\nRadius takes first priority, "
+                  "then density, finally compression factor.")
+        if density is not None:
             density_ambient = SuperCellProvider.get_mass_density(
                 supercell, unit=units_density
             )
             compression_factor = (density_ambient / density) ** (1.0 / 3.0)
-        elif radius is not None:
+        if radius is not None:
             radius_ambient = SuperCellProvider.get_wigner_seitz_radius(supercell)
             compression_factor = radius / radius_ambient
 
