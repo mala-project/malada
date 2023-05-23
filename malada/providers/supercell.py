@@ -1,5 +1,4 @@
 """Provider for creation of supercell from crystal structure."""
-
 from malada.utils import structure_to_transformation
 from .provider import Provider
 import os
@@ -38,14 +37,8 @@ class SuperCellProvider(Provider):
         cif_file : string
             Path to cif file used for supercell creation.
         """
-        file_name = (
-            self.parameters.element
-            + "_"
-            + str(self.parameters.number_of_atoms)
-            + "_"
-            + self.parameters.crystal_structure
-            + ".vasp"
-        )
+        file_name = self.parameters.element + "_" + str(self.parameters.number_of_atoms) \
+                    + "_" + self.parameters.crystal_structure + ".vasp"
         self.supercell_file = os.path.join(provider_path, file_name)
         if self.external_supercell_file is None:
             try:
@@ -53,9 +46,8 @@ class SuperCellProvider(Provider):
             except FileNotFoundError:
                 self.generate_cif(cif_file)
                 primitive_cell = ase.io.read(cif_file, format="cif")
-            transformation_matrix = structure_to_transformation[
-                self.parameters.crystal_structure
-            ][self.parameters.number_of_atoms]
+
+            transformation_matrix = self.get_transformation_matrix(cif_file)
 
             super_cell = ase.build.make_supercell(primitive_cell, transformation_matrix)
             super_cell = self.get_compressed_cell(
@@ -79,6 +71,7 @@ class SuperCellProvider(Provider):
         radius=None,
         units_density="g/(cm^3)",
     ):
+
         if sum([stretch_factor is None, density is None, radius is None]) == 3:
             raise ValueError(
                 "At least one of stretch_factor, density and radius must be speficied"
@@ -109,21 +102,20 @@ class SuperCellProvider(Provider):
         nr_electrons = 0
         for i in range(0, nr_atoms):
             nr_electrons += supercell[i].number
-        number_density = nr_electrons / volume_atoms
+        number_density = nr_electrons/volume_atoms
         angstrom3_in_m3 = 1 / (m * m * m)
         angstrom3_in_cm3 = angstrom3_in_m3 * 1000000
         if unit == "Angstrom^3":
             return number_density
         elif unit == "cm^3":
-            return number_density / angstrom3_in_cm3
+            return number_density/angstrom3_in_cm3
         else:
             raise Exception("Unit not implemented")
 
     @staticmethod
     def get_wigner_seitz_radius(supercell):
-        number_density = SuperCellProvider.get_number_density(
-            supercell, unit="Angstrom^3"
-        )
+        number_density = SuperCellProvider.\
+            get_number_density(supercell, unit="Angstrom^3")
         rs_angstrom = (3 / (4 * np.pi * number_density)) ** (1 / 3)
         return rs_angstrom / Bohr
 
@@ -137,9 +129,9 @@ class SuperCellProvider(Provider):
         u_angstrom3_in_kg_m3 = kg / (m * m * m)
         u_angstrom3_in_g_cm3 = u_angstrom3_in_kg_m3 * 1000
         if unit == "kg_m^3":
-            return mass_density / u_angstrom3_in_kg_m3
+            return mass_density/u_angstrom3_in_kg_m3
         elif unit == "g/(cm^3)":
-            return mass_density / u_angstrom3_in_g_cm3
+            return mass_density/u_angstrom3_in_g_cm3
         elif unit == "u_Angstrom^3":
             return mass_density
         else:
@@ -201,3 +193,42 @@ class SuperCellProvider(Provider):
         )
         # write to the cif file
         structure.to(filename=cif_file)
+
+    def get_transformation_matrix(self, cif_file):
+        # extract the number of atoms in the unit cell
+        nsites = self.get_nsites_from_cif(cif_file)
+        if nsites is None:
+            raise Exception(
+                "cif file is not formatted correctly.\n"
+                "It must contain _cell_formula_units_Z."
+            )
+        atoms_over_nsites = self.parameters.number_of_atoms / nsites
+        if atoms_over_nsites % 2 != 0:
+            raise Exception(
+                "Number of atoms together with crystal structure "
+                "is not supported. The ratio of these two values "
+                "must be an even number."
+            )
+        # matrix which creates supercell
+        transform_ratios = [1, 1, 1]
+        while atoms_over_nsites > 1:
+            for i in range(3):
+                transform_ratios[i] *= 2
+                atoms_over_nsites /= 2
+
+        transformation_matrix = [
+            [transform_ratios[0], 0, 0],
+            [0, transform_ratios[1], 0],
+            [0, 0, transform_ratios[2]],
+        ]
+
+        return transformation_matrix
+
+    @staticmethod
+    def get_nsites_from_cif(cif_file):
+        with open(cif_file, "r") as file:
+            for line in file:
+                if line.startswith("_cell_formula_units_Z"):
+                    return int(line.split()[-1])
+        # returns None if the line isn't found
+        return None
