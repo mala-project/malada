@@ -63,7 +63,7 @@ class SuperCellProvider(Provider):
         compression_factor=None,
         density=None,
         radius=None,
-        units_density="g_cm^3",
+        units_density="g/(cm^3)",
     ):
 
         if compression_factor is None and density is None and radius is None:
@@ -108,7 +108,7 @@ class SuperCellProvider(Provider):
         return rs_angstrom / Bohr
 
     @staticmethod
-    def get_mass_density(supercell, unit="g_cm^3"):
+    def get_mass_density(supercell, unit="g/(cm^3)"):
         nr_atoms = len(supercell)
         mass_atom = supercell[0].mass
         mass_atoms = nr_atoms * mass_atom
@@ -118,7 +118,7 @@ class SuperCellProvider(Provider):
         u_angstrom3_in_g_cm3 = u_angstrom3_in_kg_m3 * 1000
         if unit == "kg_m^3":
             return mass_density/u_angstrom3_in_kg_m3
-        elif unit == "g_cm^3":
+        elif unit == "g/(cm^3)":
             return mass_density/u_angstrom3_in_g_cm3
         elif unit == "u_Angstrom^3":
             return mass_density
