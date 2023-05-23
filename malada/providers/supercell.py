@@ -48,7 +48,7 @@ class SuperCellProvider(Provider):
             super_cell = ase.build.make_supercell(primitive_cell,
                                                   transformation_matrix)
             super_cell = self.get_compressed_cell(super_cell,
-                                                  compression_factor = self.parameters.compression,
+                                                  stretch_factor = self.parameters.stretch_factor,
                                                   density = self.parameters.mass_density,
                                                   radius = self.parameters.WS_radius)
             ase.io.write(self.supercell_file,
@@ -60,30 +60,30 @@ class SuperCellProvider(Provider):
     @staticmethod
     def get_compressed_cell(
         supercell,
-        compression_factor=None,
+        stretch_factor=None,
         density=None,
         radius=None,
         units_density="g/(cm^3)",
     ):
 
-        if sum([compression_factor is None, density is None, radius is None]) == 3:
+        if sum([stretch_factor is None, density is None, radius is None]) == 3:
             raise ValueError(
-                "At least one of compression_factor, density and radius must be speficied"
+                "At least one of stretch_factor, density and radius must be speficied"
             )
-        elif sum([compression_factor is None, density is None, radius is None]) < 2:
-            print("Warning: More than one of compression factor, density, "
+        elif sum([stretch_factor is None, density is None, radius is None]) < 2:
+            print("Warning: More than one of stretch factor, density, "
                   "and radius is specified.\nRadius takes first priority, "
-                  "then density, finally compression factor.")
+                  "then density, finally stretch factor.")
         if density is not None:
             density_ambient = SuperCellProvider.get_mass_density(
                 supercell, unit=units_density
             )
-            compression_factor = (density_ambient / density) ** (1.0 / 3.0)
+            stretch_factor = (density_ambient / density) ** (1.0 / 3.0)
         if radius is not None:
             radius_ambient = SuperCellProvider.get_wigner_seitz_radius(supercell)
-            compression_factor = radius / radius_ambient
+            stretch_factor = radius / radius_ambient
 
-        supercell.set_cell(supercell.get_cell() * compression_factor, scale_atoms=True)
+        supercell.set_cell(supercell.get_cell() * stretch_factor, scale_atoms=True)
 
         return supercell
 

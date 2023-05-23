@@ -114,7 +114,7 @@ class Parameters:
     def __init__(self):
         # General information about the system.
         self.temperature = 0
-        self.compression = None
+        self.stretch_factor = None
         self.mass_density = None
         self.WS_radius = None
         self.number_of_atoms = 0
