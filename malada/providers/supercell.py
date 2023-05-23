@@ -1,4 +1,5 @@
 """Provider for creation of supercell from crystal structure."""
+
 from malada.utils import structure_to_transformation
 from .provider import Provider
 import os
@@ -7,6 +8,7 @@ import ase.build
 from ase.units import m, kg, Bohr
 from shutil import copyfile
 import numpy as np
+from mp_api.client import MPRester
 
 
 class SuperCellProvider(Provider):
@@ -40,7 +42,11 @@ class SuperCellProvider(Provider):
                     + "_" + self.parameters.crystal_structure + ".vasp"
         self.supercell_file = os.path.join(provider_path, file_name)
         if self.external_supercell_file is None:
-            primitive_cell = ase.io.read(cif_file, format="cif")
+            try:
+                primitive_cell = ase.io.read(cif_file, format="cif")
+            except FileNotFoundError:
+                self.generate_cif(cif_file)
+                primitive_cell = ase.io.read(cif_file, format="cif")
             transformation_matrix = structure_to_transformation\
                                     [self.parameters.crystal_structure]\
                                     [self.parameters.number_of_atoms]
@@ -128,5 +134,19 @@ class SuperCellProvider(Provider):
             return mass_density
         else:
             raise Exception("Unit not implemented")
+
+    def generate_cif(self, cif_file):
+        # read in the api key
+        with open(self.parameters.mp_api_file, "r") as f:
+            api_key = f.readlines()[0].strip()
+        # initialize materials project api
+        mpr = MPRester(api_key)
+        # dictionary relating elements to their MP IDs
+        # TODO: maybe this needs to go elsewhere
+        mat_ids = {"Al": "mp-134", "Be": "mp-87"}
+        structure = mpr.get_structure_by_material_id(mat_ids[self.parameters.element], conventional_unit_cell=True)
+        structure.to(filename = cif_file)
+        
+        
 
 
