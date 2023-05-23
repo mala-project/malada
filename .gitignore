@@ -10,6 +10,7 @@ temp/
 *.egg-info
 *.pyc
 *.npy
+.mp_api/
 examples/ex*/
 examples/develop*/
 examples/develop.py
