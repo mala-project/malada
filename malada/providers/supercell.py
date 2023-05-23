@@ -48,7 +48,9 @@ class SuperCellProvider(Provider):
             super_cell = ase.build.make_supercell(primitive_cell,
                                                   transformation_matrix)
             super_cell = self.get_compressed_cell(super_cell,
-                                                  self.parameters.compression)
+                                                  stretch_factor = self.parameters.stretch_factor,
+                                                  density = self.parameters.mass_density,
+                                                  radius = self.parameters.WS_radius)
             ase.io.write(self.supercell_file,
                          super_cell, format="vasp", long_format=True)
         else:
@@ -56,9 +58,33 @@ class SuperCellProvider(Provider):
             print("Getting <<supercell>>.vasp file from disc.")
 
     @staticmethod
-    def get_compressed_cell(supercell, compression_factor):
-        supercell.set_cell(supercell.get_cell() * compression_factor,
-                           scale_atoms=True)
+    def get_compressed_cell(
+        supercell,
+        stretch_factor=None,
+        density=None,
+        radius=None,
+        units_density="g/(cm^3)",
+    ):
+
+        if sum([stretch_factor is None, density is None, radius is None]) == 3:
+            raise ValueError(
+                "At least one of stretch_factor, density and radius must be speficied"
+            )
+        elif sum([stretch_factor is None, density is None, radius is None]) < 2:
+            print("Warning: More than one of stretch factor, density, "
+                  "and radius is specified.\nRadius takes first priority, "
+                  "then density, finally stretch factor.")
+        if density is not None:
+            density_ambient = SuperCellProvider.get_mass_density(
+                supercell, unit=units_density
+            )
+            stretch_factor = (density_ambient / density) ** (1.0 / 3.0)
+        if radius is not None:
+            radius_ambient = SuperCellProvider.get_wigner_seitz_radius(supercell)
+            stretch_factor = radius / radius_ambient
+
+        supercell.set_cell(supercell.get_cell() * stretch_factor, scale_atoms=True)
+
         return supercell
 
     @staticmethod
@@ -86,7 +112,7 @@ class SuperCellProvider(Provider):
         return rs_angstrom / Bohr
 
     @staticmethod
-    def get_mass_density(supercell, unit="g_cm^3"):
+    def get_mass_density(supercell, unit="g/(cm^3)"):
         nr_atoms = len(supercell)
         mass_atom = supercell[0].mass
         mass_atoms = nr_atoms * mass_atom
@@ -96,7 +122,7 @@ class SuperCellProvider(Provider):
         u_angstrom3_in_g_cm3 = u_angstrom3_in_kg_m3 * 1000
         if unit == "kg_m^3":
             return mass_density/u_angstrom3_in_kg_m3
-        elif unit == "g_cm^3":
+        elif unit == "g/(cm^3)":
             return mass_density/u_angstrom3_in_g_cm3
         elif unit == "u_Angstrom^3":
             return mass_density
