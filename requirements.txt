@@ -2,3 +2,5 @@ ase
 numpy
 scipy
 asap3
+mp-api
+mpcontribs-client

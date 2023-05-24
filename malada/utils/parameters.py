@@ -1,5 +1,6 @@
 """Collection of all parameters for the pipeline."""
 
+import os
 from .slurmparams import SlurmParameters
 
 
@@ -129,6 +130,7 @@ class Parameters:
         self.pseudopotential = {"path": None, "valence_electrons": 0,
                                 "name": None}
         self.run_system = "bash"
+        self.mp_api_file = os.path.expanduser("~") + "/malada/.mp_api/.api_key"
         self.dft_slurm = SlurmParameters()
         self.md_slurm = SlurmParameters()
 
