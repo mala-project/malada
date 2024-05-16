@@ -54,7 +54,7 @@ class DFTConvergenceProvider(Provider):
         self.converged_cutoff = predefined_cutoff
         self.converged_kgrid = predefined_kgrid
 
-    def provide(self, provider_path, supercell_file):
+    def provide(self, provider_path, supercell_file, create_submit_script=True):
         """
         Provide DFT parameters converged to within user specification.
 
@@ -106,6 +106,14 @@ class DFTConvergenceProvider(Provider):
                                                                                 fixed_kpoints=(1, 1, 1))
                     else:
                         if self.parameters.run_system == "slurm_creator":
+                            all_submit_file = open(
+                                os.path.join(provider_path, "submit_all.sh"), mode='w')
+                            all_submit_file.write("#!/bin/bash\n\n")
+                            for cutoff_folder in cutoff_folders:
+                                all_submit_file.write("cd "+cutoff_folder.split("/")[-2]+"\n")
+                                all_submit_file.write("sbatch submit.slurm\n")
+                                all_submit_file.write("cd ..\n")
+                            all_submit_file.close()
                             print("Run scripts created, please run via slurm.\n"
                                   "Quitting now.")
                             quit()
@@ -138,6 +146,15 @@ class DFTConvergenceProvider(Provider):
                             fixed_cutoff=self.converged_cutoff)
                     else:
                         if self.parameters.run_system == "slurm_creator":
+                            all_submit_file = open(
+                                os.path.join(provider_path, "submit_all.sh"), mode='w')
+                            all_submit_file.write("#!/bin/bash\n\n")
+                            for kpoint_folder in kpoints_folders:
+                                all_submit_file.write("cd "+kpoint_folder.split("/")[-2]+"\n")
+                                all_submit_file.write("sbatch submit.slurm\n")
+                                all_submit_file.write("cd ..\n")
+                            all_submit_file.close()
+
                             print("Run scripts created, please run via slurm.\n"
                                   "Quitting now.")
                             quit()

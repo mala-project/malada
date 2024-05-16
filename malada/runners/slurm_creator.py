@@ -120,6 +120,8 @@ class SlurmCreatorRunner(Runner):
                 submit_file.write(slurm_params.mpi_runner+" "+slurm_params.get_mpirunner_process_params()+" "+
                                   str(slurm_params.nodes*slurm_params.tasks_per_node)+" "+
                                   slurm_params.scf_executable+" \n")
+        submit_file.write(slurm_params.cleanup_string)
+        submit_file.write("\n")
 
         submit_file.close()
 

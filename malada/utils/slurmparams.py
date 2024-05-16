@@ -43,6 +43,7 @@ class SlurmParameters:
         self.execution_time = 0
         self.partition_string = ""
         self.mpi_runner = "mpirun"
+        self.cleanup_string = ""
 
         # TODO: Maybe some consistency checks here?
         self.tasks_per_node = 0
@@ -79,6 +80,9 @@ class SlurmParameters:
         node = SubElement(top, "nodes",
                           {"type": "int"})
         node.text = str(self.nodes)
+        node = SubElement(top, "cleanup_string",
+                          {"type": "string"})
+        node.text = self.cleanup_string
         rough_string = tostring(top, 'utf-8')
         reparsed = minidom.parseString(rough_string)
         with open(filename, "w") as f:
@@ -114,6 +118,11 @@ class SlurmParameters:
         new_object.partition_string = filecontents.find("partition_string").text
         new_object.tasks_per_node = int(filecontents.find("tasks_per_node").text)
         new_object.nodes = int(filecontents.find("nodes").text)
+        try:
+            new_object.cleanup_string = filecontents.find("cleanup_string").text
+        except:
+            pass
+
         return new_object
 
     def get_mpirunner_process_params(self):
