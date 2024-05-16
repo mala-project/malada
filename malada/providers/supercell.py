@@ -7,7 +7,10 @@ import ase.build
 from ase.units import m, kg, Bohr
 from shutil import copyfile
 import numpy as np
-from mp_api.client import MPRester
+try:
+    from mp_api.client import MPRester
+except:
+    pass
 
 
 class SuperCellProvider(Provider):
