@@ -34,7 +34,7 @@ class DFTProvider(Provider):
     def provide(self, provider_path, dft_convergence_file,
                 ldos_convergence_file, possible_snapshots_file,
                 do_postprocessing=True, numbering_starts_at=0,
-                parsing_starts_at=0):
+                parsing_starts_at=0, ignore_atom_number=False):
         """
         Provide a set of DFT calculations on predefined snapshots.
 
@@ -68,6 +68,10 @@ class DFTProvider(Provider):
         parsing_starts_at : int
             Overwrites numbering_starts_at. Number from which to start
             processing snapshots.
+
+        ignore_atom_number : bool
+            If True, a convergence file for a different number of atoms
+            can be loaded.
         """
         if parsing_starts_at > 0:
             numbering_starts_at = parsing_starts_at
@@ -87,7 +91,8 @@ class DFTProvider(Provider):
                                       all_valid_snapshots[snapshot_number-numbering_starts_at+parsing_starts_at],
                                       snapshot_path,
                                       "snapshot"+str(snapshot_number),
-                                      do_postprocessing)
+                                      do_postprocessing,
+                                      ignore_atom_number)
             for i in range(0, self.parameters.number_of_snapshots):
                 # Run the individul files.
                 snapshot_number = i + numbering_starts_at
@@ -103,11 +108,13 @@ class DFTProvider(Provider):
 
     def __create_dft_run(self, dft_convergence_file, ldos_convergence_file,
                         atoms, snapshot_path, snapshot_name,
-                        do_postprocessing):
+                        do_postprocessing, ignore_atom_number):
         # Get cluster info
         # TODO: Use DFT kgrid for scf and LDOS kgrid for NSCF calculations.
-        cutoff, kgrid = self._read_convergence(dft_convergence_file)
-        ldos_params, kgrid = self.__read_ldos_convergence(ldos_convergence_file)
+        cutoff, kgrid = self._read_convergence(dft_convergence_file,
+                                               ignore_atom_number)
+        ldos_params, kgrid = self.__read_ldos_convergence(ldos_convergence_file,
+                                                          ignore_atom_number)
         # Create folder
         if not os.path.exists(snapshot_path):
             os.makedirs(snapshot_path)
@@ -147,6 +154,8 @@ class DFTProvider(Provider):
             qe_input_data["tstress"] = False
         if self.parameters.dft_calculate_force is False:
             qe_input_data["tprnfor"] = False
+        if self.parameters.dft_assume_two_dimensional:
+            qe_input_data["assume_isolated"] = "2D"
 
         id_string = self.parameters.element+"_"+snapshot_name
         ase.io.write(os.path.join(snapshot_path,id_string+".pw.scf.in"),
@@ -187,6 +196,7 @@ class DFTProvider(Provider):
             ldos_file.write(" delta_e=" + str(deltae) + ",\n")
             ldos_file.write(
                 " degauss_ldos=" + str(deltae * smearing_factor) + ",\n")
+            ldos_file.write(" use_gauss_ldos=.true.\n")
             ldos_file.write("/\n")
             ldos_file.write("&plot\n")
             ldos_file.write(" iflag=3,\n")
@@ -214,16 +224,19 @@ class DFTProvider(Provider):
             ldos_file.close()
             dens_file.close()
 
-    def __read_ldos_convergence(self, filename):
+    def __read_ldos_convergence(self, filename, ignore_atom_number):
 
         # Parse the XML file and first check for consistency.
         filecontents = ET.parse(filename).getroot()
         dftparams = filecontents.find("calculationparameters")
+        number_of_atoms_check = (int(dftparams.find("number_of_atoms").text)
+                                 != self.parameters.number_of_atoms) if (
+                ignore_atom_number is False) else False
         if dftparams.find("element").text != self.parameters.element or \
            dftparams.find("crystal_structure").text != self.parameters.crystal_structure or \
            dftparams.find("dft_calculator").text != self.parameters.dft_calculator or \
            float(dftparams.find("temperature").text) != self.parameters.temperature or \
-           int(dftparams.find("number_of_atoms").text) != self.parameters.number_of_atoms:
+                number_of_atoms_check:
             raise Exception("Incompatible convergence parameters provided.")
         ldos_params = {"ldos_offset_eV": float(filecontents.find("ldos_offset_eV").text),
                        "ldos_spacing_eV": float(filecontents.find("ldos_spacing_eV").text),

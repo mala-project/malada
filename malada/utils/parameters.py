@@ -148,6 +148,7 @@ class Parameters:
         self.dft_calculate_force = True
         self.dft_use_inversion_symmetry = False
         self.dft_mixing_beta = 0.1
+        self.dft_assume_two_dimensional = True
 
         # Information about MD parsing.
         self.snapshot_parsing_beginning = -1

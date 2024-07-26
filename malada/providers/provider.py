@@ -30,16 +30,20 @@ class Provider:
         """
         pass
 
-    def _read_convergence(self, filename):
+    def _read_convergence(self, filename, ignore_atom_number):
 
         # Parse the XML file and first check for consistency.
         filecontents = ET.parse(filename).getroot()
         dftparams = filecontents.find("calculationparameters")
+        number_of_atoms_check = (int(dftparams.find("number_of_atoms").text)
+                                 != self.parameters.number_of_atoms) if (
+                ignore_atom_number is False) else False
+
         if dftparams.find("element").text != self.parameters.element or \
            dftparams.find("crystal_structure").text != self.parameters.crystal_structure or \
            dftparams.find("dft_calculator").text != self.parameters.dft_calculator or \
            float(dftparams.find("temperature").text) != self.parameters.temperature or \
-           int(dftparams.find("number_of_atoms").text) != self.parameters.number_of_atoms:
+                number_of_atoms_check:
             raise Exception("Incompatible convergence parameters provided.")
 
         cutoff_energy = int(filecontents.find("cutoff_energy").text)
