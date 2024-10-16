@@ -214,10 +214,13 @@ class SuperCellProvider(Provider):
             )
         # matrix which creates supercell
         transform_ratios = [1, 1, 1]
+        i = 0
         while atoms_over_nsites > 1:
-            for i in range(3):
-                transform_ratios[i] *= 2
-                atoms_over_nsites /= 2
+            transform_ratios[i] *= 2
+            atoms_over_nsites /= 2
+            i += 1
+            if i > 2:
+                i = 0
 
         transformation_matrix = [
             [transform_ratios[0], 0, 0],
