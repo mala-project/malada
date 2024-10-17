@@ -30,7 +30,7 @@ class Provider:
         """
         pass
 
-    def _read_convergence(self, filename, ignore_atom_number):
+    def _read_convergence(self, filename, ignore_atom_number=False):
 
         # Parse the XML file and first check for consistency.
         filecontents = ET.parse(filename).getroot()
