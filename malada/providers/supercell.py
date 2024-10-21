@@ -1,5 +1,4 @@
 """Provider for creation of supercell from crystal structure."""
-from malada.utils import structure_to_transformation
 from .provider import Provider
 import os
 import ase.io
@@ -206,11 +205,11 @@ class SuperCellProvider(Provider):
                 "It must contain _cell_formula_units_Z."
             )
         atoms_over_nsites = self.parameters.number_of_atoms / nsites
-        if atoms_over_nsites % 2 != 0:
+        if np.log2(atoms_over_nsites) % 1 != 0:
             raise Exception(
-                "Number of atoms together with crystal structure "
+                "Number of atoms with this crystal structure "
                 "is not supported. The ratio of these two values "
-                "must be an even number."
+                "must be a power of 2."
             )
         # matrix which creates supercell
         transform_ratios = [1, 1, 1]
