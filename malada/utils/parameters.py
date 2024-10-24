@@ -110,6 +110,10 @@ class Parameters:
         be used. E.g. if =0.05, the overall number of bands will be the number
         of electrons times 1.05. Has to be scaled with temperature. Default
         is 0.05, which should be ok up to ~2500K.
+
+    dft_assume_two_dimensional : bool
+        If True, two dimensional DFT calculations will be performed.
+        To that end, the relevant QE parameters will be selected.
     """
 
     def __init__(self):
@@ -152,6 +156,7 @@ class Parameters:
         self.dft_use_inversion_symmetry = False
         self.dft_mixing_beta = 0.1
         self.dft_assume_two_dimensional = False
+        self.twodimensional_cutting_tolerance = 1e-3
 
         # Information about MD parsing.
         self.snapshot_parsing_beginning = -1
