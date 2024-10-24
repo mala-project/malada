@@ -152,6 +152,17 @@ class DFTProvider(Provider):
         }
         nbands = self._get_number_of_bands()
         outdir = "temp"
+        if (
+            self.parameters.dft_scf_accuracy_per_atom_Ry >= 1e-6
+            and self.parameters.dft_assume_two_dimensional
+        ):
+            print(
+                "Large DFT accuracy threshold detected. When running "
+                "two-dimensional calculations, which include areas of low "
+                "electronic density, smaller accuracy thresholds are "
+                "recommended. Consider setting dft_scf_accuracy_per_atom_Ry "
+                "to, e.g., 1-e9."
+            )
         qe_input_data = {
             "occupations": "smearing",
             "calculation": "scf",
