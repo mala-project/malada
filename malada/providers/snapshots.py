@@ -300,7 +300,7 @@ class SnapshotsProvider(Provider):
         # distance metric usef for the snapshot parsing (realspace similarity
         # of the snapshot), we first find the center of the equilibrated part
         # of the trajectory and calculate the differences w.r.t to to it.
-        center = int((np.shape(self.distance_metrics_denoised)[0]-self.first_snapshot)/2)
+        center = int((np.shape(self.distance_metrics_denoised)[0]-self.first_snapshot)/2) + self.first_snapshot
         width = int(self.parameters.distance_metrics_estimated_equilibrium *
                     np.shape(self.distance_metrics_denoised)[0])
         self.distances_realspace = []
