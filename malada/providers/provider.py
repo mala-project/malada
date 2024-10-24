@@ -1,4 +1,5 @@
 """Base class for all pipeline providers."""
+
 from abc import ABC, abstractmethod
 import xml.etree.ElementTree as ET
 import glob
@@ -30,22 +31,39 @@ class Provider:
         """
         pass
 
-    def _read_convergence(self, filename):
+    def _read_convergence(self, filename, ignore_atom_number=False):
 
         # Parse the XML file and first check for consistency.
         filecontents = ET.parse(filename).getroot()
         dftparams = filecontents.find("calculationparameters")
-        if dftparams.find("element").text != self.parameters.element or \
-           dftparams.find("crystal_structure").text != self.parameters.crystal_structure or \
-           dftparams.find("dft_calculator").text != self.parameters.dft_calculator or \
-           float(dftparams.find("temperature").text) != self.parameters.temperature or \
-           int(dftparams.find("number_of_atoms").text) != self.parameters.number_of_atoms:
+        number_of_atoms_check = (
+            (
+                int(dftparams.find("number_of_atoms").text)
+                != self.parameters.number_of_atoms
+            )
+            if (ignore_atom_number is False)
+            else False
+        )
+
+        if (
+            dftparams.find("element").text != self.parameters.element
+            or dftparams.find("crystal_structure").text
+            != self.parameters.crystal_structure
+            or dftparams.find("dft_calculator").text
+            != self.parameters.dft_calculator
+            or float(dftparams.find("temperature").text)
+            != self.parameters.temperature
+            or number_of_atoms_check
+        ):
             raise Exception("Incompatible convergence parameters provided.")
 
         cutoff_energy = int(filecontents.find("cutoff_energy").text)
         kpoints = filecontents.find("kpoints")
-        kgrid = (int(kpoints.find("kx").text),int(kpoints.find("kx").text),
-                 int(kpoints.find("kx").text))
+        kgrid = (
+            int(kpoints.find("kx").text),
+            int(kpoints.find("kx").text),
+            int(kpoints.find("kx").text),
+        )
 
         return cutoff_energy, kgrid
 
@@ -56,16 +74,22 @@ class Provider:
         # I know this breaks down if one of the out files is for any reason incorrect.
         i_actual = 0
         for posfile in ordered_file_list:
-            current_atoms = ase.io.read(posfile,index = ':', format="espresso-out")
+            current_atoms = ase.io.read(
+                posfile, index=":", format="espresso-out"
+            )
             for i in range(0, len(current_atoms)):
                 if i_actual < self.parameters.maximum_number_of_timesteps:
                     atoms_to_write = self.enforce_pbc(current_atoms[i])
                     if i_actual == 0:
-                        traj_writer = ase.io.trajectory.TrajectoryWriter(file_name, mode='w')
+                        traj_writer = ase.io.trajectory.TrajectoryWriter(
+                            file_name, mode="w"
+                        )
                         traj_writer.write(atoms=atoms_to_write)
                         i_actual += 1
                     else:
-                        traj_writer = ase.io.trajectory.TrajectoryWriter(file_name, mode='a')
+                        traj_writer = ase.io.trajectory.TrajectoryWriter(
+                            file_name, mode="a"
+                        )
                         if i > 0:
                             traj_writer.write(atoms=atoms_to_write)
                             i_actual += 1
@@ -83,7 +107,11 @@ class Provider:
             posfile = open(file_to_open)
             for line in posfile.readlines():
                 if i < self.parameters.maximum_number_of_timesteps:
-                    if "temperature" in line and "=" in line and "Starting" not in line:
+                    if (
+                        "temperature" in line
+                        and "=" in line
+                        and "Starting" not in line
+                    ):
                         temp = float((line.split("=")[1]).split("K")[0])
                         temps.append(temp)
                         i += 1
@@ -108,7 +136,7 @@ class Provider:
                         time_step_found = True
                     if time_step_found and "cpu time" in line:
                         current_time = float(line.split()[-2])
-                        times.append(current_time-last_time)
+                        times.append(current_time - last_time)
                         last_time = current_time
                         time_step_found = False
                         i += 1
@@ -127,8 +155,7 @@ class Provider:
             for line in posfile.readlines():
                 if i < self.parameters.maximum_number_of_timesteps:
                     if "tmprt" in line:
-                        temp = float(
-                            line.split()[2])
+                        temp = float(line.split()[2])
                         temps.append(temp)
                         i += 1
                 else:
@@ -160,18 +187,24 @@ class Provider:
         # I know this breaks down if one of the out files is for any reason incorrect.
         i_actual = 0
         for file_to_open in ordered_file_list:
-            current_atoms = ase.io.read(os.path.join(file_to_open, "OUTCAR")
-                                        , index=':',
-                                        format="vasp-out")
+            current_atoms = ase.io.read(
+                os.path.join(file_to_open, "OUTCAR"),
+                index=":",
+                format="vasp-out",
+            )
             for i in range(0, len(current_atoms)):
                 if i_actual < self.parameters.maximum_number_of_timesteps:
                     atoms_to_write = self.enforce_pbc(current_atoms[i])
                     if i_actual == 0:
-                        traj_writer = ase.io.trajectory.TrajectoryWriter(file_name,  mode='w')
+                        traj_writer = ase.io.trajectory.TrajectoryWriter(
+                            file_name, mode="w"
+                        )
                         traj_writer.write(atoms=atoms_to_write)
                         i_actual += 1
                     else:
-                        traj_writer = ase.io.trajectory.TrajectoryWriter(file_name,  mode='a')
+                        traj_writer = ase.io.trajectory.TrajectoryWriter(
+                            file_name, mode="a"
+                        )
                         if i > 0:
                             traj_writer.write(atoms=atoms_to_write)
                             i_actual += 1
@@ -179,9 +212,11 @@ class Provider:
                     break
 
     def _get_number_of_bands(self):
-        number_of_bands = int(self.parameters.number_of_atoms *
-                          self.parameters.pseudopotential["valence_electrons"]
-                          * (1.0 + self.parameters.number_of_bands_factor))
+        number_of_bands = int(
+            self.parameters.number_of_atoms
+            * self.parameters.pseudopotential["valence_electrons"]
+            * (1.0 + self.parameters.number_of_bands_factor)
+        )
         return number_of_bands
 
     @staticmethod
@@ -214,7 +249,10 @@ class Provider:
         # metric here.
         rescaled_atoms = 0
         for i in range(0, len(atoms)):
-            if False in (np.isclose(new_atoms[i].position,
-                          atoms[i].position, atol=0.001)):
+            if False in (
+                np.isclose(
+                    new_atoms[i].position, atoms[i].position, atol=0.001
+                )
+            ):
                 rescaled_atoms += 1
         return new_atoms

@@ -1,4 +1,5 @@
 """Interface to automate creation of Runners."""
+
 from .bashrunner import BashRunner
 from .slurm_creator import SlurmCreatorRunner
 
@@ -27,4 +28,3 @@ def RunnerInterface(parameters):
         return runner
     else:
         raise Exception("Unknown runner type.")
-
