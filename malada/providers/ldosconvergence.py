@@ -1,4 +1,5 @@
 """Provider for optimal LDOS calculation parameters."""
+
 import os
 from shutil import copyfile
 from .provider import Provider
@@ -46,19 +47,26 @@ class LDOSConvergenceProvider(Provider):
             Path to a file containing an ASE trajectory containing atomic
             snapshots for DFT/LDOS calculation.
         """
-        file_name = self.parameters.element + \
-                    str(self.parameters.number_of_atoms) + \
-                    "_" + self.parameters.crystal_structure +\
-                    "_" + str(self.parameters.temperature) +\
-                    "_" + self.parameters.dft_calculator+".ldosconf.xml"
+        file_name = (
+            self.parameters.element
+            + str(self.parameters.number_of_atoms)
+            + "_"
+            + self.parameters.crystal_structure
+            + "_"
+            + str(self.parameters.temperature)
+            + "_"
+            + self.parameters.dft_calculator
+            + ".ldosconf.xml"
+        )
         self.ldos_configuration_file = os.path.join(provider_path, file_name)
         # Check if there exist results or if we have to work from scratch.
         if self.external_ldos_configuration is None:
-            raise Exception("Currently there is no way to determine LDOS"
-                            "configuration automatically.")
+            raise Exception(
+                "Currently there is no way to determine LDOS"
+                "configuration automatically."
+            )
         else:
-            copyfile(self.external_ldos_configuration,
-                     self.ldos_configuration_file)
+            copyfile(
+                self.external_ldos_configuration, self.ldos_configuration_file
+            )
             print("Getting <<ldos_configuration>>.xml file from disc.")
-
-

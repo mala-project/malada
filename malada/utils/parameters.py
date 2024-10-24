@@ -127,8 +127,11 @@ class Parameters:
         self.dft_calculator = "qe"
         self.md_calculator = "qe"
         # TODO: Get number of electrons directly from file.
-        self.pseudopotential = {"path": None, "valence_electrons": 0,
-                                "name": None}
+        self.pseudopotential = {
+            "path": None,
+            "valence_electrons": 0,
+            "name": None,
+        }
         self.run_system = "bash"
         self.mp_api_file = os.path.expanduser("~") + "/malada/.mp_api/.api_key"
         self.dft_slurm = SlurmParameters()

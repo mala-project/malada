@@ -1,4 +1,5 @@
 """Provider for crystal structures."""
+
 from .provider import Provider
 import os
 from shutil import copyfile
@@ -35,12 +36,17 @@ class CrystalStructureProvider(Provider):
         provider_path : string
             Path in which to operate in.
         """
-        file_name = self.parameters.element + \
-                    "_" + self.parameters.crystal_structure + ".cif"
-        self.cif_file = os.path.join(provider_path,file_name)
+        file_name = (
+            self.parameters.element
+            + "_"
+            + self.parameters.crystal_structure
+            + ".cif"
+        )
+        self.cif_file = os.path.join(provider_path, file_name)
         if self.external_cif_file is None:
-            raise Exception("Currently there is no way to provide a cif file"
-                            "on the fly.")
+            raise Exception(
+                "Currently there is no way to provide a cif file" "on the fly."
+            )
         else:
 
             copyfile(self.external_cif_file, self.cif_file)

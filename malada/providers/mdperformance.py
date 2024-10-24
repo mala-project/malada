@@ -1,4 +1,5 @@
 """Provider for optimal MD performance parameters."""
+
 import os
 from shutil import copyfile
 from xml.etree.ElementTree import Element, SubElement, tostring
@@ -39,27 +40,37 @@ class MDPerformanceProvider(Provider):
         dft_convergence_file : string
             Path to xml file containing the DFT convergence parameter.
         """
-        file_name = self.parameters.element + \
-                    str(self.parameters.number_of_atoms) + \
-                    "_" + self.parameters.crystal_structure +\
-                    "_" + str(self.parameters.temperature) +\
-                    "_" + self.parameters.dft_calculator+".mdperformance.xml"
+        file_name = (
+            self.parameters.element
+            + str(self.parameters.number_of_atoms)
+            + "_"
+            + self.parameters.crystal_structure
+            + "_"
+            + str(self.parameters.temperature)
+            + "_"
+            + self.parameters.dft_calculator
+            + ".mdperformance.xml"
+        )
         self.md_performance_xml = os.path.join(provider_path, file_name)
         if self.external_performance_file is None:
             if self.parameters.run_system == "bash":
                 # In this case, we can simply write an empty xml file
-                print("Using bash based run system, no MD performance "
-                      "optimization possible or necessary.")
-                top = Element('mdperformanceparameters')
-                dummy = SubElement(top, "nraise", {'type': "float"})
+                print(
+                    "Using bash based run system, no MD performance "
+                    "optimization possible or necessary."
+                )
+                top = Element("mdperformanceparameters")
+                dummy = SubElement(top, "nraise", {"type": "float"})
                 dummy.text = "0.001"
-                rough_string = tostring(top, 'utf-8')
+                rough_string = tostring(top, "utf-8")
                 reparsed = minidom.parseString(rough_string)
                 with open(self.md_performance_xml, "w") as f:
                     f.write(reparsed.toprettyxml(indent="  "))
             else:
-                raise Exception("Currently there is no way to evaluate MD "
-                                "performance on the fly.")
+                raise Exception(
+                    "Currently there is no way to evaluate MD "
+                    "performance on the fly."
+                )
         else:
             copyfile(self.external_performance_file, self.md_performance_xml)
             print("Getting <<md_performance>>.xml file from disc.")

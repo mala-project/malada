@@ -1,4 +1,5 @@
 """Provider for creation of supercell from crystal structure."""
+
 from .provider import Provider
 import os
 import ase.io
@@ -6,6 +7,7 @@ import ase.build
 from ase.units import m, kg, Bohr
 from shutil import copyfile
 import numpy as np
+
 try:
     from mp_api.client import MPRester
 except:
@@ -39,8 +41,14 @@ class SuperCellProvider(Provider):
         cif_file : string
             Path to cif file used for supercell creation.
         """
-        file_name = self.parameters.element + "_" + str(self.parameters.number_of_atoms) \
-                    + "_" + self.parameters.crystal_structure + ".vasp"
+        file_name = (
+            self.parameters.element
+            + "_"
+            + str(self.parameters.number_of_atoms)
+            + "_"
+            + self.parameters.crystal_structure
+            + ".vasp"
+        )
         self.supercell_file = os.path.join(provider_path, file_name)
         if self.external_supercell_file is None:
             try:
@@ -51,7 +59,9 @@ class SuperCellProvider(Provider):
 
             transformation_matrix = self.get_transformation_matrix(cif_file)
 
-            super_cell = ase.build.make_supercell(primitive_cell, transformation_matrix)
+            super_cell = ase.build.make_supercell(
+                primitive_cell, transformation_matrix
+            )
             super_cell = self.get_compressed_cell(
                 super_cell,
                 stretch_factor=self.parameters.stretch_factor,
@@ -59,7 +69,10 @@ class SuperCellProvider(Provider):
                 radius=self.parameters.WS_radius,
             )
             ase.io.write(
-                self.supercell_file, super_cell, format="vasp", long_format=True
+                self.supercell_file,
+                super_cell,
+                format="vasp",
+                long_format=True,
             )
         else:
             copyfile(self.external_supercell_file, self.supercell_file)
@@ -78,7 +91,9 @@ class SuperCellProvider(Provider):
             raise ValueError(
                 "At least one of stretch_factor, density and radius must be speficied"
             )
-        elif sum([stretch_factor is None, density is None, radius is None]) < 2:
+        elif (
+            sum([stretch_factor is None, density is None, radius is None]) < 2
+        ):
             print(
                 "Warning: More than one of stretch factor, density, "
                 "and radius is specified.\nRadius takes first priority, "
@@ -90,10 +105,14 @@ class SuperCellProvider(Provider):
             )
             stretch_factor = (density_ambient / density) ** (1.0 / 3.0)
         if radius is not None:
-            radius_ambient = SuperCellProvider.get_wigner_seitz_radius(supercell)
+            radius_ambient = SuperCellProvider.get_wigner_seitz_radius(
+                supercell
+            )
             stretch_factor = radius / radius_ambient
 
-        supercell.set_cell(supercell.get_cell() * stretch_factor, scale_atoms=True)
+        supercell.set_cell(
+            supercell.get_cell() * stretch_factor, scale_atoms=True
+        )
 
         return supercell
 
@@ -104,20 +123,21 @@ class SuperCellProvider(Provider):
         nr_electrons = 0
         for i in range(0, nr_atoms):
             nr_electrons += supercell[i].number
-        number_density = nr_electrons/volume_atoms
+        number_density = nr_electrons / volume_atoms
         angstrom3_in_m3 = 1 / (m * m * m)
         angstrom3_in_cm3 = angstrom3_in_m3 * 1000000
         if unit == "Angstrom^3":
             return number_density
         elif unit == "cm^3":
-            return number_density/angstrom3_in_cm3
+            return number_density / angstrom3_in_cm3
         else:
             raise Exception("Unit not implemented")
 
     @staticmethod
     def get_wigner_seitz_radius(supercell):
-        number_density = SuperCellProvider.\
-            get_number_density(supercell, unit="Angstrom^3")
+        number_density = SuperCellProvider.get_number_density(
+            supercell, unit="Angstrom^3"
+        )
         rs_angstrom = (3 / (4 * np.pi * number_density)) ** (1 / 3)
         return rs_angstrom / Bohr
 
@@ -131,9 +151,9 @@ class SuperCellProvider(Provider):
         u_angstrom3_in_kg_m3 = kg / (m * m * m)
         u_angstrom3_in_g_cm3 = u_angstrom3_in_kg_m3 * 1000
         if unit == "kg_m^3":
-            return mass_density/u_angstrom3_in_kg_m3
+            return mass_density / u_angstrom3_in_kg_m3
         elif unit == "g/(cm^3)":
-            return mass_density/u_angstrom3_in_g_cm3
+            return mass_density / u_angstrom3_in_g_cm3
         elif unit == "u_Angstrom^3":
             return mass_density
         else:
@@ -160,7 +180,12 @@ class SuperCellProvider(Provider):
         # search materials project database for the desired element
         structures = mpr.summary.search(
             chemsys=self.parameters.element,
-            fields=["symmetry", "material_id", "theoretical", "energy_above_hull"],
+            fields=[
+                "symmetry",
+                "material_id",
+                "theoretical",
+                "energy_above_hull",
+            ],
         )
         # narrow down by correct structure
         structures = list(
@@ -180,14 +205,18 @@ class SuperCellProvider(Provider):
                 + "Please reconsider parameters or provide your own input files."
             )
         # narrow down by structures which are experimentally verified
-        structures_expt = list(filter(lambda x: x.theoretical == False, structures))
+        structures_expt = list(
+            filter(lambda x: x.theoretical == False, structures)
+        )
         # choose minimal energy structure
         if len(structures_expt) == 0:
             best_structure = min(structures, key=lambda x: x.energy_above_hull)
         elif len(structures_expt) == 1:
             best_structure = structures_expt[0]
         elif len(structures_expt) > 1:
-            best_structure = min(structures_expt, key=lambda x: x.energy_above_hull)
+            best_structure = min(
+                structures_expt, key=lambda x: x.energy_above_hull
+            )
         # get the ID of the best structure
         best_structure_id = best_structure.material_id
         structure = mpr.get_structure_by_material_id(
