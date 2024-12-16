@@ -144,7 +144,7 @@ class DFTConvergenceProvider(Provider):
                                 "Run scripts created, please run via slurm.\n"
                                 "Quitting now."
                             )
-                            quit()
+                            return
                         else:
                             raise Exception("DFT calculations failed.")
                     if self.converged_cutoff is None:
@@ -199,7 +199,7 @@ class DFTConvergenceProvider(Provider):
                                 "Run scripts created, please run via slurm.\n"
                                 "Quitting now."
                             )
-                            quit()
+                            return
                         else:
                             raise Exception("DFT calculations failed.")
 

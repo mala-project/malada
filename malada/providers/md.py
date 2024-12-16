@@ -126,7 +126,7 @@ class MDProvider(Provider):
                 if self.parameters.run_system == "slurm_creator":
                     print("Created run scripts. Please run via slurm.")
                     print("Quitting...")
-                    quit()
+                    return
             else:
                 folder_to_parse = self.external_run_folder
 
