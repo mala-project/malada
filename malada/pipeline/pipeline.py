@@ -1,7 +1,15 @@
 """Data generation Pipeline."""
-from malada import CrystalStructureProvider, SuperCellProvider, \
-                   DFTConvergenceProvider, MDPerformanceProvider, MDProvider, \
-                   SnapshotsProvider, LDOSConvergenceProvider, DFTProvider
+
+from malada import (
+    CrystalStructureProvider,
+    SuperCellProvider,
+    DFTConvergenceProvider,
+    MDPerformanceProvider,
+    MDProvider,
+    SnapshotsProvider,
+    LDOSConvergenceProvider,
+    DFTProvider,
+)
 import os
 
 
@@ -39,42 +47,45 @@ class DataPipeline:
         Provider for final DFT calculations and LDOS calculation
     """
 
-    def __init__(self, parameters,
-                 crystal_structure_provider: CrystalStructureProvider = None,
-                 supercell_provider: SuperCellProvider = None,
-                 dft_convergence_provider: DFTConvergenceProvider = None,
-                 md_performance_provider: MDPerformanceProvider = None,
-                 md_provider: MDProvider = None,
-                 snapshots_provider: SnapshotsProvider = None,
-                 ldos_configuration_provider: LDOSConvergenceProvider = None,
-                 dft_provider: DFTProvider = None,
-                 ):
+    def __init__(
+        self,
+        parameters,
+        crystal_structure_provider: CrystalStructureProvider = None,
+        supercell_provider: SuperCellProvider = None,
+        dft_convergence_provider: DFTConvergenceProvider = None,
+        md_performance_provider: MDPerformanceProvider = None,
+        md_provider: MDProvider = None,
+        snapshots_provider: SnapshotsProvider = None,
+        ldos_configuration_provider: LDOSConvergenceProvider = None,
+        dft_provider: DFTProvider = None,
+    ):
         self.parameters = parameters
 
         # Create the providers object that were not otherwise specified.
         if crystal_structure_provider is None:
-            self.crystal_structure_provider = \
-                CrystalStructureProvider(self.parameters)
+            self.crystal_structure_provider = CrystalStructureProvider(
+                self.parameters
+            )
         else:
             self.crystal_structure_provider = crystal_structure_provider
         if supercell_provider is None:
-            self.supercell_provider = \
-                SuperCellProvider(self.parameters)
+            self.supercell_provider = SuperCellProvider(self.parameters)
         else:
             self.supercell_provider = supercell_provider
         if dft_convergence_provider is None:
-            self.dft_convergence_provider = \
-                DFTConvergenceProvider(self.parameters)
+            self.dft_convergence_provider = DFTConvergenceProvider(
+                self.parameters
+            )
         else:
             self.dft_convergence_provider = dft_convergence_provider
         if md_performance_provider is None:
-            self.md_performance_provider = \
-                MDPerformanceProvider(self.parameters)
+            self.md_performance_provider = MDPerformanceProvider(
+                self.parameters
+            )
         else:
             self.md_performance_provider = md_performance_provider
         if md_provider is None:
-            self.md_provider = \
-                MDProvider(self.parameters)
+            self.md_provider = MDProvider(self.parameters)
         else:
             self.md_provider = md_provider
         if snapshots_provider is None:
@@ -82,7 +93,9 @@ class DataPipeline:
         else:
             self.snapshots_provider = snapshots_provider
         if ldos_configuration_provider is None:
-            self.ldos_configuration_provider = LDOSConvergenceProvider(self.parameters)
+            self.ldos_configuration_provider = LDOSConvergenceProvider(
+                self.parameters
+            )
         else:
             self.ldos_configuration_provider = ldos_configuration_provider
         if dft_provider is None:
@@ -94,8 +107,9 @@ class DataPipeline:
         """Run a full data generation pipeline."""
         # Step one: Get the crystal structure.
         print("Getting the crystal structure...")
-        path00 = os.path.join(self.parameters.base_folder,
-                              "00_crystal_structure")
+        path00 = os.path.join(
+            self.parameters.base_folder, "00_crystal_structure"
+        )
         if not os.path.exists(path00):
             os.makedirs(path00)
         self.crystal_structure_provider.provide(path00)
@@ -104,20 +118,24 @@ class DataPipeline:
 
         # Step two: Build the supercell.
         print("Building supercell...")
-        path01 = os.path.join(self.parameters.base_folder,
-                              "01_supercell")
+        path01 = os.path.join(self.parameters.base_folder, "01_supercell")
         if not os.path.exists(path01):
             os.makedirs(path01)
-        self.supercell_provider.provide(path01, self.crystal_structure_provider.cif_file)
+        self.supercell_provider.provide(
+            path01, self.crystal_structure_provider.cif_file
+        )
         print("Building supercell: Done.")
 
         # Step three: Converge DFT parameters.
         print("Converging DFT parameters...")
-        path02 = os.path.join(self.parameters.base_folder, "02_dft_convergence")
+        path02 = os.path.join(
+            self.parameters.base_folder, "02_dft_convergence"
+        )
         if not os.path.exists(path02):
             os.makedirs(path02)
-        self.dft_convergence_provider.provide(path02,
-                                              self.supercell_provider.supercell_file)
+        self.dft_convergence_provider.provide(
+            path02, self.supercell_provider.supercell_file
+        )
         print("Converging DFT parameters: Done.")
 
         # Step four: Get optimal MD run parameters.
@@ -125,9 +143,9 @@ class DataPipeline:
         path03 = os.path.join(self.parameters.base_folder, "03_md_performance")
         if not os.path.exists(path03):
             os.makedirs(path03)
-        self.md_performance_provider.provide(path03,
-                                             self.dft_convergence_provider.
-                                             convergence_results_file)
+        self.md_performance_provider.provide(
+            path03, self.dft_convergence_provider.convergence_results_file
+        )
         print("Testing MD performance: Done.")
 
         # Step five: Get/Calculate a MD trajectory.
@@ -135,10 +153,12 @@ class DataPipeline:
         path04 = os.path.join(self.parameters.base_folder, "04_md")
         if not os.path.exists(path04):
             os.makedirs(path04)
-        self.md_provider.provide(path04, self.supercell_provider.supercell_file,
-                                 self.dft_convergence_provider.
-                                 convergence_results_file, self.
-                                 md_performance_provider.md_performance_xml)
+        self.md_provider.provide(
+            path04,
+            self.supercell_provider.supercell_file,
+            self.dft_convergence_provider.convergence_results_file,
+            self.md_performance_provider.md_performance_xml,
+        )
         print("Getting MD trajectory: Done.")
 
         # Step six: Parsing MD trajectory for snapshots.
@@ -146,28 +166,36 @@ class DataPipeline:
         path05 = os.path.join(self.parameters.base_folder, "05_snapshots")
         if not os.path.exists(path05):
             os.makedirs(path05)
-        self.snapshots_provider.provide(path05,
-                                        self.md_provider.trajectory_file,
-                                        self.md_provider.temperature_file)
+        self.snapshots_provider.provide(
+            path05,
+            self.md_provider.trajectory_file,
+            self.md_provider.temperature_file,
+        )
         print("Parsing snapshots from MD trajectory: Done.")
 
         # Step seven: Determining the LDOS parameters.
         print("Determining LDOS parameters...")
-        path06 = os.path.join(self.parameters.base_folder, "06_ldosconfiguration")
+        path06 = os.path.join(
+            self.parameters.base_folder, "06_ldosconfiguration"
+        )
         if not os.path.exists(path06):
             os.makedirs(path06)
-        self.ldos_configuration_provider.provide(path06,
-                                                 self.snapshots_provider.snapshot_file,
-                                                 self.dft_convergence_provider.convergence_results_file)
+        self.ldos_configuration_provider.provide(
+            path06,
+            self.snapshots_provider.snapshot_file,
+            self.dft_convergence_provider.convergence_results_file,
+        )
         print("Determining LDOS parameters: Done.")
 
         # Step eight (final step): Perfroming the necessary DFT calculations.
         print("Performing DFT calculation...")
-        path07 = os.path.join(self.parameters.base_folder,
-                              "07_dft")
+        path07 = os.path.join(self.parameters.base_folder, "07_dft")
         if not os.path.exists(path07):
             os.makedirs(path07)
-        self.dft_provider.provide(path07,self.dft_convergence_provider.convergence_results_file,
-                                  self.ldos_configuration_provider.ldos_configuration_file,
-                                  self.snapshots_provider.snapshot_file)
+        self.dft_provider.provide(
+            path07,
+            self.dft_convergence_provider.convergence_results_file,
+            self.ldos_configuration_provider.ldos_configuration_file,
+            self.snapshots_provider.snapshot_file,
+        )
         print("Performing DFT calculation: Done.")

@@ -1,4 +1,5 @@
 """Parameters to create a slurm run script."""
+
 from xml.etree.ElementTree import Element, SubElement, tostring, parse
 from xml.dom import minidom
 
@@ -43,6 +44,7 @@ class SlurmParameters:
         self.execution_time = 0
         self.partition_string = ""
         self.mpi_runner = "mpirun"
+        self.cleanup_string = ""
 
         # TODO: Maybe some consistency checks here?
         self.tasks_per_node = 0
@@ -57,29 +59,24 @@ class SlurmParameters:
         filename : string
             Path to file to save parameters to.
         """
-        top = Element('slurmparameters')
-        node = SubElement(top, "scf_executable",
-                          {"type": "string"})
+        top = Element("slurmparameters")
+        node = SubElement(top, "scf_executable", {"type": "string"})
         node.text = self.scf_executable
-        node = SubElement(top, "module_loading_string",
-                          {"type": "string"})
+        node = SubElement(top, "module_loading_string", {"type": "string"})
         node.text = self.module_loading_string
-        node = SubElement(top, "execution_time",
-                          {"type": "int"})
+        node = SubElement(top, "execution_time", {"type": "int"})
         node.text = str(self.execution_time)
-        node = SubElement(top, "partition_string",
-                          {"type": "string"})
+        node = SubElement(top, "partition_string", {"type": "string"})
         node.text = self.partition_string
-        node = SubElement(top, "mpi_runner",
-                          {"type": "string"})
+        node = SubElement(top, "mpi_runner", {"type": "string"})
         node.text = self.mpi_runner
-        node = SubElement(top, "tasks_per_node",
-                          {"type": "int"})
+        node = SubElement(top, "tasks_per_node", {"type": "int"})
         node.text = str(self.tasks_per_node)
-        node = SubElement(top, "nodes",
-                          {"type": "int"})
+        node = SubElement(top, "nodes", {"type": "int"})
         node.text = str(self.nodes)
-        rough_string = tostring(top, 'utf-8')
+        node = SubElement(top, "cleanup_string", {"type": "string"})
+        node.text = self.cleanup_string
+        rough_string = tostring(top, "utf-8")
         reparsed = minidom.parseString(rough_string)
         with open(filename, "w") as f:
             f.write(reparsed.toprettyxml(indent="  "))
@@ -105,15 +102,32 @@ class SlurmParameters:
         new_object.scf_executable = filecontents.find("scf_executable").text
         try:
             new_object.pp_executable = filecontents.find("pp_executable").text
-            new_object.dos_executable = filecontents.find("dos_executable").text
+            new_object.dos_executable = filecontents.find(
+                "dos_executable"
+            ).text
         except:
             pass
-        new_object.module_loading_string = filecontents.find("module_loading_string").text
+        new_object.module_loading_string = filecontents.find(
+            "module_loading_string"
+        ).text
         new_object.mpi_runner = filecontents.find("mpi_runner").text
-        new_object.execution_time = int(filecontents.find("execution_time").text)
-        new_object.partition_string = filecontents.find("partition_string").text
-        new_object.tasks_per_node = int(filecontents.find("tasks_per_node").text)
+        new_object.execution_time = int(
+            filecontents.find("execution_time").text
+        )
+        new_object.partition_string = filecontents.find(
+            "partition_string"
+        ).text
+        new_object.tasks_per_node = int(
+            filecontents.find("tasks_per_node").text
+        )
         new_object.nodes = int(filecontents.find("nodes").text)
+        try:
+            new_object.cleanup_string = filecontents.find(
+                "cleanup_string"
+            ).text
+        except:
+            pass
+
         return new_object
 
     def get_mpirunner_process_params(self):

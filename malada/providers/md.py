@@ -42,8 +42,13 @@ class MDProvider(Provider):
         file.
     """
 
-    def __init__(self, parameters, external_trajectory=None,
-                 external_temperatures=None, external_run_folder=None):
+    def __init__(
+        self,
+        parameters,
+        external_trajectory=None,
+        external_temperatures=None,
+        external_run_folder=None,
+    ):
         super(MDProvider, self).__init__(parameters)
         self.external_trajectory = external_trajectory
         self.external_temperatures = external_temperatures
@@ -51,8 +56,13 @@ class MDProvider(Provider):
         self.trajectory_file = None
         self.temperature_file = None
 
-    def provide(self, provider_path, supercell_file, dft_convergence_file,
-                md_performance_file):
+    def provide(
+        self,
+        provider_path,
+        supercell_file,
+        dft_convergence_file,
+        md_performance_file,
+    ):
         """
         Provide a MD trajectory and temperatures from previous steps.
 
@@ -75,30 +85,39 @@ class MDProvider(Provider):
             MD.
         """
         # Creating file for output.
-        file_name = self.parameters.element + \
-                    str(self.parameters.number_of_atoms) + \
-                    "_" + self.parameters.crystal_structure +\
-                    "_" + str(self.parameters.temperature)
-        self.trajectory_file = os.path.join(provider_path, file_name+".traj")
-        self.temperature_file = os.path.join(provider_path, file_name +
-                                             ".temp.npy")
+        file_name = (
+            self.parameters.element
+            + str(self.parameters.number_of_atoms)
+            + "_"
+            + self.parameters.crystal_structure
+            + "_"
+            + str(self.parameters.temperature)
+        )
+        self.trajectory_file = os.path.join(provider_path, file_name + ".traj")
+        self.temperature_file = os.path.join(
+            provider_path, file_name + ".temp.npy"
+        )
 
         # MD performance has to be loaded if SLURM is used.
         # TODO: Fix this, the MD parameters should also contain the thermostat
         # controller
         if self.parameters.run_system == "slurm_creator":
-            self.parameters.md_slurm = malada.SlurmParameters.\
-                                       from_xml(md_performance_file)
-        if self.external_trajectory is None or self.external_temperatures is None:
+            self.parameters.md_slurm = malada.SlurmParameters.from_xml(
+                md_performance_file
+            )
+        if (
+            self.external_trajectory is None
+            or self.external_temperatures is None
+        ):
             if self.external_run_folder is None:
                 # Here, we have to perform the MD first.
                 # First, create MD inputs.
-                self.__create_md_run(dft_convergence_file,
-                                     supercell_file, provider_path)
+                self.__create_md_run(
+                    dft_convergence_file, supercell_file, provider_path
+                )
 
                 # Run the MD calculation.
-                mdrunner = malada.RunnerInterface(
-                    self.parameters)
+                mdrunner = malada.RunnerInterface(self.parameters)
                 mdrunner.run_folder(provider_path, "md")
                 folder_to_parse = provider_path
 
@@ -107,46 +126,57 @@ class MDProvider(Provider):
                 if self.parameters.run_system == "slurm_creator":
                     print("Created run scripts. Please run via slurm.")
                     print("Quitting...")
-                    quit()
+                    return
             else:
                 folder_to_parse = self.external_run_folder
 
             # Now we parse the results.
             if self.parameters.md_calculator == "qe":
-                self._qe_out_to_trajectory(folder_to_parse, self.trajectory_file)
-                self._qe_out_to_temperature(folder_to_parse, self.temperature_file)
+                self._qe_out_to_trajectory(
+                    folder_to_parse, self.trajectory_file
+                )
+                self._qe_out_to_temperature(
+                    folder_to_parse, self.temperature_file
+                )
             else:
-                self._vasp_out_to_trajectory(folder_to_parse, self.trajectory_file)
-                self._vasp_out_to_temperature(folder_to_parse, self.temperature_file)
+                self._vasp_out_to_trajectory(
+                    folder_to_parse, self.trajectory_file
+                )
+                self._vasp_out_to_temperature(
+                    folder_to_parse, self.temperature_file
+                )
         else:
             copyfile(self.external_trajectory, self.trajectory_file)
             copyfile(self.external_temperatures, self.temperature_file)
-            print("Getting <<trajectory>>.traj and <<temperatures>>.temp.npy"
-                  " files from disc.")
+            print(
+                "Getting <<trajectory>>.traj and <<temperatures>>.temp.npy"
+                " files from disc."
+            )
 
-    def __create_md_run(self, dft_convergence_file,
-                        posfile, base_path):
+    def __create_md_run(self, dft_convergence_file, posfile, base_path):
         cutoff, kgrid = self._read_convergence(dft_convergence_file)
         if self.parameters.md_at_gamma_point:
             kgrid = (1, 1, 1)
             if self.parameters.dft_calculator == "qe":
                 kgrid = None
 
-        qe_pseudopotentials = {self.parameters.element:
-                                   self.parameters.pseudopotential["name"]}
+        qe_pseudopotentials = {
+            self.parameters.element: self.parameters.pseudopotential["name"]
+        }
         nbands = self._get_number_of_bands()
 
         qe_input_data = {
-            "occupations": 'smearing',
-            "calculation": 'md',
-            "restart_mode": 'from_scratch',
+            "occupations": "smearing",
+            "calculation": "md",
+            "restart_mode": "from_scratch",
             "prefix": self.parameters.element,
             "pseudo_dir": self.parameters.pseudopotential["path"],
             "outdir": "temp",
             "ibrav": 0,
-            "smearing": 'fermi-dirac',
-            "degauss": round(kelvin_to_rydberg(
-                self.parameters.temperature), 7),
+            "smearing": "fermi-dirac",
+            "degauss": round(
+                kelvin_to_rydberg(self.parameters.temperature), 7
+            ),
             "ecutrho": cutoff * 4,
             "ecutwfc": cutoff,
             "tstress": True,
@@ -154,8 +184,8 @@ class MDProvider(Provider):
             "nbnd": nbands,
             "mixing_mode": "plain",
             "mixing_beta": 0.1,
-            "conv_thr": self.parameters.dft_scf_accuracy_per_atom_Ry *
-                        self.parameters.number_of_atoms,
+            "conv_thr": self.parameters.dft_scf_accuracy_per_atom_Ry
+            * self.parameters.number_of_atoms,
             # "verbosity" : "high", # This is maybe a bit high
             "nosym": True,
             # MD variables - these are not final in any way.
@@ -164,11 +194,11 @@ class MDProvider(Provider):
             # https://www2.mpip-mainz.mpg.de/~andrienk/journal_club/thermostats.pdf
             # it is apparent that we would need Nose-Hover, but the next
             # best thing QE gives us is berendsen.
-            "ion_temperature": 'berendsen',
+            "ion_temperature": "berendsen",
             "tempw": self.parameters.temperature,
             # Time step: In Ryberg atomic units.
             # For now: 1 fs
-            "dt": second_to_rydberg_time(1e-15*self.parameters.time_step_fs),
+            "dt": second_to_rydberg_time(1e-15 * self.parameters.time_step_fs),
             # Number of steps.
             # For now: 500.
             "nstep": self.parameters.maximum_number_of_timesteps,
@@ -176,7 +206,7 @@ class MDProvider(Provider):
             # I think we want verlet, which is also the default.
             "ion_dynamics": "verlet",
             # I think this helps with performance.
-            "wfc_extrapolation": 'second order',
+            "wfc_extrapolation": "second order",
             # This controls the velocity rescaling performed by the Berendsen
             # thermostat. It corresponds to tau/dt in e.g. eq. 1.12
             # of https://link.springer.com/content/pdf/10.1007%2F978-3-540-74686-7_1.pdf
@@ -186,11 +216,11 @@ class MDProvider(Provider):
         vasp_input_data = {
             "ISTART": 0,
             "ENCUT": str(cutoff) + " eV",
-            "EDIFF": 1e-6 * self.parameters.number_of_atoms *
-                     ase.units.Rydberg,
+            "EDIFF": 1e-6
+            * self.parameters.number_of_atoms
+            * ase.units.Rydberg,
             "ISMEAR": -1,
-            "SIGMA": round(kelvin_to_eV(
-                self.parameters.temperature), 7),
+            "SIGMA": round(kelvin_to_eV(self.parameters.temperature), 7),
             "ISYM": 0,
             "NBANDS": nbands,
             "LREAL": "A",
@@ -218,41 +248,42 @@ class MDProvider(Provider):
             # This enables the Nose Hoover thermostat, it is controlled by this
             # parameter
             "SMASS": self.parameters.md_thermostat_controller,
-
             # Time step in fs, we want 1 fs.
             "POTIM": self.parameters.time_step_fs,
-
             # TEBEG: Initial temperature.
             "TEBEG": self.parameters.temperature,
-
             # This surpresses large disk operations at the end of the run
             "LWAVE": ".FALSE.",
             "LCHARG": ".FALSE.",
             "LPLANE": ".FALSE.",
-
         }
 
         if self.parameters.dft_calculator == "qe":
             atoms_Angstrom = ase.io.read(posfile, format="vasp")
-            ase.io.write(os.path.join(base_path, self.parameters.element
-                                      + ".pw.md.in"),
-                         atoms_Angstrom,
-                         "espresso-in", input_data=qe_input_data,
-                         pseudopotentials= \
-                             qe_pseudopotentials, kpts=kgrid)
+            ase.io.write(
+                os.path.join(base_path, self.parameters.element + ".pw.md.in"),
+                atoms_Angstrom,
+                "espresso-in",
+                input_data=qe_input_data,
+                pseudopotentials=qe_pseudopotentials,
+                kpts=kgrid,
+            )
         elif self.parameters.dft_calculator == "vasp":
             atoms_Angstrom = ase.io.read(posfile, format="vasp")
-            ase.io.write(os.path.join(base_path, "POSCAR"), atoms_Angstrom,
-                         "vasp")
-            ase.io.write(os.path.join(base_path, "POSCAR_original"), atoms_Angstrom,
-                         "vasp")
+            ase.io.write(
+                os.path.join(base_path, "POSCAR"), atoms_Angstrom, "vasp"
+            )
+            ase.io.write(
+                os.path.join(base_path, "POSCAR_original"),
+                atoms_Angstrom,
+                "vasp",
+            )
             VaspUtils.write_to_incar(base_path, vasp_input_data)
             VaspUtils.write_to_kpoints(base_path, kgrid)
-            VaspUtils.write_to_potcar_copy(base_path,
-                                           os.path.join(
-                                               self.parameters.pseudopotential[
-                                                   "path"],
-                                               self.parameters.pseudopotential[
-                                                   "name"]))
-
-
+            VaspUtils.write_to_potcar_copy(
+                base_path,
+                os.path.join(
+                    self.parameters.pseudopotential["path"],
+                    self.parameters.pseudopotential["name"],
+                ),
+            )

@@ -1,4 +1,5 @@
 """Base class for all runners."""
+
 from abc import ABC, abstractmethod
 
 
