@@ -72,7 +72,6 @@ class SuperCellProvider(Provider):
                 self.supercell_file,
                 super_cell,
                 format="vasp",
-                long_format=True,
             )
         else:
             copyfile(self.external_supercell_file, self.supercell_file)
