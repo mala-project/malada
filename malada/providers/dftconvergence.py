@@ -277,7 +277,7 @@ class DFTConvergenceProvider(Provider):
             cpnode = SubElement(
                 calculationparameters, "element" + str(idx), {"type": "string"}
             )
-        cpnode.text = self.parameters.element
+            cpnode.text = element
         cpnode = SubElement(
             calculationparameters, "number_of_atoms", {"type": "int"}
         )
@@ -811,13 +811,13 @@ class DFTConvergenceProvider(Provider):
     def __k_edge_length_to_grid(self, edge_length, atoms_Angstrom):
         # TODO: Reflect geometry here.
         scaling_x = int(
-            np.ceil(
+            np.round(
                 atoms_Angstrom.cell.cellpar()[0]
                 / atoms_Angstrom.cell.cellpar()[2]
             )
         )
         scaling_y = int(
-            np.ceil(
+            np.round(
                 atoms_Angstrom.cell.cellpar()[1]
                 / atoms_Angstrom.cell.cellpar()[2]
             )
