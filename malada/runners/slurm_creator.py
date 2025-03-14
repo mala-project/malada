@@ -88,12 +88,7 @@ class SlurmCreatorRunner(Runner):
                 ldos_file = glob.glob(os.path.join(folder, "*.pp.ldos.in"))
                 dens_file = glob.glob(os.path.join(folder, "*.pp.dens.in"))
                 dos_file = glob.glob(os.path.join(folder, "*.dos.in"))
-                if (
-                    len(scf_file) != 1
-                    or len(ldos_file) != 1
-                    or len(dens_file) != 1
-                    or len(dos_file) != 1
-                ):
+                if len(scf_file) != 1:
                     print(scf_file, ldos_file, dens_file, dos_file, folder)
                     raise Exception("Run folder with ambigous content.")
                 submit_file.write(
@@ -120,30 +115,32 @@ class SlurmCreatorRunner(Runner):
                     + os.path.basename(dens_file[0])
                     + " \n"
                 )
-                submit_file.write(
-                    slurm_params.mpi_runner
-                    + " "
-                    + slurm_params.get_mpirunner_process_params()
-                    + " "
-                    + str(slurm_params.nodes * slurm_params.tasks_per_node)
-                    + " "
-                    + slurm_params.dos_executable
-                    + " -in "
-                    + os.path.basename(dos_file[0])
-                    + " \n"
-                )
-                submit_file.write(
-                    slurm_params.mpi_runner
-                    + " "
-                    + slurm_params.get_mpirunner_process_params()
-                    + " "
-                    + str(slurm_params.nodes * slurm_params.tasks_per_node)
-                    + " "
-                    + slurm_params.pp_executable
-                    + " -in "
-                    + os.path.basename(ldos_file[0])
-                    + " \n"
-                )
+                for _dos_file in sorted(dos_file):
+                    submit_file.write(
+                        slurm_params.mpi_runner
+                        + " "
+                        + slurm_params.get_mpirunner_process_params()
+                        + " "
+                        + str(slurm_params.nodes * slurm_params.tasks_per_node)
+                        + " "
+                        + slurm_params.dos_executable
+                        + " -in "
+                        + os.path.basename(_dos_file)
+                        + " \n"
+                    )
+                for _ldos_file in sorted(ldos_file):
+                    submit_file.write(
+                        slurm_params.mpi_runner
+                        + " "
+                        + slurm_params.get_mpirunner_process_params()
+                        + " "
+                        + str(slurm_params.nodes * slurm_params.tasks_per_node)
+                        + " "
+                        + slurm_params.pp_executable
+                        + " -in "
+                        + os.path.basename(_ldos_file)
+                        + " \n"
+                    )
             elif calculation_type == "md":
                 md_file = glob.glob(os.path.join(folder, "*.pw.md.in"))
                 if len(md_file) != 1:

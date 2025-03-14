@@ -44,9 +44,24 @@ class Provider:
             if (ignore_atom_number is False)
             else False
         )
+        element_list = (
+            [self.parameters.element]
+            if isinstance(self.parameters.element, str)
+            else self.parameters.element
+        )
+        element_string = ""
+        for element in element_list:
+            element_string += element
+
+        element_string_saved = ""
+        if isinstance(self.parameters.element, str):
+            element_string_saved = dftparams.find("element").text
+        else:
+            for element_type in range(0, len(self.parameters.element)):
+                element_string_saved += dftparams.find("element"+str(element_type)).text
 
         if (
-            dftparams.find("element").text != self.parameters.element
+                element_string != element_string_saved
             or dftparams.find("crystal_structure").text
             != self.parameters.crystal_structure
             or dftparams.find("dft_calculator").text

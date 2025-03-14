@@ -135,6 +135,15 @@ class DFTProvider(Provider):
         do_postprocessing,
         ignore_atom_number,
     ):
+        element_list = (
+            [self.parameters.element]
+            if isinstance(self.parameters.element, str)
+            else self.parameters.element
+        )
+        element_string = ""
+        for element in element_list:
+            element_string += element
+
         # Get cluster info
         # TODO: Use DFT kgrid for scf and LDOS kgrid for NSCF calculations.
         cutoff, kgrid = self._read_convergence(
@@ -147,9 +156,18 @@ class DFTProvider(Provider):
         if not os.path.exists(snapshot_path):
             os.makedirs(snapshot_path)
 
-        qe_pseudopotentials = {
-            self.parameters.element: self.parameters.pseudopotential["name"]
-        }
+        qe_pseudopotentials = {}
+        if isinstance(self.parameters.element, str):
+            qe_pseudopotentials = {
+                self.parameters.element: self.parameters.pseudopotential[
+                    "name"
+                ]
+            }
+        else:
+            for element in self.parameters.element:
+                qe_pseudopotentials[element] = self.parameters.pseudopotential[
+                    "name"
+                ][element]
         nbands = self._get_number_of_bands()
         outdir = "temp"
         if (
@@ -168,7 +186,7 @@ class DFTProvider(Provider):
             "calculation": "scf",
             "restart_mode": "from_scratch",
             "verbosity": "high",
-            "prefix": self.parameters.element,
+            "prefix": element_string,
             "pseudo_dir": self.parameters.pseudopotential["path"],
             "outdir": outdir,
             "ibrav": 0,
@@ -198,7 +216,7 @@ class DFTProvider(Provider):
         if self.parameters.dft_assume_two_dimensional:
             qe_input_data["assume_isolated"] = "2D"
 
-        id_string = self.parameters.element + "_" + snapshot_name
+        id_string = element_string + "_" + snapshot_name
         ase.io.write(
             os.path.join(snapshot_path, id_string + ".pw.scf.in"),
             atoms,
@@ -208,53 +226,95 @@ class DFTProvider(Provider):
             kpts=kgrid,
         )
 
-        emin = ldos_params["ldos_offset_eV"]
-        deltae = ldos_params["ldos_spacing_eV"]
-        emax = (
-            ldos_params["ldos_length"] * ldos_params["ldos_spacing_eV"]
-            + ldos_params["ldos_offset_eV"]
+        emin_list = []
+        deltae_list = []
+        emax_list = []
+        smearing_factor_list = []
+
+        number_of_splits = len(
+            [k for k, v in ldos_params.items() if "ldos_offset_eV" in k]
         )
-        smearing_factor = ldos_params["smearing_factor"]
+        for i in range(number_of_splits):
+            emin_list.append(ldos_params["ldos_offset_eV" + "_" + str(i)])
+            deltae_list.append(ldos_params["ldos_spacing_eV" + "_" + str(i)])
+            emax_list.append(
+                ldos_params["ldos_length" + "_" + str(i)]
+                * ldos_params["ldos_spacing_eV" + "_" + str(i)]
+                + ldos_params["ldos_offset_eV" + "_" + str(i)]
+            )
+            smearing_factor_list.append(
+                ldos_params["smearing_factor" + "_" + str(i)]
+            )
 
         if do_postprocessing:
-            # DOS file
-            dos_file = open(
-                os.path.join(snapshot_path, id_string + ".dos.in"), mode="w"
-            )
-            dos_file.write("&dos\n")
-            dos_file.write(" outdir='" + outdir + "',\n")
-            dos_file.write(" prefix='" + self.parameters.element + "',\n")
-            dos_file.write(" Emin=" + str(emin) + ",\n")
-            dos_file.write(" Emax=" + str(emax) + ",\n")
-            dos_file.write(" DeltaE=" + str(deltae) + ",\n")
-            dos_file.write(
-                " degauss=" + str(deltae * smearing_factor / Rydberg) + ",\n"
-            )
-            dos_file.write(" fildos='" + id_string + ".dos'\n")
-            dos_file.write("/\n")
+            for split in range(ldos_params["number_of_splits"]):
+                emin = ldos_params["ldos_offset_eV" + "_" + str(split)]
+                deltae = ldos_params["ldos_spacing_eV" + "_" + str(split)]
 
-            # LDOS file
-            ldos_file = open(
-                os.path.join(snapshot_path, id_string + ".pp.ldos.in"),
-                mode="w",
-            )
-            ldos_file.write("&inputpp\n")
-            ldos_file.write(" outdir='" + outdir + "',\n")
-            ldos_file.write(" prefix='" + self.parameters.element + "',\n")
-            ldos_file.write(" plot_num=3,\n")
-            ldos_file.write(" emin=" + str(emin) + ",\n")
-            ldos_file.write(" emax=" + str(emax) + ",\n")
-            ldos_file.write(" delta_e=" + str(deltae) + ",\n")
-            ldos_file.write(
-                " degauss_ldos=" + str(deltae * smearing_factor) + ",\n"
-            )
-            ldos_file.write(" use_gauss_ldos=.true.\n")
-            ldos_file.write("/\n")
-            ldos_file.write("&plot\n")
-            ldos_file.write(" iflag=3,\n")
-            ldos_file.write(" output_format=6,\n")
-            ldos_file.write(" fileout='" + id_string + "_ldos.cube',\n")
-            ldos_file.write("/\n")
+                emax = (
+                    ldos_params["ldos_length" + "_" + str(split)]
+                    * ldos_params["ldos_spacing_eV" + "_" + str(split)]
+                    + ldos_params["ldos_offset_eV" + "_" + str(split)]
+                )
+                smearing_factor = ldos_params[
+                    "smearing_factor" + "_" + str(split)
+                ]
+                # DOS file
+                dos_file = open(
+                    os.path.join(
+                        snapshot_path, id_string + "_" + str(split) + ".dos.in"
+                    ),
+                    mode="w",
+                )
+                dos_file.write("&dos\n")
+                dos_file.write(" outdir='" + outdir + "',\n")
+                dos_file.write(" prefix='" + element_string + "',\n")
+                dos_file.write(" Emin=" + str(emin) + ",\n")
+                dos_file.write(" Emax=" + str(emax) + ",\n")
+                dos_file.write(" DeltaE=" + str(deltae) + ",\n")
+                dos_file.write(
+                    " degauss="
+                    + str(deltae * smearing_factor / Rydberg)
+                    + ",\n"
+                )
+                dos_file.write(
+                    " fildos='" + id_string + "_" + str(split) + ".dos'\n"
+                )
+                dos_file.write("/\n")
+
+                # LDOS file
+                ldos_file = open(
+                    os.path.join(
+                        snapshot_path,
+                        id_string + "_" + str(split) + ".pp.ldos.in",
+                    ),
+                    mode="w",
+                )
+                ldos_file.write("&inputpp\n")
+                ldos_file.write(" outdir='" + outdir + "',\n")
+                ldos_file.write(" prefix='" + element_string + "',\n")
+                ldos_file.write(" plot_num=3,\n")
+                ldos_file.write(" emin=" + str(emin) + ",\n")
+                ldos_file.write(" emax=" + str(emax) + ",\n")
+                ldos_file.write(" delta_e=" + str(deltae) + ",\n")
+                ldos_file.write(
+                    " degauss_ldos=" + str(deltae * smearing_factor) + ",\n"
+                )
+                ldos_file.write(" use_gauss_ldos=.true.\n")
+                ldos_file.write("/\n")
+                ldos_file.write("&plot\n")
+                ldos_file.write(" iflag=3,\n")
+                ldos_file.write(" output_format=6,\n")
+                ldos_file.write(
+                    " fileout='"
+                    + id_string
+                    + "_"
+                    + str(split)
+                    + "_ldos.cube',\n"
+                )
+                ldos_file.write("/\n")
+                dos_file.close()
+                ldos_file.close()
 
             # Density file
             dens_file = open(
@@ -263,7 +323,7 @@ class DFTProvider(Provider):
             )
             dens_file.write("&inputpp\n")
             dens_file.write(" outdir='" + outdir + "',\n")
-            dens_file.write(" prefix='" + self.parameters.element + "',\n")
+            dens_file.write(" prefix='" + element_string + "',\n")
             dens_file.write(" plot_num=0,\n")
             dens_file.write("/\n")
             dens_file.write("&plot\n")
@@ -271,9 +331,6 @@ class DFTProvider(Provider):
             dens_file.write(" output_format=6,\n")
             dens_file.write(" fileout='" + id_string + "_dens.cube',\n")
             dens_file.write("/\n")
-
-            dos_file.close()
-            ldos_file.close()
             dens_file.close()
 
     def __read_ldos_convergence(self, filename, ignore_atom_number):
@@ -289,8 +346,26 @@ class DFTProvider(Provider):
             if (ignore_atom_number is False)
             else False
         )
+        element_list = (
+            [self.parameters.element]
+            if isinstance(self.parameters.element, str)
+            else self.parameters.element
+        )
+        element_string = ""
+        for element in element_list:
+            element_string += element
+
+        element_string_saved = ""
+        if isinstance(self.parameters.element, str):
+            element_string_saved = dftparams.find("element").text
+        else:
+            for element_type in range(0, len(self.parameters.element)):
+                element_string_saved += dftparams.find(
+                    "element" + str(element_type)
+                ).text
+
         if (
-            dftparams.find("element").text != self.parameters.element
+            element_string != element_string_saved
             or dftparams.find("crystal_structure").text
             != self.parameters.crystal_structure
             or dftparams.find("dft_calculator").text
@@ -300,16 +375,40 @@ class DFTProvider(Provider):
             or number_of_atoms_check
         ):
             raise Exception("Incompatible convergence parameters provided.")
-        ldos_params = {
-            "ldos_offset_eV": float(filecontents.find("ldos_offset_eV").text),
-            "ldos_spacing_eV": float(
-                filecontents.find("ldos_spacing_eV").text
-            ),
-            "ldos_length": int(filecontents.find("ldos_length").text),
-            "smearing_factor": float(
-                filecontents.find("smearing_factor").text
-            ),
-        }
+
+        if filecontents.find("number_of_ldos") is not None:
+            ldos_params = {
+                "number_of_splits": int(
+                    filecontents.find("number_of_ldos").text
+                )
+            }
+            for i in range(0, ldos_params["number_of_splits"]):
+                ldos_params["ldos_offset_eV" + "_" + str(i)] = float(
+                    filecontents.find("ldos_offset_eV" + "_" + str(i)).text
+                )
+                ldos_params["ldos_spacing_eV" + "_" + str(i)] = float(
+                    filecontents.find("ldos_spacing_eV" + "_" + str(i)).text
+                )
+                ldos_params["ldos_length" + "_" + str(i)] = int(
+                    filecontents.find("ldos_length" + "_" + str(i)).text
+                )
+                ldos_params["smearing_factor" + "_" + str(i)] = float(
+                    filecontents.find("smearing_factor" + "_" + str(i)).text
+                )
+        else:
+            ldos_params = {
+                "number_of_splits": 1,
+                "ldos_offset_eV_1": float(
+                    filecontents.find("ldos_offset_eV").text
+                ),
+                "ldos_spacing_eV_1": float(
+                    filecontents.find("ldos_spacing_eV").text
+                ),
+                "ldos_length_1": int(filecontents.find("ldos_length").text),
+                "smearing_factor_1": float(
+                    filecontents.find("smearing_factor").text
+                ),
+            }
         kpoints = filecontents.find("kpoints")
         kgrid = (
             int(kpoints.find("kx").text),
