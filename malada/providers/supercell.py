@@ -1,4 +1,5 @@
 """Provider for creation of supercell from crystal structure."""
+import re
 
 from .provider import Provider
 import os
@@ -59,9 +60,9 @@ class SuperCellProvider(Provider):
 
             transformation_matrix = self.get_transformation_matrix(cif_file)
 
-            super_cell = ase.build.make_supercell(
+            super_cell = ase.build.sort(ase.build.make_supercell(
                 primitive_cell, transformation_matrix
-            )
+            ))
             super_cell = self.get_compressed_cell(
                 super_cell,
                 stretch_factor=self.parameters.stretch_factor,
@@ -143,8 +144,9 @@ class SuperCellProvider(Provider):
     @staticmethod
     def get_mass_density(supercell, unit="g/(cm^3)"):
         nr_atoms = len(supercell)
-        mass_atom = supercell[0].mass
-        mass_atoms = nr_atoms * mass_atom
+        mass_atoms = 0
+        for atom in supercell:
+            mass_atoms += atom.mass
         volume_atoms = supercell.get_volume()
         mass_density = mass_atoms / volume_atoms
         u_angstrom3_in_kg_m3 = kg / (m * m * m)
@@ -262,6 +264,22 @@ class SuperCellProvider(Provider):
         with open(cif_file, "r") as file:
             for line in file:
                 if line.startswith("_cell_formula_units_Z"):
-                    return int(line.split()[-1])
-        # returns None if the line isn't found
+                    return int(line.split()[-1])*atoms_per_site
+                if line.startswith("_chemical_formula_structural"):
+                    line = "_chemical_formula_structural   VCrO3"
+                    elementstring = line.split()[1]
+                    element_beginnings = [m.start() for m in re.finditer(r'[A-Z]', elementstring)]
+                    atoms_per_site = 0
+                    for element_beginning in element_beginnings:
+                        if not elementstring[element_beginning+1].islower() and not elementstring[element_beginning+1].isdigit():
+                            atoms_per_site += 1
+                        if elementstring[element_beginning+1].islower():
+                            if elementstring[element_beginning+2].isdigit():
+                                atoms_per_site += int(elementstring[element_beginning+2])
+                            else:
+                                atoms_per_site += 1
+                        if elementstring[element_beginning+1].isdigit():
+                            atoms_per_site += int(elementstring[element_beginning+1])
+
+# returns None if the line isn't found
         return None
