@@ -42,8 +42,17 @@ class SuperCellProvider(Provider):
         cif_file : string
             Path to cif file used for supercell creation.
         """
+        element_list = (
+            [self.parameters.element]
+            if isinstance(self.parameters.element, str)
+            else self.parameters.element
+        )
+        element_string = ""
+        for element in element_list:
+            element_string += element
+
         file_name = (
-            self.parameters.element
+            element_string
             + "_"
             + str(self.parameters.number_of_atoms)
             + "_"

@@ -514,13 +514,29 @@ class DFTConvergenceProvider(Provider):
                 ase.io.write(this_folder + "POSCAR", atoms_Angstrom, "vasp")
                 VaspUtils.write_to_incar(this_folder, vasp_input_data)
                 VaspUtils.write_to_kpoints(this_folder, kpoints)
-                VaspUtils.write_to_potcar_copy(
-                    this_folder,
-                    os.path.join(
-                        self.parameters.pseudopotential["path"],
-                        self.parameters.pseudopotential["name"],
-                    ),
-                )
+
+                if isinstance(self.parameters.pseudopotential["path"], str):
+                    VaspUtils.write_to_potcar_copy(
+                        this_folder,
+                        os.path.join(
+                            self.parameters.pseudopotential["path"],
+                            self.parameters.pseudopotential["name"],
+                        ),
+                    )
+                elif isinstance(self.parameters.pseudopotential["path"], dict):
+                    psp_list = []
+                    for key in self.parameters.pseudopotential["path"].keys():
+                        psp_list.append(os.path.join(self.parameters.pseudopotential["path"][key],
+                                                     self.parameters.pseudopotential["name"][key]))
+                    VaspUtils.write_to_potcar_copy(
+                        this_folder,
+                        psp_list                    )
+                else:
+                    raise Exception("Incompatible pseudopotential "
+                                    "information, please provide either a "
+                                    "single name and path or a dictionary "
+                                    "for path and name (indexed by element).")
+
 
         return converge_folder_list
 

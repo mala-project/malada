@@ -69,5 +69,13 @@ class VaspUtils:
         """
         file_handle = open(os.path.join(folder, "potcar_copy.sh"), "w")
         file_handle.write("#!/bin/bash\n")
-        file_handle.write("cp " + pspstring + " POTCAR\n")
+        if isinstance(pspstring, str):
+            file_handle.write("cp " + pspstring + " POTCAR\n")
+        else:
+            file_handle.write(
+                "cat ~/pot/Al/POTCAR ~/pot/C/POTCAR ~/pot/H/POTCAR > POTCAR"
+            )
+            for entry in pspstring:
+                file_handle.write(entry)
+            file_handle.write(" > POTCAR \n")
         file_handle.close()
