@@ -85,8 +85,15 @@ class MDProvider(Provider):
             MD.
         """
         # Creating file for output.
+        element_string = ""
+        if isinstance(self.parameters.element, str):
+            element_string = self.parameters.element
+        else:
+            for element in self.parameters.element:
+                element_string += element + "_"
+
         file_name = (
-            self.parameters.element
+            element_string
             + str(self.parameters.number_of_atoms)
             + "_"
             + self.parameters.crystal_structure
@@ -154,15 +161,26 @@ class MDProvider(Provider):
             )
 
     def __create_md_run(self, dft_convergence_file, posfile, base_path):
+        if not os.path.isdir(base_path):
+            os.makedirs(base_path)
         cutoff, kgrid = self._read_convergence(dft_convergence_file)
         if self.parameters.md_at_gamma_point:
             kgrid = (1, 1, 1)
             if self.parameters.dft_calculator == "qe":
                 kgrid = None
 
-        qe_pseudopotentials = {
-            self.parameters.element: self.parameters.pseudopotential["name"]
-        }
+                qe_pseudopotentials = {}
+                if isinstance(self.parameters.element, str):
+                    qe_pseudopotentials = {
+                        self.parameters.element: self.parameters.pseudopotential[
+                            "name"
+                        ]
+                    }
+                else:
+                    for element in self.parameters.element:
+                        qe_pseudopotentials[element] = (
+                            self.parameters.pseudopotential["name"][element]
+                        )
         nbands = self._get_number_of_bands()
 
         qe_input_data = {
@@ -280,10 +298,24 @@ class MDProvider(Provider):
             )
             VaspUtils.write_to_incar(base_path, vasp_input_data)
             VaspUtils.write_to_kpoints(base_path, kgrid)
-            VaspUtils.write_to_potcar_copy(
-                base_path,
-                os.path.join(
-                    self.parameters.pseudopotential["path"],
-                    self.parameters.pseudopotential["name"],
-                ),
-            )
+            if isinstance(self.parameters.pseudopotential["path"], str):
+                VaspUtils.write_to_potcar_copy(
+                    base_path,
+                    os.path.join(
+                        self.parameters.pseudopotential["path"],
+                        self.parameters.pseudopotential["name"],
+                    ),
+                )
+            elif isinstance(self.parameters.pseudopotential["path"], dict):
+                psp_list = []
+                for key in self.parameters.pseudopotential["path"].keys():
+                    psp_list.append(os.path.join(self.parameters.pseudopotential["path"][key],
+                                                 self.parameters.pseudopotential["name"][key]))
+                VaspUtils.write_to_potcar_copy(
+                    base_path,
+                    psp_list                    )
+            else:
+                raise Exception("Incompatible pseudopotential "
+                                "information, please provide either a "
+                                "single name and path or a dictionary "
+                                "for path and name (indexed by element).")

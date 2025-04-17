@@ -73,9 +73,9 @@ class VaspUtils:
             file_handle.write("cp " + pspstring + " POTCAR\n")
         else:
             file_handle.write(
-                "cat ~/pot/Al/POTCAR ~/pot/C/POTCAR ~/pot/H/POTCAR > POTCAR"
+                "cat "
             )
             for entry in pspstring:
-                file_handle.write(entry)
+                file_handle.write(entry+" ")
             file_handle.write(" > POTCAR \n")
         file_handle.close()
