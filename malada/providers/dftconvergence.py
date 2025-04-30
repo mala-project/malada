@@ -525,18 +525,37 @@ class DFTConvergenceProvider(Provider):
                     )
                 elif isinstance(self.parameters.pseudopotential["path"], dict):
                     psp_list = []
-                    for key in self.parameters.pseudopotential["path"].keys():
-                        psp_list.append(os.path.join(self.parameters.pseudopotential["path"][key],
-                                                     self.parameters.pseudopotential["name"][key]))
-                    VaspUtils.write_to_potcar_copy(
-                        this_folder,
-                        psp_list                    )
-                else:
-                    raise Exception("Incompatible pseudopotential "
-                                    "information, please provide either a "
-                                    "single name and path or a dictionary "
-                                    "for path and name (indexed by element).")
 
+                    # The POTCAR paths have to be ordered just as they are in
+                    # the POSCAR, which is alphabetically.
+                    sorted_path = {
+                        key: value
+                        for key, value in sorted(
+                            self.parameters.pseudopotential["path"].items()
+                        )
+                    }
+                    sorted_name = {
+                        key: value
+                        for key, value in sorted(
+                            self.parameters.pseudopotential["name"].items()
+                        )
+                    }
+
+                    for key in sorted_path.keys():
+                        psp_list.append(
+                            os.path.join(
+                                sorted_path[key],
+                                sorted_name[key],
+                            )
+                        )
+                    VaspUtils.write_to_potcar_copy(this_folder, psp_list)
+                else:
+                    raise Exception(
+                        "Incompatible pseudopotential "
+                        "information, please provide either a "
+                        "single name and path or a dictionary "
+                        "for path and name (indexed by element)."
+                    )
 
         return converge_folder_list
 

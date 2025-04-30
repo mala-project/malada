@@ -55,8 +55,15 @@ class SnapshotsProvider(Provider):
         temperaturefile : string
             File containing the temperatures from the MD run as numpy array.
         """
+        element_string = ""
+        if isinstance(self.parameters.element, str):
+            element_string = self.parameters.element
+        else:
+            for element in self.parameters.element:
+                element_string += element + "_"
+
         file_name = (
-            self.parameters.element
+            element_string
             + str(self.parameters.number_of_atoms)
             + "_"
             + self.parameters.crystal_structure

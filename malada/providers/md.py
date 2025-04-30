@@ -164,6 +164,14 @@ class MDProvider(Provider):
         if not os.path.isdir(base_path):
             os.makedirs(base_path)
         cutoff, kgrid = self._read_convergence(dft_convergence_file)
+
+        element_string = ""
+        if isinstance(self.parameters.element, str):
+            element_string = self.parameters.element
+        else:
+            for element in self.parameters.element:
+                element_string += element + "_"
+
         if self.parameters.md_at_gamma_point:
             kgrid = (1, 1, 1)
             if self.parameters.dft_calculator == "qe":
@@ -187,7 +195,7 @@ class MDProvider(Provider):
             "occupations": "smearing",
             "calculation": "md",
             "restart_mode": "from_scratch",
-            "prefix": self.parameters.element,
+            "prefix": element_string,
             "pseudo_dir": self.parameters.pseudopotential["path"],
             "outdir": "temp",
             "ibrav": 0,
@@ -279,7 +287,7 @@ class MDProvider(Provider):
         if self.parameters.dft_calculator == "qe":
             atoms_Angstrom = ase.io.read(posfile, format="vasp")
             ase.io.write(
-                os.path.join(base_path, self.parameters.element + ".pw.md.in"),
+                os.path.join(base_path, element_string + ".pw.md.in"),
                 atoms_Angstrom,
                 "espresso-in",
                 input_data=qe_input_data,
