@@ -142,7 +142,10 @@ class SlurmParameters:
             The correct call parameter for this type of MPI runner.
 
         """
-        if self.mpi_runner == "mpiexec" or self.mpi_runner == "mpirun":
+        if "mpiexec" in self.mpi_runner or "mpirun" in self.mpi_runner:
             return "-np"
-        elif self.mpi_runner == "srun":
+        elif "srun" in self.mpi_runner:
             return "-n"
+        else:
+            # Fallback
+            return "-np"
